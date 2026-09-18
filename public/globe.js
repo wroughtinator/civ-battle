@@ -228,12 +228,18 @@ export class Globe {
    const point=(x,y,z)=>{const p=norm(add(add(up,mul(east,x)),mul(north,z)));return mul(p,ground(p,t.terrain===4?1:0)+y);};
    const prop=(name,x=0,z=0,scale=.065,angle=0,owner=-1)=>{this.loadStatic(name);const list=this.propInstances.get(name)||[];list.push([...point(x,.002,z),angle,scale,scale,scale,1,...(palette[owner]||[0,0,0])]);this.propInstances.set(name,list);};
    if(staticBuild&&(t.terrain===2||t.terrain===1)){
-    const count=t.terrain===2?9:2;
+    const forest=t.terrain===2,count=forest?9:2;
     for(let j=0;j<count;j++){
-     const angle=rnd(i,j,1)*Math.PI*2,r=.041+Math.sqrt(rnd(i,j,2))*.015,x=Math.cos(angle)*r,z=Math.sin(angle)*r,p=norm(add(add(up,mul(east,x)),mul(north,z)));
+     // A rotated, jittered spiral covers the tile instead of clumping trees on
+     // its rim. Broad overlapping crowns add density at the same mesh budget.
+     // Leave a small central clearing so units and settlements stay readable.
+     const angle=forest?rnd(i,0,8)*Math.PI*2+j*2.399963+(rnd(i,j,1)-.5)*.35:rnd(i,j,1)*Math.PI*2;
+     const r=forest?Math.sqrt(.022**2+(j+.3+rnd(i,j,2)*.4)/count*(.053**2-.022**2)):.041+Math.sqrt(rnd(i,j,2))*.015;
+     const x=Math.cos(angle)*r,z=Math.sin(angle)*r,p=norm(add(add(up,mul(east,x)),mul(north,z)));
      if(shoreDistance(p,shores)<.014)continue;
-     const h=.034+rnd(i,j,3)*.025,width=.90+rnd(i,j,4)*.60;
-     const instance=[...mul(p,surface(p,0)),rnd(i,j,5)*6.283,h*width,h,h*(.7+rnd(i,j,6)*.5),.85+rnd(i,j,7)*.25];this.treeInstances.push(instance);this.treeGroups.get(treeNames[(i+j)%3]).push(instance);
+     const h=forest?.040+rnd(i,j,3)*.018:.034+rnd(i,j,3)*.025,width=forest?1.65+rnd(i,j,4)*.40:.90+rnd(i,j,4)*.60;
+     const depth=forest?1.55+rnd(i,j,6)*.40:.7+rnd(i,j,6)*.5;
+     const instance=[...mul(p,surface(p,0)),rnd(i,j,5)*6.283,h*width,h,h*depth,(forest?.72:.85)+rnd(i,j,7)*.25];this.treeInstances.push(instance);this.treeGroups.get(treeNames[(i+j)%3]).push(instance);
     }
    }
    if(!this.preview&&s.visible&&s.owner>=0&&t.terrain===1&&!this.state.cities.some(c=>c.tile===i))prop('farm',0,0,.066,0,s.owner);
