@@ -1,0 +1,9 @@
+/target/
+/node_modules/
+/.wrangler/
+/worker/engine.wasm
+/public/engine.wasm
+/artifacts/
+.dev.vars
+.dev.vars.*
+.env*

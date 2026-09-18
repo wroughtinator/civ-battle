@@ -1,0 +1,3190 @@
+{
+  "calls": [
+    3446,
+    3445
+  ],
+  "games": [
+    {
+      "commands": [
+        98,
+        105,
+        111,
+        111,
+        110,
+        110,
+        110,
+        105
+      ],
+      "players": [
+        {
+          "launch": 408,
+          "provinces": 9,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 36,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 367,
+          "provinces": 38,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 245,
+          "provinces": 52,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 245,
+          "provinces": 56,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 397,
+          "provinces": 21,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 368,
+          "provinces": 29,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 336,
+          "provinces": 6,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        }
+      ],
+      "rotation": 0,
+      "seed": 91731,
+      "tick": 1324,
+      "victory": 2,
+      "winner_role": 1
+    },
+    {
+      "commands": [
+        99,
+        97,
+        108,
+        108,
+        108,
+        108,
+        108,
+        107
+      ],
+      "players": [
+        {
+          "launch": 280,
+          "provinces": 36,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 278,
+          "provinces": 21,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 211,
+          "provinces": 35,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 211,
+          "provinces": 55,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 393,
+          "provinces": 27,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 301,
+          "provinces": 21,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 314,
+          "provinces": 36,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 19,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "rotation": 1,
+      "seed": 91731,
+      "tick": 1290,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        92,
+        108,
+        108,
+        109,
+        109,
+        109,
+        109,
+        108
+      ],
+      "players": [
+        {
+          "launch": 292,
+          "provinces": 30,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 222,
+          "provinces": 12,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 222,
+          "provinces": 45,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 418,
+          "provinces": 43,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 237,
+          "provinces": 24,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 265,
+          "provinces": 33,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 22,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 282,
+          "provinces": 36,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            3
+          ]
+        }
+      ],
+      "rotation": 2,
+      "seed": 91731,
+      "tick": 1301,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        90,
+        108,
+        78,
+        110,
+        111,
+        111,
+        111,
+        108
+      ],
+      "players": [
+        {
+          "launch": 252,
+          "provinces": 48,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 252,
+          "provinces": 54,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 351,
+          "provinces": 40,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 391,
+          "provinces": 29,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 311,
+          "provinces": 4,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 381,
+          "provinces": 16,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 42,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 0,
+          "provinces": 0,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 3,
+      "seed": 91731,
+      "tick": 1331,
+      "victory": 2,
+      "winner_role": 1
+    },
+    {
+      "commands": [
+        93,
+        104,
+        108,
+        108,
+        107,
+        108,
+        108,
+        108
+      ],
+      "players": [
+        {
+          "launch": 214,
+          "provinces": 56,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 365,
+          "provinces": 6,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 30,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 328,
+          "provinces": 46,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 292,
+          "provinces": 10,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 405,
+          "provinces": 41,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 239,
+          "provinces": 23,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 214,
+          "provinces": 37,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        }
+      ],
+      "rotation": 4,
+      "seed": 91731,
+      "tick": 1293,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        93,
+        99,
+        103,
+        103,
+        103,
+        102,
+        103,
+        103
+      ],
+      "players": [
+        {
+          "launch": 412,
+          "provinces": 26,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 171,
+          "provinces": 17,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 228,
+          "provinces": 29,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 35,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 181,
+          "provinces": 40,
+          "role": 1,
+          "tech": [
+            1,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 198,
+          "provinces": 33,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 155,
+          "provinces": 37,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 155,
+          "provinces": 29,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        }
+      ],
+      "rotation": 5,
+      "seed": 91731,
+      "tick": 1234,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        87,
+        105,
+        109,
+        109,
+        109,
+        109,
+        109,
+        110
+      ],
+      "players": [
+        {
+          "launch": 313,
+          "provinces": 43,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 319,
+          "provinces": 16,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 355,
+          "provinces": 14,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 42,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 318,
+          "provinces": 7,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 231,
+          "provinces": 41,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 231,
+          "provinces": 61,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 297,
+          "provinces": 18,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 6,
+      "seed": 91731,
+      "tick": 1310,
+      "victory": 2,
+      "winner_role": 1
+    },
+    {
+      "commands": [
+        78,
+        105,
+        105,
+        105,
+        105,
+        105,
+        105,
+        104
+      ],
+      "players": [
+        {
+          "launch": 278,
+          "provinces": 26,
+          "role": 7,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 242,
+          "provinces": 10,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 41,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 222,
+          "provinces": 5,
+          "role": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 178,
+          "provinces": 32,
+          "role": 3,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 178,
+          "provinces": 56,
+          "role": 4,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 416,
+          "provinces": 46,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 307,
+          "provinces": 24,
+          "role": 6,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 7,
+      "seed": 91731,
+      "tick": 1257,
+      "victory": 2,
+      "winner_role": 1
+    },
+    {
+      "commands": [
+        89,
+        111,
+        110,
+        110,
+        110,
+        110,
+        94,
+        110
+      ],
+      "players": [
+        {
+          "launch": 413,
+          "provinces": 32,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 389,
+          "provinces": 44,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 243,
+          "provinces": 64,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 243,
+          "provinces": 51,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 321,
+          "provinces": 32,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 29,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 184,
+          "provinces": 0,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 375,
+          "provinces": 19,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 0,
+      "seed": 92464,
+      "tick": 1322,
+      "victory": 2,
+      "winner_role": 5
+    },
+    {
+      "commands": [
+        88,
+        111,
+        103,
+        111,
+        111,
+        111,
+        111,
+        111
+      ],
+      "players": [
+        {
+          "launch": 332,
+          "provinces": 38,
+          "role": 1,
+          "tech": [
+            2,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 255,
+          "provinces": 44,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 255,
+          "provinces": 50,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 392,
+          "provinces": 28,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 370,
+          "provinces": 35,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 403,
+          "provinces": 19,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 409,
+          "provinces": 27,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 14,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "rotation": 1,
+      "seed": 92464,
+      "tick": 1334,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        96,
+        102,
+        106,
+        101,
+        106,
+        106,
+        106,
+        106
+      ],
+      "players": [
+        {
+          "launch": 194,
+          "provinces": 43,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 194,
+          "provinces": 44,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 287,
+          "provinces": 19,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 294,
+          "provinces": 29,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 59,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 305,
+          "provinces": 19,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 241,
+          "provinces": 15,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 273,
+          "provinces": 39,
+          "role": 1,
+          "tech": [
+            1,
+            4,
+            4
+          ]
+        }
+      ],
+      "rotation": 2,
+      "seed": 92464,
+      "tick": 1273,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        95,
+        104,
+        109,
+        109,
+        109,
+        109,
+        109,
+        109
+      ],
+      "players": [
+        {
+          "launch": 230,
+          "provinces": 51,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 370,
+          "provinces": 33,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 332,
+          "provinces": 36,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 23,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 329,
+          "provinces": 38,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 322,
+          "provinces": 5,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 361,
+          "provinces": 32,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 230,
+          "provinces": 31,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        }
+      ],
+      "rotation": 3,
+      "seed": 92464,
+      "tick": 1309,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        104,
+        98,
+        107,
+        107,
+        106,
+        107,
+        107,
+        107
+      ],
+      "players": [
+        {
+          "launch": 256,
+          "provinces": 26,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 237,
+          "provinces": 29,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 307,
+          "provinces": 15,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 235,
+          "provinces": 18,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 48,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 287,
+          "provinces": 30,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 203,
+          "provinces": 36,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 203,
+          "provinces": 40,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        }
+      ],
+      "rotation": 4,
+      "seed": 92464,
+      "tick": 1282,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        76,
+        108,
+        108,
+        108,
+        108,
+        107,
+        108,
+        108
+      ],
+      "players": [
+        {
+          "launch": 309,
+          "provinces": 27,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 257,
+          "provinces": 41,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 335,
+          "provinces": 41,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 197,
+          "provinces": 0,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 49,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 215,
+          "provinces": 34,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 215,
+          "provinces": 51,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 355,
+          "provinces": 29,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 5,
+      "seed": 92464,
+      "tick": 1294,
+      "victory": 2,
+      "winner_role": 1
+    },
+    {
+      "commands": [
+        103,
+        110,
+        112,
+        112,
+        112,
+        112,
+        94,
+        113
+      ],
+      "players": [
+        {
+          "launch": 63,
+          "provinces": 0,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 328,
+          "provinces": 24,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 29,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 413,
+          "provinces": 34,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 267,
+          "provinces": 55,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 267,
+          "provinces": 58,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 355,
+          "provinces": 21,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 354,
+          "provinces": 33,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 6,
+      "seed": 92464,
+      "tick": 1346,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        86,
+        105,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106
+      ],
+      "players": [
+        {
+          "launch": 420,
+          "provinces": 32,
+          "role": 7,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 271,
+          "provinces": 25,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 295,
+          "provinces": 39,
+          "role": 1,
+          "tech": [
+            2,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 195,
+          "provinces": 26,
+          "role": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 195,
+          "provinces": 53,
+          "role": 3,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 415,
+          "provinces": 24,
+          "role": 4,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 269,
+          "provinces": 26,
+          "role": 5,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 252,
+          "provinces": 26,
+          "role": 6,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        }
+      ],
+      "rotation": 7,
+      "seed": 92464,
+      "tick": 1274,
+      "victory": 2,
+      "winner_role": 7
+    },
+    {
+      "commands": [
+        97,
+        102,
+        104,
+        104,
+        104,
+        104,
+        104,
+        97
+      ],
+      "players": [
+        {
+          "launch": 264,
+          "provinces": 16,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 275,
+          "provinces": 35,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 168,
+          "provinces": 54,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 260,
+          "provinces": 33,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 278,
+          "provinces": 30,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 237,
+          "provinces": 17,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 28,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 168,
+          "provinces": 1,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 0,
+      "seed": 93197,
+      "tick": 1247,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        93,
+        98,
+        104,
+        104,
+        104,
+        104,
+        104,
+        104
+      ],
+      "players": [
+        {
+          "launch": 420,
+          "provinces": 32,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 165,
+          "provinces": 42,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 296,
+          "provinces": 29,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 308,
+          "provinces": 43,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 248,
+          "provinces": 29,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 222,
+          "provinces": 21,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 178,
+          "provinces": 18,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 269,
+          "provinces": 16,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            3
+          ]
+        }
+      ],
+      "rotation": 1,
+      "seed": 93197,
+      "tick": 1244,
+      "victory": 2,
+      "winner_role": 1
+    },
+    {
+      "commands": [
+        99,
+        104,
+        96,
+        108,
+        108,
+        108,
+        108,
+        78
+      ],
+      "players": [
+        {
+          "launch": 215,
+          "provinces": 48,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 359,
+          "provinces": 22,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 249,
+          "provinces": 24,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 385,
+          "provinces": 44,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 260,
+          "provinces": 32,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 0,
+          "provinces": 0,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 37,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 296,
+          "provinces": 28,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "rotation": 2,
+      "seed": 93197,
+      "tick": 1294,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        91,
+        89,
+        104,
+        103,
+        104,
+        104,
+        104,
+        104
+      ],
+      "players": [
+        {
+          "launch": 213,
+          "provinces": 12,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 262,
+          "provinces": 14,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 302,
+          "provinces": 25,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 35,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 386,
+          "provinces": 35,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 392,
+          "provinces": 37,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 310,
+          "provinces": 24,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 167,
+          "provinces": 44,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        }
+      ],
+      "rotation": 3,
+      "seed": 93197,
+      "tick": 1246,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        109,
+        106,
+        108,
+        108,
+        108,
+        109,
+        109,
+        109
+      ],
+      "players": [
+        {
+          "launch": 222,
+          "provinces": 16,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 305,
+          "provinces": 35,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 28,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 331,
+          "provinces": 18,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 279,
+          "provinces": 31,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 237,
+          "provinces": 37,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 222,
+          "provinces": 66,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 233,
+          "provinces": 5,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 4,
+      "seed": 93197,
+      "tick": 1301,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        105,
+        108,
+        108,
+        108,
+        108,
+        74,
+        109,
+        109
+      ],
+      "players": [
+        {
+          "launch": 0,
+          "provinces": 0,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 221,
+          "provinces": 14,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 398,
+          "provinces": 40,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 45,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 378,
+          "provinces": 39,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 221,
+          "provinces": 42,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 386,
+          "provinces": 19,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 304,
+          "provinces": 34,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 5,
+      "seed": 93197,
+      "tick": 1300,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        93,
+        103,
+        91,
+        105,
+        105,
+        105,
+        105,
+        106
+      ],
+      "players": [
+        {
+          "launch": 420,
+          "provinces": 23,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 278,
+          "provinces": 27,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 374,
+          "provinces": 29,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 369,
+          "provinces": 38,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 183,
+          "provinces": 34,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 285,
+          "provinces": 26,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 318,
+          "provinces": 33,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 251,
+          "provinces": 22,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        }
+      ],
+      "rotation": 6,
+      "seed": 93197,
+      "tick": 1262,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        101,
+        102,
+        106,
+        106,
+        106,
+        100,
+        106,
+        93
+      ],
+      "players": [
+        {
+          "launch": 213,
+          "provinces": 6,
+          "role": 7,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 385,
+          "provinces": 38,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 32,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 195,
+          "provinces": 58,
+          "role": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "launch": 259,
+          "provinces": 37,
+          "role": 3,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 277,
+          "provinces": 40,
+          "role": 4,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 230,
+          "provinces": 0,
+          "role": 5,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 216,
+          "provinces": 24,
+          "role": 6,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 7,
+      "seed": 93197,
+      "tick": 1274,
+      "victory": 2,
+      "winner_role": 1
+    },
+    {
+      "commands": [
+        81,
+        101,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106
+      ],
+      "players": [
+        {
+          "launch": 420,
+          "provinces": 23,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 324,
+          "provinces": 23,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 334,
+          "provinces": 33,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 281,
+          "provinces": 39,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 259,
+          "provinces": 45,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 276,
+          "provinces": 20,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 261,
+          "provinces": 43,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 195,
+          "provinces": 21,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        }
+      ],
+      "rotation": 0,
+      "seed": 93930,
+      "tick": 1274,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        105,
+        96,
+        108,
+        108,
+        108,
+        108,
+        108,
+        107
+      ],
+      "players": [
+        {
+          "launch": 281,
+          "provinces": 18,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 253,
+          "provinces": 15,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 337,
+          "provinces": 40,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 287,
+          "provinces": 41,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 341,
+          "provinces": 36,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 312,
+          "provinces": 34,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 211,
+          "provinces": 57,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 39,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "rotation": 1,
+      "seed": 93930,
+      "tick": 1290,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        106,
+        102,
+        110,
+        111,
+        111,
+        110,
+        110,
+        110
+      ],
+      "players": [
+        {
+          "launch": 398,
+          "provinces": 27,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 336,
+          "provinces": 26,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 312,
+          "provinces": 14,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 334,
+          "provinces": 20,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 55,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 244,
+          "provinces": 57,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 403,
+          "provinces": 46,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 309,
+          "provinces": 17,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "rotation": 2,
+      "seed": 93930,
+      "tick": 1323,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        102,
+        97,
+        108,
+        107,
+        108,
+        108,
+        108,
+        108
+      ],
+      "players": [
+        {
+          "launch": 326,
+          "provinces": 42,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 339,
+          "provinces": 26,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 338,
+          "provinces": 30,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 43,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 215,
+          "provinces": 43,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 278,
+          "provinces": 43,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 343,
+          "provinces": 31,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 323,
+          "provinces": 18,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 3,
+      "seed": 93930,
+      "tick": 1294,
+      "victory": 2,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        108,
+        109,
+        109,
+        109,
+        109,
+        110,
+        110,
+        110
+      ],
+      "players": [
+        {
+          "launch": 360,
+          "provinces": 42,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 235,
+          "provinces": 17,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 302,
+          "provinces": 31,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 235,
+          "provinces": 62,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 46,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 312,
+          "provinces": 40,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 326,
+          "provinces": 20,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 292,
+          "provinces": 21,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 4,
+      "seed": 93930,
+      "tick": 1314,
+      "victory": 2,
+      "winner_role": 0
+    },
+    {
+      "commands": [
+        107,
+        107,
+        109,
+        109,
+        109,
+        109,
+        103,
+        109
+      ],
+      "players": [
+        {
+          "launch": 237,
+          "provinces": 9,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 252,
+          "provinces": 3,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 230,
+          "provinces": 62,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 372,
+          "provinces": 44,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 386,
+          "provinces": 46,
+          "role": 1,
+          "tech": [
+            3,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 18,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 348,
+          "provinces": 30,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 398,
+          "provinces": 37,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        }
+      ],
+      "rotation": 5,
+      "seed": 93930,
+      "tick": 1309,
+      "victory": 2,
+      "winner_role": 2
+    },
+    {
+      "commands": [
+        94,
+        107,
+        108,
+        107,
+        107,
+        107,
+        107,
+        108
+      ],
+      "players": [
+        {
+          "launch": 264,
+          "provinces": 27,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 210,
+          "provinces": 33,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 263,
+          "provinces": 21,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 320,
+          "provinces": 44,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 386,
+          "provinces": 37,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 34,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 293,
+          "provinces": 48,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 269,
+          "provinces": 17,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 6,
+      "seed": 93930,
+      "tick": 1289,
+      "victory": 2,
+      "winner_role": 3
+    },
+    {
+      "commands": [
+        96,
+        102,
+        108,
+        108,
+        108,
+        108,
+        108,
+        107
+      ],
+      "players": [
+        {
+          "launch": 215,
+          "provinces": 60,
+          "role": 7,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "launch": 417,
+          "provinces": 24,
+          "role": 0,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 263,
+          "provinces": 30,
+          "role": 1,
+          "tech": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "launch": 336,
+          "provinces": 27,
+          "role": 2,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 420,
+          "provinces": 38,
+          "role": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 398,
+          "provinces": 42,
+          "role": 4,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "launch": 334,
+          "provinces": 35,
+          "role": 5,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "launch": 256,
+          "provinces": 16,
+          "role": 6,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 7,
+      "seed": 93930,
+      "tick": 1294,
+      "victory": 2,
+      "winner_role": 3
+    }
+  ],
+  "max_nodes": [
+    10,
+    210
+  ],
+  "mean_plan_ms": [
+    2.093073128264655,
+    44.2849770682148
+  ],
+  "method": "Eight players: depth 1, depth 3, six of seven fixed style probes; identical 12-second action opportunities, identical resources and candidate/evaluation code; maps and seats rotated. Planning uses sanitized observations and estimated enemy state. Role 0=depth 1, role 1=depth 3, other roles=fixed policies. This is a finite empirical test, not a guarantee of superiority.",
+  "wins_shallow_deep_other": [
+    11,
+    7,
+    14
+  ]
+}

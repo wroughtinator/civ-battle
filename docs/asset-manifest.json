@@ -1,0 +1,131 @@
+{
+  "verified": "2026-09-17",
+  "assets": [
+    {
+      "file": "public/assets/archer.mesh",
+      "license": "CC0-1.0",
+      "bytes": 16992,
+      "sha256": "400bf5401f2bbe5dfbb69727ebdf2e48d681a606f4d6224f35521f8ceef862a2"
+    },
+    {
+      "file": "public/assets/artillery.mesh",
+      "license": "CC0-1.0",
+      "bytes": 10176,
+      "sha256": "f9711e66a7e0ada2aa1ced11a19c262ab67c9bab4f607447fce970e1795aec2b"
+    },
+    {
+      "file": "public/assets/audio/cues.json",
+      "bytes": 648,
+      "sha256": "7aa3667444bdf33b8a8049b6d0d29c8bd082f15e87fbbae8c9bc9c095df09a64",
+      "license": "99Sounds game-use license"
+    },
+    {
+      "file": "public/assets/audio/game-audio.mp3",
+      "bytes": 473084,
+      "sha256": "8cb633b97af8768bdbe537e8fddf868cb1327cc918fee2795212f6ff0398f068",
+      "license": "99Sounds game-use license"
+    },
+    {
+      "file": "public/assets/carrier.mesh",
+      "license": "CC0-1.0",
+      "bytes": 7392,
+      "sha256": "1861393423c034da7d41213bd559c30e23f96e410fc101542424ccc70940fff8"
+    },
+    {
+      "file": "public/assets/cavalry.mesh",
+      "license": "CC0-1.0",
+      "bytes": 17280,
+      "sha256": "12cfdc442dd00716a09c8fc5bee2d43c048b93f8132e4bac9c79f3f6903d42b8"
+    },
+    {
+      "file": "public/assets/drone.mesh",
+      "bytes": 9792,
+      "sha256": "15941b507b209d478e187db0e052810fcfd392270d71aea5b1f2baa53419eea7",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/engineer.mesh",
+      "license": "CC0-1.0",
+      "bytes": 12096,
+      "sha256": "cb4e47e30219ace9d64c88b584120f0344f6152ed0c7d36ad65f8f535139e6a5"
+    },
+    {
+      "file": "public/assets/fleet.mesh",
+      "bytes": 14976,
+      "sha256": "a122113041ff65da498a9031fd32b3c543a1838c84d2bf58634fae6c8ae420c4",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/guard.mesh",
+      "license": "CC0-1.0",
+      "bytes": 11328,
+      "sha256": "3af5c68bc989a5c614f23ae71247e30f052578fa03ca63d887610f9616c0f155"
+    },
+    {
+      "file": "public/assets/launcher.mesh",
+      "license": "CC0-1.0",
+      "bytes": 21408,
+      "sha256": "4261b22bf0c4c65eed3f5a0a7345a0e842692733eff0443dbb12bf408c7b1988"
+    },
+    {
+      "file": "public/assets/missile.mesh",
+      "bytes": 7296,
+      "sha256": "cd42ce9f60ab39bec42efb002894d3f3a4467baeab159a5ffb07d7fd88803f21",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/nuke.mesh",
+      "bytes": 7296,
+      "sha256": "2df0cc66584e5dd0d568cc0c455bc1d7c1e0fd1645ce3e321dce096ab402ae11",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/ocean-normal.png",
+      "bytes": 929899,
+      "sha256": "adc44dd8d95d138990369989cad79a067797e220e5ead4cc1de4da33cbf55cb0",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/ocean-roughness.png",
+      "bytes": 189653,
+      "sha256": "9d6cea00c368952a7029db526f5c8836175290dd95c1647de4b7ccffbcbf2282",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/recon.mesh",
+      "bytes": 29088,
+      "sha256": "aa28290ca0a700bc096a1322a02e574b37a9bd5245a69567e62ad620e4dc6dd6",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/satellite.mesh",
+      "bytes": 13728,
+      "sha256": "ae92cff53ae6cf8b50316ef6b43dda4eee92871db46a22c9442f203979ae7325",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/scout.mesh",
+      "license": "CC0-1.0",
+      "bytes": 10080,
+      "sha256": "3374e8e5674c2a49443c68605ad8a87ff5d5ea5680e9a0bdc1c6a9fe04f65f19"
+    },
+    {
+      "file": "public/assets/settler.mesh",
+      "license": "CC0-1.0",
+      "bytes": 19968,
+      "sha256": "1ebaa72953542ad114e3e8ce5aa9433d1b9b3081a115cf6269f2a0d398ccbfcb"
+    },
+    {
+      "file": "public/assets/submarine.mesh",
+      "bytes": 133152,
+      "sha256": "a7c55c7452ae0d6f5e6789c0c67d9f5022e63c1f4c1e4514c1a4d0dcc895ad5c",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/tank.mesh",
+      "bytes": 51456,
+      "sha256": "19269403c12d290e5ec030ec56440a1bd11a241192f00ace0f58e17d64566c77",
+      "license": "CC0-1.0"
+    }
+  ]
+}

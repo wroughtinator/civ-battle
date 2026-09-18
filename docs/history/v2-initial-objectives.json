@@ -1,0 +1,1070 @@
+{
+  "calls": [
+    679,
+    680
+  ],
+  "games": [
+    {
+      "commands": [
+        72,
+        77,
+        78,
+        78,
+        78,
+        78,
+        78,
+        62
+      ],
+      "players": [
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 389,
+          "provinces": 18,
+          "role": 0,
+          "sites": 1,
+          "tech": [
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 256,
+          "provinces": 22,
+          "role": 1,
+          "sites": 1,
+          "tech": [
+            2,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 246,
+          "provinces": 40,
+          "role": 2,
+          "sites": 1,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 416.2402038574219,
+          "launch": 0,
+          "mandate": 308,
+          "provinces": 55,
+          "role": 3,
+          "sites": 1,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 480,
+          "provinces": 36,
+          "role": 4,
+          "sites": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 338,
+          "provinces": 27,
+          "role": 5,
+          "sites": 1,
+          "tech": [
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 323,
+          "provinces": 21,
+          "role": 6,
+          "sites": 1,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 255.58958435058594,
+          "launch": 0,
+          "mandate": 174,
+          "provinces": 5,
+          "role": 7,
+          "sites": 0,
+          "tech": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "rotation": 0,
+      "seed": 100527,
+      "tick": 936,
+      "victory": 1,
+      "winner_role": 4
+    },
+    {
+      "commands": [
+        80,
+        74,
+        84,
+        84,
+        84,
+        83,
+        83,
+        83
+      ],
+      "players": [
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 369,
+          "provinces": 7,
+          "role": 1,
+          "sites": 0,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 512.0886840820312,
+          "launch": 34,
+          "mandate": 286,
+          "provinces": 33,
+          "role": 2,
+          "sites": 1,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 378.8204040527344,
+          "launch": 0,
+          "mandate": 271,
+          "provinces": 51,
+          "role": 3,
+          "sites": 1,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 493.9999084472656,
+          "launch": 0,
+          "mandate": 480,
+          "provinces": 38,
+          "role": 4,
+          "sites": 1,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 597.2201538085938,
+          "launch": 0,
+          "mandate": 295,
+          "provinces": 28,
+          "role": 5,
+          "sites": 1,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 421,
+          "provinces": 28,
+          "role": 6,
+          "sites": 3,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 167,
+          "provinces": 26,
+          "role": 7,
+          "sites": 0,
+          "tech": [
+            1,
+            3,
+            3
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 408,
+          "provinces": 11,
+          "role": 0,
+          "sites": 0,
+          "tech": [
+            3,
+            2,
+            2
+          ]
+        }
+      ],
+      "rotation": 1,
+      "seed": 100527,
+      "tick": 1000,
+      "victory": 1,
+      "winner_role": 4
+    },
+    {
+      "commands": [
+        77,
+        67,
+        104,
+        105,
+        105,
+        105,
+        105,
+        105
+      ],
+      "players": [
+        {
+          "capitals": 1,
+          "industry": 578.320068359375,
+          "launch": 60,
+          "mandate": 418,
+          "provinces": 29,
+          "role": 2,
+          "sites": 0,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 559.449951171875,
+          "launch": 0,
+          "mandate": 434,
+          "provinces": 54,
+          "role": 3,
+          "sites": 1,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 557.9902954101562,
+          "launch": 0,
+          "mandate": 451,
+          "provinces": 52,
+          "role": 4,
+          "sites": 0,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 422,
+          "provinces": 30,
+          "role": 5,
+          "sites": 0,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 563.4801635742188,
+          "launch": 11,
+          "mandate": 480,
+          "provinces": 21,
+          "role": 6,
+          "sites": 3,
+          "tech": [
+            4,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 558.2596435546875,
+          "launch": 0,
+          "mandate": 404,
+          "provinces": 16,
+          "role": 7,
+          "sites": 2,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 585.1101684570312,
+          "launch": 214,
+          "mandate": 372,
+          "provinces": 20,
+          "role": 0,
+          "sites": 1,
+          "tech": [
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 386,
+          "provinces": 2,
+          "role": 1,
+          "sites": 0,
+          "tech": [
+            1,
+            3,
+            2
+          ]
+        }
+      ],
+      "rotation": 2,
+      "seed": 100527,
+      "tick": 1256,
+      "victory": 1,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        90,
+        90,
+        94,
+        94,
+        95,
+        95,
+        95,
+        94
+      ],
+      "players": [
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 398,
+          "provinces": 39,
+          "role": 3,
+          "sites": 1,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 480,
+          "provinces": 18,
+          "role": 4,
+          "sites": 1,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "capitals": 3,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 421,
+          "provinces": 35,
+          "role": 5,
+          "sites": 0,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 393,
+          "provinces": 16,
+          "role": 6,
+          "sites": 2,
+          "tech": [
+            4,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 13,
+          "mandate": 354,
+          "provinces": 38,
+          "role": 7,
+          "sites": 1,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 347,
+          "provinces": 4,
+          "role": 0,
+          "sites": 0,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 216,
+          "provinces": 18,
+          "role": 1,
+          "sites": 0,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 517.481689453125,
+          "launch": 16,
+          "mandate": 429,
+          "provinces": 29,
+          "role": 2,
+          "sites": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        }
+      ],
+      "rotation": 3,
+      "seed": 100527,
+      "tick": 1132,
+      "victory": 1,
+      "winner_role": 4
+    },
+    {
+      "commands": [
+        75,
+        70,
+        79,
+        79,
+        78,
+        79,
+        79,
+        79
+      ],
+      "players": [
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 480,
+          "provinces": 40,
+          "role": 4,
+          "sites": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 597.9401245117188,
+          "launch": 0,
+          "mandate": 280,
+          "provinces": 37,
+          "role": 5,
+          "sites": 1,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 575.8900146484375,
+          "launch": 0,
+          "mandate": 262,
+          "provinces": 34,
+          "role": 6,
+          "sites": 1,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 347,
+          "provinces": 42,
+          "role": 7,
+          "sites": 2,
+          "tech": [
+            1,
+            3,
+            3
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 295,
+          "provinces": 27,
+          "role": 0,
+          "sites": 0,
+          "tech": [
+            2,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 540.0400390625,
+          "launch": 0,
+          "mandate": 238,
+          "provinces": 0,
+          "role": 1,
+          "sites": 0,
+          "tech": [
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 540.0,
+          "launch": 0,
+          "mandate": 297,
+          "provinces": 30,
+          "role": 2,
+          "sites": 0,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 460.899169921875,
+          "launch": 0,
+          "mandate": 357,
+          "provinces": 26,
+          "role": 3,
+          "sites": 2,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        }
+      ],
+      "rotation": 4,
+      "seed": 100527,
+      "tick": 944,
+      "victory": 1,
+      "winner_role": 4
+    },
+    {
+      "commands": [
+        69,
+        71,
+        71,
+        71,
+        71,
+        70,
+        71,
+        71
+      ],
+      "players": [
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 314,
+          "provinces": 22,
+          "role": 5,
+          "sites": 2,
+          "tech": [
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 353,
+          "provinces": 26,
+          "role": 6,
+          "sites": 1,
+          "tech": [
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 243,
+          "provinces": 35,
+          "role": 7,
+          "sites": 1,
+          "tech": [
+            1,
+            3,
+            3
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 260,
+          "provinces": 24,
+          "role": 0,
+          "sites": 1,
+          "tech": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 285.01904296875,
+          "launch": 0,
+          "mandate": 131,
+          "provinces": 10,
+          "role": 1,
+          "sites": 0,
+          "tech": [
+            1,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 274,
+          "provinces": 23,
+          "role": 2,
+          "sites": 0,
+          "tech": [
+            0,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 256.4700622558594,
+          "launch": 0,
+          "mandate": 178,
+          "provinces": 32,
+          "role": 3,
+          "sites": 0,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 480,
+          "provinces": 29,
+          "role": 4,
+          "sites": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        }
+      ],
+      "rotation": 5,
+      "seed": 100527,
+      "tick": 848,
+      "victory": 1,
+      "winner_role": 4
+    },
+    {
+      "commands": [
+        82,
+        84,
+        88,
+        88,
+        88,
+        88,
+        87,
+        88
+      ],
+      "players": [
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 480,
+          "provinces": 21,
+          "role": 6,
+          "sites": 1,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 315,
+          "provinces": 37,
+          "role": 7,
+          "sites": 0,
+          "tech": [
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 284,
+          "provinces": 26,
+          "role": 0,
+          "sites": 1,
+          "tech": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 228,
+          "provinces": 14,
+          "role": 1,
+          "sites": 1,
+          "tech": [
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 571.8495483398438,
+          "launch": 0,
+          "mandate": 312,
+          "provinces": 38,
+          "role": 2,
+          "sites": 0,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 291,
+          "provinces": 24,
+          "role": 3,
+          "sites": 0,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 476,
+          "provinces": 42,
+          "role": 4,
+          "sites": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "capitals": 0,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 454,
+          "provinces": 25,
+          "role": 5,
+          "sites": 2,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        }
+      ],
+      "rotation": 6,
+      "seed": 100527,
+      "tick": 1056,
+      "victory": 1,
+      "winner_role": 6
+    },
+    {
+      "commands": [
+        78,
+        81,
+        82,
+        82,
+        82,
+        82,
+        82,
+        81
+      ],
+      "players": [
+        {
+          "capitals": 0,
+          "industry": 483.0586853027344,
+          "launch": 0,
+          "mandate": 276,
+          "provinces": 4,
+          "role": 7,
+          "sites": 0,
+          "tech": [
+            1,
+            3,
+            3
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 298,
+          "provinces": 31,
+          "role": 0,
+          "sites": 0,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 296,
+          "provinces": 24,
+          "role": 1,
+          "sites": 0,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 600.0,
+          "launch": 0,
+          "mandate": 335,
+          "provinces": 47,
+          "role": 2,
+          "sites": 2,
+          "tech": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 272.0799255371094,
+          "launch": 0,
+          "mandate": 233,
+          "provinces": 34,
+          "role": 3,
+          "sites": 0,
+          "tech": [
+            0,
+            0,
+            2
+          ]
+        },
+        {
+          "capitals": 2,
+          "industry": 466.34954833984375,
+          "launch": 0,
+          "mandate": 413,
+          "provinces": 38,
+          "role": 4,
+          "sites": 2,
+          "tech": [
+            3,
+            1,
+            1
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 575.8300170898438,
+          "launch": 0,
+          "mandate": 336,
+          "provinces": 32,
+          "role": 5,
+          "sites": 1,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "capitals": 1,
+          "industry": 381.689697265625,
+          "launch": 0,
+          "mandate": 480,
+          "provinces": 27,
+          "role": 6,
+          "sites": 3,
+          "tech": [
+            3,
+            3,
+            2
+          ]
+        }
+      ],
+      "rotation": 7,
+      "seed": 100527,
+      "tick": 984,
+      "victory": 1,
+      "winner_role": 6
+    }
+  ],
+  "max_nodes": [
+    10,
+    210
+  ],
+  "mean_plan_ms": [
+    1.8067717231222387,
+    35.504229411764705
+  ],
+  "method": "Eight players: depth 1, depth 3, six of seven fixed style probes; identical 12-second action opportunities, identical resources and candidate/evaluation code; maps and seats rotated. Planning uses sanitized observations and estimated enemy state. Role 0=depth 1, role 1=depth 3, other roles=fixed policies. This is a finite empirical test, not a guarantee of superiority.",
+  "wins_shallow_deep_other": [
+    0,
+    0,
+    8
+  ]
+}

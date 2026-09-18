@@ -1,0 +1,57 @@
+[
+  {
+    "cue": "ocean",
+    "source": "08 - Water Sounds\\99Sounds Water Sounds\\WATRSurf_Continuous Water Surf 01_SLK_WATERSOUNDS.wav",
+    "duration": 16.0
+  },
+  {
+    "cue": "land",
+    "source": "07 - Nature Sounds\\99Sounds Nature Sounds\\Wind\\WINDVege-LR_Taiwan-Wind, Vegetation, Moving Grass, Reed, Birds, Daytime, Taipei, 01.wav",
+    "duration": 2.06353125
+  },
+  {
+    "cue": "rain",
+    "source": "48 - Rain And Thunder\\99Sounds Rain And Thunder\\Rain\\rain-window-01.wav",
+    "duration": 12.0
+  },
+  {
+    "cue": "click",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Short - Mini Popup.wav",
+    "duration": 0.28
+  },
+  {
+    "cue": "confirm",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Short - Digital Crystal.wav",
+    "duration": 1.0
+  },
+  {
+    "cue": "order",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Swish - Nice And Clean.wav",
+    "duration": 0.85
+  },
+  {
+    "cue": "impact",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Impact - Cease Fire.wav",
+    "duration": 3.48934375
+  },
+  {
+    "cue": "launch",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Whoosh - Mini Jet.wav",
+    "duration": 2.5
+  },
+  {
+    "cue": "nuclear",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Impact - Nuclear Winter.wav",
+    "duration": 5.0
+  },
+  {
+    "cue": "warning",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Short - Sad Little Sonar.wav",
+    "duration": 1.49996875
+  },
+  {
+    "cue": "engine",
+    "source": "02 - 99 Sound Effects\\99 Sound Effects\\WAV\\Short - Pneumatic Woodpecker.wav",
+    "duration": 1.2
+  }
+]

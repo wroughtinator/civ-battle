@@ -1,0 +1,13 @@
+{
+  "name": "meridian",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "wrangler dev --port 8793",
+    "deploy": "npm run build && wrangler deploy",
+    "test": "cargo test --release --lib --tests && node --test tests/*.test.mjs"
+  },
+  "devDependencies": { "wrangler": "4.134.0" }
+}
