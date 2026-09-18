@@ -17,10 +17,10 @@ fn research_plans_are_minimal_immediate_and_free_to_cancel() {
     assert_eq!(g.players[0].research,-1);
     g.players[0].gold=10000.;g.command(0,"plan",0,0,1).unwrap();
     assert_eq!(g.players[0].research,14);
-    assert_eq!(g.players[0].gold,9982.);
+    assert_eq!(g.players[0].gold,10000.-definition(g.players[0].research as u8).research_cost as f32);
     g.players[0].research_left=1;
     g.command(0,"plan",0,0,19).unwrap();
-    assert_eq!(g.players[0].research,19);assert_eq!(g.players[0].gold,9982.);
+    assert_eq!(g.players[0].research,19);assert_eq!(g.players[0].gold,10000.-definition(g.players[0].research as u8).research_cost as f32);
     assert!(g.players[0].research_queue.is_empty());
     g.command(0,"plan",0,0,255).unwrap();
     assert_eq!(g.players[0].research,-1);assert_eq!(g.players[0].research_left,0);
@@ -117,4 +117,20 @@ fn military_and_space_policies_make_distinct_research_choices_under_city_pressur
     let mut race=g.clone();g.bot_policy(0,1);race.bot_policy(0,6);
     assert!(g.players[0].research_queue.is_empty(),"military policy saves for an endangered city");
     assert_eq!(race.players[0].research_queue,vec![1,24,3],"space policy accepts the development risk");
+}
+
+#[test]
+fn military_policy_keeps_its_spending_choice_after_six_minutes(){
+    let mut g=world();g.tick=600;g.squads.clear();g.discoveries.clear();
+    g.cities.iter_mut().find(|c|c.owner==0).unwrap().production=3;
+    g.players[0].gold=100.;g.bot_policy(0,2);
+    assert!(g.players[0].research_queue.last().is_some_and(|k|[1,24,3,22].contains(k)));
+    g.players[0].research_queue.clear();g.players[0].unlocked.extend([1,24,3,22]);
+    g.tick+=ORDER_INTERVAL;
+    g.bot_policy(0,2);
+    assert!(g.players[0].research_queue.is_empty(),"finished cavalry composition must not buy the full space tree");
+    g.players[0].unlocked.retain(|&k|k!=3);
+    g.players[0].research_queue=vec![2,10];g.tick+=ORDER_INTERVAL;
+    g.bot_policy(0,2);
+    assert!(g.players[0].research_queue.is_empty(),"switching to military must cancel a pending space goal");
 }

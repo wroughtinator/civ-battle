@@ -132,6 +132,23 @@ export function summarize(events) {
   const weakPolicies=diversity.strategies.filter(s=>s.opponents===7&&s.mean_win_rate<0.4).map(s=>s.name);
   if(weakPolicies.length)warnings.push(`Underperforming tested policies (below 40% opponent-weighted wins): ${weakPolicies.join(', ')}. The diversity gate needs several viable policies; it does not mean every playstyle is competitive.`);
   const spaceShare=all.length?(wins.space??0)/all.length:null;
+  // Keep experimental populations separate: their timing-dependent mixture is
+  // not an estimate of the route distribution in ordinary human games.
+  const routeCounts=matches=>{
+    const space=matches.filter(m=>m.victory==='space').length;
+    const conquest=matches.filter(m=>m.victory==='elimination'||m.victory==='conquest').length;
+    const total=space+conquest;
+    return {games:matches.length,space,conquest,other:matches.length-total,
+      space_share:total?space/total:null,
+      distance_from_even_percentage_points:total?Math.abs(space/total-.5)*100:null};
+  };
+  const victoryBalance={target_space_share:0.5,cohorts:{
+    active_strategy:routeCounts(meta.filter(e=>e.a!=='idle'&&e.b!=='idle').flatMap(e=>e.matches)),
+    eight_player_full_rotations:routeCounts(balanced),
+    idle_control:routeCounts(meta.filter(e=>e.a==='idle'||e.b==='idle').flatMap(e=>e.matches)),
+    ...Object.fromEntries(['compute','apm_frequency','apm_repeat','apm_thinking'].map(phase=>
+      [phase,routeCounts(pairs.filter(e=>e.phase===phase).flatMap(e=>e.matches))]))
+  }};
   if(spaceShare>=0.8)warnings.push(`${pct(spaceShare)} of counted victories are space launches. Military pressure may be feeding a space race rather than supporting an independent conquest route; inspect captures and the multiplayer endings.`);
   const pacing={};
   for(const group of ['two_player','eight_player']) {
@@ -168,7 +185,7 @@ export function summarize(events) {
     input_restraint:inputRestraint.verdict,completion:completion.verdict};
   const verdict=Object.values(gates).includes('FAIL')?'FAIL':Object.values(gates).every(g=>g==='PASS')?'PASS':'INCONCLUSIVE';
   return {schema_version:3,name:'Meridian Strategy Audit',verdict,certificate_scope:'Operational tests of this policy portfolio, sampled maps, horizons and input rates; not a proof of strategic depth or distinct human metas.',
-    config,gates,compute,completion,pacing,unrecruited_unit_types:unused,underperforming_policies:weakPolicies,space_victory_share:spaceShare,input_restraint:inputRestraint,diversity,decisions,multiplayer,negative_control:{pairs:control.length,idle_win_rate:idleRate},
+    config,gates,compute,completion,pacing,victory_balance:victoryBalance,unrecruited_unit_types:unused,underperforming_policies:weakPolicies,space_victory_share:spaceShare,input_restraint:inputRestraint,diversity,decisions,multiplayer,negative_control:{pairs:control.length,idle_win_rate:idleRate},
     observations:{completed_matches:all.length,excluded_incomplete_pairs:partialPairs,victory_counts:wins,
       average_captures:mean(all.map(m=>m.captures)),average_founded_cities:mean(all.map(m=>m.cities_founded)),
       orders,train_orders:trains,invalid_orders:invalid},warnings,
@@ -185,7 +202,7 @@ export function markdown(r) {
     '| Higher vs lower compute | Complete seed pairs | Higher win rate | 95% interval | Verdict |',
     '|---|---:|---:|---|---|',...r.compute.map(c=>`| ${c.high} vs ${c.low} | ${c.pairs} | ${pct(c.high_win_rate)} | ${c.interval95.map(pct).join(' – ')} | ${c.verdict} |`),'',
     '## Input frequency and spam penalty','',
-    `The engine permits at most one normal order every ${r.config.order_interval??2} seconds (${(60/(r.config.order_interval??2)).toFixed(1)} opportunities/minute). The experiment still compares attempts every 2 versus 8 seconds; engine cooldowns reject premature attempts. Actual successful orders/minute are measured below; these are not mouse clicks. Search rollouts respect the experimental order intervals. Repeated-command bots think every 8 seconds and blindly retry their last successful command at intervening 2-second opportunities.`,'',
+    `${r.config.order_interval===0?'The engine has no shared order cooldown; unit commitments still apply.':`The engine permits at most one normal order every ${r.config.order_interval??2} seconds (${(60/(r.config.order_interval??2)).toFixed(1)} opportunities/minute).`} The experiment compares attempts every 2 versus 8 seconds. Actual successful orders/minute are measured below; these are not mouse clicks. Search rollouts respect the experimental order intervals. Repeated-command bots think every 8 seconds and blindly retry their last successful command at intervening 2-second opportunities.`,'',
     '| Test (fast side first) | Seed pairs | Fast win rate | 95% interval | Excess over 50% | Actual APM, fast / slow | Verdict |',
     '|---|---:|---:|---|---:|---|---|',
     ...r.input_restraint.tests.map(t=>`| ${t.label} | ${t.pairs} | ${pct(t.fast_win_rate)} | ${t.interval95.map(pct).join(' – ')} | ${t.excess_fast_win_percentage_points?.toFixed(1)??'n/a'} pp | ${t.fast_actual_apm?.toFixed(1)??'n/a'} / ${t.slow_actual_apm?.toFixed(1)??'n/a'} | ${t.verdict} |`),'',
@@ -203,6 +220,10 @@ export function markdown(r) {
     '| Position | Immediate best → later best | Later value spread | Delayed gain | Real state consequence | More compute replay gain |',
     '|---|---|---:|---:|---|---:|',...r.decisions.probes.map(p=>`| ${p.snapshot} (${p.seed}:${p.tick}) | ${p.immediate_best} → ${p.later_best} | ${p.spread.toFixed(3)} | ${p.delayed_gain.toFixed(3)} | ${p.tangible_consequence} | ${p.high_minus_low_replay_value.toFixed(3)} |`),'',
     '## Outcomes and collapse warnings','',
+    'Victory-route target: 50% space / 50% conquest. Descriptive counts, not a certificate or a forecast of human outcomes. Compare identical completed seeds; do not tune against the timing-dependent pooled percentage. Stalls never count as either route.','',
+    '| Cohort | Space | Conquest | Other | Space share | Distance from 50/50 (pp) |',
+    '|---|---:|---:|---:|---:|---:|',
+    ...Object.entries(r.victory_balance?.cohorts??{}).map(([name,c])=>`| ${name} | ${c.space} | ${c.conquest} | ${c.other} | ${pct(c.space_share)} | ${c.distance_from_even_percentage_points?.toFixed(1)??'n/a'} |`),'',
     ...Object.entries(r.pacing??{}).map(([group,t])=>`${group.replaceAll('_',' ')}: ${t.completed_games} completed games, mean ${t.mean_seconds==null?'n/a':(t.mean_seconds/60).toFixed(1)} minutes, median ${t.median_seconds==null?'n/a':(t.median_seconds/60).toFixed(1)}, 80th percentile ${t.p80_seconds==null?'n/a':(t.p80_seconds/60).toFixed(1)}; ${pct(t.completed_by_15_minutes)} of completions within 15 minutes; ${t.space_wins} space victories. Capped games are excluded from duration averages and remain failures in the completion gate.`),
     `Counted ${r.observations.completed_matches} completed matches; excluded ${r.observations.excluded_incomplete_pairs} incomplete pairs.`,
     `Diagnostic tick-cap stalls: ${r.completion.tick_capped_games}/${r.completion.games} resolved experiments. Runtime cutoffs remain separate.`,
