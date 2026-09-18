@@ -27,12 +27,25 @@ test('everyone retains victory until returning; rematch resets once and waits fo
 });
 test('leaving frees a lobby seat, transfers host, revokes old socket and token',async()=>{
  const {room,sockets,send}=fixture();room.room.phase='lobby';
- assert.equal((await send(0,'leave')).error,0);assert.equal(room.view(1).host,true);assert.equal(room.view(1).humans,2);assert.equal(room.seatFor('hash0'),-1);
+ assert.equal((await send(0,'leave')).error,0);const host=room.hostSlot();assert.ok([1,2].includes(host));assert.equal(room.view(host).host,true);assert.equal(room.view(1).humans,2);assert.equal(room.seatFor('hash0'),-1);
  const response=await room.handleFetch(new Request('https://example.test/api/rooms/abc/join',{method:'POST',body:'{}'}));const joined=await response.json();assert.equal(joined.slot,0);
- assert.equal(room.view(0).result,null);
+ assert.equal(room.view(0).result,null);assert.equal(room.hostSlot(),host);
+ const restored=new room.constructor(room.ctx,{}, {room:JSON.parse(JSON.stringify(room.room))});assert.equal(restored.hostSlot(),host);
+ assert.equal((await send(host,'configure',{difficulty:2})).error,0);assert.equal((await send(3-host,'start')).error,1);assert.equal((await send(host,'start')).error,0);
  await room.webSocketMessage(sockets[0],JSON.stringify({type:'presence',active:true}));assert.equal(room.room.game.players[0].bot,true);
  await room.webSocketClose(sockets[0],1000);assert.equal(room.room.seats[0].seq,0);
 });
 test('running game leave uses AI and return is rejected before victory',async()=>{
  const {room,send}=fixture();assert.equal((await send(1,'lobby')).error,1);assert.equal((await send(1,'leave')).error,0);assert.equal(room.room.game.players[1].bot,true);assert.equal(room.room.phase,'running');
+});
+
+test('closing the host connection transfers a lobby to a connected player',async()=>{
+ const {room,sockets,send}=fixture();room.room.phase='lobby';
+ sockets[0].readyState=3;await room.webSocketClose(sockets[0],1000);
+ const host=room.hostSlot();assert.ok([1,2].includes(host));
+ assert.equal(room.view(host).host,true);
+ // Returning to the old seat must not take ownership back.
+ room.room.seats[0].disconnectedAt=0;assert.equal(room.hostSlot(),host);
+ assert.equal((await send(host,'configure',{difficulty:2})).error,0);
+ assert.equal((await send(host,'start')).error,0);
 });
