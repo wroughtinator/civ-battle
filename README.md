@@ -6,8 +6,8 @@ Two to eight players on a full-size procedural WebGL2 globe, with an authoritati
 
 ## Current game: discrete pieces
 
-- One unit per hex. Tap a unit, choose the first action (movement), then tap a destination to start its weighted hex route. Map taps without an armed action inspect the city or unit. Moving never implicitly attacks.
-- Select the crossed swords to show attack range, then tap a hex to fire immediately, without confirmation. Every attack fires once. Attacks and abilities commit the piece through windup and recovery; movement queued during that time waits. The hand stops its plan. The bin immediately disbands it, returning 25% of its cost only in friendly territory.
+- One unit per hex. Tap a unit, choose the first action (movement), then tap a destination to start its weighted hex route. Map taps without an armed action inspect the city or unit. Each step instantly changes the occupied hex and uses a short visual glide for every visible unit, including enemies. Speed controls the cooldown between steps. Land units cannot enter water. Moving never implicitly attacks.
+- Select the crossed swords to show attack range, then tap a hex to fire immediately, without confirmation. Every attack fires once. Attacks and abilities commit the piece through windup and recovery; movement queued during that time waits. The highlighted hand clears the remaining path immediately, including during shared order recovery, while preserving the last step’s cooldown. The bin immediately disbands it, returning 25% of its cost only in friendly territory.
 - Guard, scout and fragile settler are available initially. A settler must reach a viable site at least four hexes from another city, pay the founding cost, and work for 45 seconds. Completing the city consumes that settler. Occupy an enemy city center for 12 seconds to capture it; commandos take six. There is no population army or abstract garrison.
 - Losing every city permanently eliminates a player, removes remaining units and foundations, and opens read-only full-map spectating. The last surviving civilization wins immediately.
 - The book opens a searchable manual for every icon. Its picker explains any visible icon, including why a disabled action cannot execute, without activating it. Arrows and other projectiles, impact flashes and floating health loss follow server-issued, visibility-filtered events.
@@ -32,3 +32,7 @@ Use Node and Rust with `wasm32-unknown-unknown`. `npm ci`, `npm run build`, `npm
 Current rules are in `engine/src/tactics.rs` and `engine/src/tactics/`. Earlier engines remain available only for old running matches. `worker/index.js` handles admission, names, credentials, sequence replay, presence, snapshots and SQLite persistence. `public` contains custom WebGL2 rendering, icon controls and Web Audio. `docs/ASSETS.md` and `docs/asset-manifest.json` preserve asset provenance.
 
 The graphics are stylized procedural 3D. Tests establish specific invariants and compare selected policies; they do not prove chess-level depth, universal dominance of a stronger bot, or that all cheating is impossible. Physical-device performance and prolonged real-player balance testing remain useful follow-up work.
+
+## License
+
+The source code is licensed under the [MIT License](LICENSE). Visual assets retain their existing CC0 dedication. The bundled 99Sounds audio is separately licensed and is not covered by MIT; it must not be redistributed as a standalone sound library. See [asset provenance and license details](docs/ASSETS.md).

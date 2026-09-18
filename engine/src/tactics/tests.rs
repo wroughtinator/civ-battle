@@ -793,3 +793,21 @@ fn land_cannot_enter_water_even_with_an_injected_route() {
     assert!(g.can_enter(6,b));
     assert!(g.can_enter(7,b));
 }
+
+#[test]
+fn a_single_step_snaps_immediately_and_keeps_its_full_final_cooldown() {
+    let (mut g, a, b) = arena();
+    g.squads.truncate(1);
+    let id = g.squads[0].id;
+    let cost = g.move_cost(&g.squads[0], b);
+    g.command(0, "move", id, b, 0).unwrap();
+    assert_eq!(g.squads[0].tile, b);
+    assert!(g.occupant(a).is_none());
+    assert_eq!(g.squads[0].path, vec![b]);
+    assert_eq!(g.squads[0].left, cost);
+    g.step(cost as u32 - 1);
+    assert_eq!(g.squads[0].left, 1);
+    g.step(1);
+    assert_eq!(g.squads[0].left, 0);
+    assert_eq!(g.squads[0].tile, b);
+}
