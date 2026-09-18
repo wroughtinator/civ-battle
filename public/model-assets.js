@@ -60,9 +60,9 @@ export class RiggedMesh {
 }
 
 export class Woodland {
- constructor(gl,buffer,texture,sway=true){
+ constructor(gl,buffer,texture,sway=true,tilt=false){
   if(buffer.byteLength%60)throw Error('Invalid instanced mesh');
-  this.gl=gl;this.texture=texture;this.count=buffer.byteLength/20;this.instances=[];this.sway=sway;
+  this.gl=gl;this.texture=texture;this.count=buffer.byteLength/20;this.instances=[];this.sway=sway;this.tilt=tilt;
   this.vao=gl.createVertexArray();this.buffer=gl.createBuffer();this.instanceBuffer=gl.createBuffer();gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,buffer,gl.STATIC_DRAW);
   for(const [loc,size,type,offset] of [[0,3,gl.SHORT,0],[1,3,gl.SHORT,6],[6,2,gl.UNSIGNED_SHORT,16]]){gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,size,type,true,20,offset);}
   gl.bindBuffer(gl.ARRAY_BUFFER,this.instanceBuffer);
@@ -77,7 +77,7 @@ export class Woodland {
    visible.push(...instance.slice(0,8),...(instance.length===11?instance.slice(8,11):[0,0,0]));
   }
   if(!visible.length)return;
-  g.uniform1f(globe.u.foliage,this.sway?1:2);g.activeTexture(g.TEXTURE3);g.bindTexture(g.TEXTURE_2D,this.texture);g.uniform1i(globe.u.treeTexture,3);
+  g.uniform1f(globe.u.foliage,this.sway?1:this.tilt?3:2);g.activeTexture(g.TEXTURE3);g.bindTexture(g.TEXTURE_2D,this.texture);g.uniform1i(globe.u.treeTexture,3);
   g.bindVertexArray(this.vao);g.bindBuffer(g.ARRAY_BUFFER,this.instanceBuffer);g.bufferData(g.ARRAY_BUFFER,new Float32Array(visible),g.DYNAMIC_DRAW);g.vertexAttrib3f(2,1,1,1);g.vertexAttrib3f(3,1,4,0);g.drawArraysInstanced(g.TRIANGLES,0,this.count,visible.length/11);g.uniform1f(globe.u.foliage,0);
  }
 }

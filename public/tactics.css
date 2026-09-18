@@ -93,3 +93,7 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 #navigation,#top-actions{pointer-events:auto}
 
 .lobby-title{grid-column:1/-1;font-size:25px;font-weight:400;margin:0 0 16px;color:var(--cream)}.player-color{display:inline-block;width:8px;height:8px;min-width:8px;border-radius:50%;background:var(--seat,var(--faction));box-shadow:0 0 8px color-mix(in srgb,var(--seat,var(--faction)) 30%,transparent)}.seat small{color:var(--seat)}#lobby .seat{gap:8px}
+
+.damage-number{text-shadow:none;-webkit-text-stroke:3px var(--player-outline);paint-order:stroke fill}
+.pickup-reward{font:bold 28px system-ui,sans-serif;white-space:nowrap}
+.pickup-reward .icon:first-child{width:30px;height:30px;color:#ffd36e}

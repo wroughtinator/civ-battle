@@ -30,7 +30,7 @@ void main(){
   float dx=(1.-edge.a)*8.,d=length(vec2(dx,float(y)));
   if(d<best&&texelFetch(depthTexture,q,0).r<=depth+.000001){best=d;color=edge.rgb;}
  }
- float coverage=1.-smoothstep(radius-.75,radius+.75,best);
+ float coverage=.4*(1.-smoothstep(radius-.75,radius+.75,best));
  outColor=vec4(mix(scene.rgb,color,coverage),max(scene.a,coverage));
 }`;
 
