@@ -76,6 +76,7 @@ const paths = {
 };
 export const iconNames=Object.keys(paths);
 export const icon = (name, cls='') => `<svg data-icon="${Object.hasOwn(paths,name)?name:'globe'}" class="icon ${cls}" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.globe}</svg>`;
-export const colors=['#e6b85b','#ef806d','#65c5c7','#b2a0ef','#8bbb7b','#e8a6ce','#87b5ea','#d7d3bc','#c87652'];
+// Eight separated player hues shared by map and UI; gray is reserved for neutrals.
+export const colors=['#f2b83d','#f23d3d','#3df2f2','#973df2','#97f23d','#f23dc4','#3d6af2','#3df26a','#b6bdc7'];
 export const buildings=['city','wheat','coin','temple','fort','sail','rocket','factory'];
 export const techs=[['swords','gear','cannon','logistics'],['scroll','telescope','factory','rocket'],['wheat','sail','coin','heart']];

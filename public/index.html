@@ -14,8 +14,21 @@
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="https://meridian-globe.camerons-nonsense.workers.dev/assets/globe-share.jpg">
 <meta name="twitter:image:alt" content="A globe with oceans, mountains and clouds">
-<title>Meridian</title><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/tactics.css"></head>
-<body>
+<title>Meridian</title><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/tactics.css"><style>
+#loading-screen{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#18383d 0%,#09171d 65%);color:#eee9d9;font-family:system-ui,sans-serif;opacity:1;transition:opacity .45s ease;touch-action:none}
+#loading-screen.leaving{opacity:0}.loading-content{width:min(340px,calc(100vw - 64px));text-align:center}.loading-emblem{width:76px;height:76px;color:#e6b85b;margin-bottom:28px;filter:drop-shadow(0 0 22px #e6b85b25)}#loading-title{font-size:22px;font-weight:500;letter-spacing:.02em;margin:0 0 28px}#loading-progress{display:block;width:100%;height:5px;border:0;border-radius:10px;overflow:hidden;background:#ffffff16;accent-color:#e6b85b}#loading-progress::-webkit-progress-bar{background:#ffffff16}#loading-progress::-webkit-progress-value{background:#e6b85b;transition:width .2s}#loading-progress::-moz-progress-bar{background:#e6b85b}.loading-meta{display:flex;justify-content:space-between;gap:12px;margin-top:14px;font-size:12px;color:#a1b6b7}#loading-percent{font-variant-numeric:tabular-nums;color:#e6b85b}#loading-retry{margin:24px auto 0;padding:12px 24px;border:1px solid #e6b85b;border-radius:6px;background:transparent;color:#e6b85b;font:inherit;cursor:pointer}#loading-retry[hidden]{display:none}@media(prefers-reduced-motion:reduce){#loading-screen,#loading-progress::-webkit-progress-value{transition:none}}
+</style></head>
+<body aria-busy="true">
+ <section id="loading-screen" aria-label="Game loading">
+  <div class="loading-content">
+   <svg class="loading-emblem" viewBox="0 0 60 60" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="30" cy="30" r="23"/><ellipse cx="30" cy="30" rx="11" ry="23"/><path d="M7 30h46M11 17h38M11 43h38"/></svg>
+   <h1 id="loading-title" role="status">Downloading game…</h1>
+   <progress id="loading-progress" max="100" value="0" aria-label="Estimated game download progress"></progress>
+   <div class="loading-meta"><span id="loading-detail">Estimating time remaining…</span><span id="loading-percent">0%</span></div>
+   <button id="loading-retry" hidden>Try again</button>
+   <noscript><p>Enable JavaScript to load the game.</p></noscript>
+  </div>
+ </section>
  <div id="stars" aria-hidden="true"></div><div class="aura" aria-hidden="true"></div>
  <canvas id="globe" aria-label="Interactive globe. Drag to rotate, scroll or pinch to zoom, select a unit, choose the movement action, then tap a destination."></canvas>
  <div id="markers"></div>
@@ -30,5 +43,5 @@
  <dialog id="ending" class="panel" aria-labelledby="victory-title"></dialog>
  <div id="toast" role="status"></div><div id="march-hint" class="hidden"></div>
  <footer id="dock" class="hidden"></footer>
- <script type="module" src="/app.js"></script>
+ <script type="module" data-game-boot src="/loading.js"></script>
 </body></html>

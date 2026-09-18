@@ -1,4 +1,5 @@
 import {createShowcase, showcasePosition, showcaseFeedback} from './showcase.js';
+import {assetBytes,assetsReady,finishLoading,loadingFailed,loadingStage} from './loading.js';
 import { Globe } from './globe.js';
 import { icon, colors } from './icons.js';
 import { Soundscape } from './audio.js';
@@ -154,7 +155,7 @@ function select(tile){
   command(kind,data).finally(()=>{if(activeUnit===u.id&&!abilityTarget)globe.previewPath=[];});
   renderProvince();return;
  }
- // A hex tap inspects its city. A unit's moving marker always selects that unit.
+ // Invisible model hit targets keep individual units selectable on city tiles.
  if(state.cities.some(c=>c.tile===tile)){selectCity(tile);return;}
  const on=state.squads.find(u=>u.tile===tile&&u.boarded_on==null);
  if(on){selectUnit(on.id);return;}
@@ -249,10 +250,10 @@ function renderEnding(){
 }
 function rebuildMarkers(){
  $('markers').innerHTML='';markerNodes=[];const preview=state.phase==='preview'||state.phase==='lobby';if(preview)return;
- for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.innerHTML=`<span class="marker-name">${html(state.players[c.owner].name)}</span>${icon(c.capital>=0?'crown':'city')}${c.capture?`<span>${c.capture}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
- if(!preview)for(const u of state.squads){if(u.boarded_on!=null)continue;const el=document.createElement('button');el.className=`marker unit-marker ${u.founding?'founding':''} ${u.mode===1?'concealed':''}`;el.style.setProperty('--faction',colors[u.owner]);el.setAttribute('aria-label',`${(state.players[u.owner]?.name||'')}, ${unitNames[u.kind]} ${u.id}, health ${num(u.hp)}`);el.innerHTML=icon(unitIcons[u.kind])+(inForestCover(world,u)?`<span class="cover-badge" aria-label="Forest cover">${icon('shield')}</span>`:'')+`<i class="piece-health" style="width:${100*u.hp/state.rules.specs[u.kind].hp}%"></i>${u.founding?`<span class="work-count">${u.work}</span>`:u.locked_until>state.tick?`<span class="work-count">${u.locked_until-state.tick}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(u.tile);else selectUnit(u.id);};$('markers').append(el);markerNodes.push({el,p:world[u.tile].p,i:-1,u});}
+ for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
+ if(!preview)for(const u of state.squads){if(u.boarded_on!=null)continue;const el=document.createElement('button');el.className=`marker unit-marker ${u.founding?'founding':''} ${u.mode===1?'concealed':''}`;el.style.setProperty('--faction',colors[u.owner]);el.setAttribute('aria-label',`${(state.players[u.owner]?.name||'')}, ${unitNames[u.kind]} ${u.id}, health ${num(u.hp)}`);el.onclick=()=>{if(abilityTarget)select(u.tile);else selectUnit(u.id);};$('markers').append(el);markerNodes.push({el,p:world[u.tile].p,i:-1,u});}
 }
-function updateMarkers(now){if(!globe)return;if(globe.state?.showcase){showcaseFeedback(showcase,world,now);globe.effects.accept(showcase,now);}for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y+(u?22:-34)}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
+function updateMarkers(now){if(!globe)return;if(globe.state?.showcase){showcaseFeedback(showcase,world,now);globe.effects.accept(showcase,now);}for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y-10}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
  if(state?.phase==='running')$('clock').innerHTML=icon('clock')+`<span>${time(lastTick+Math.min(2,Math.floor((now-lastStateAt)/1000)))}</span>`;feedbackLayer.update(now,globe);soundscape.mix(globe,state,now);
 }
 $('navigation').innerHTML=btn('leave-room','arrow','Back to title');
@@ -274,7 +275,11 @@ document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement|
 document.addEventListener('visibilitychange',()=>{if(ws?.readyState===1){ws.send(JSON.stringify({type:'presence',active:!document.hidden}));if(!document.hidden)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));}});
 try{
  globe=new Globe($('globe'),select);globe.onFrame=updateMarkers;
- const module=await WebAssembly.compileStreaming(fetch('/engine.wasm'));const e=new WebAssembly.Instance(module,{}).exports,enc=new TextEncoder(),dec=new TextDecoder();
+ const module=await WebAssembly.compile(await assetBytes('/engine.wasm'));const e=new WebAssembly.Instance(module,{}).exports,enc=new TextEncoder(),dec=new TextDecoder();
  previewEngine=request=>{const bytes=enc.encode(JSON.stringify(request)),p=e.alloc(bytes.length);new Uint8Array(e.memory.buffer,p,bytes.length).set(bytes);e.run(p,bytes.length);return JSON.parse(dec.decode(new Uint8Array(e.memory.buffer,e.output_ptr(),e.output_len())));};
- makePreview();const id=new URL(location.href).searchParams.get('room');if(id){if(!/^[a-f0-9]{20}$/.test(id))throw Error('404');await joinRoom(id);}else $('connection').innerHTML=icon('globe');
-}catch(e){console.error(e);toast('warning',Number(e.message)||503,true);$('start').disabled=true;}
+ makePreview();const id=new URL(location.href).searchParams.get('room');if(id){if(!/^[a-f0-9]{20}$/.test(id))throw Error('404');loadingStage('Joining your game…');await joinRoom(id);}else $('connection').innerHTML=icon('globe');
+ await assetsReady();
+ // Let the renderer upload and draw the completed scene before revealing it.
+ await new Promise(resolve=>{globe.onFrame=now=>{updateMarkers(now);globe.onFrame=updateMarkers;resolve();};});
+ await finishLoading();
+}catch(e){console.error(e);loadingFailed(e);$('start').disabled=true;}

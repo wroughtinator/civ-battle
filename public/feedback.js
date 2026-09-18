@@ -1,4 +1,3 @@
-import {icon} from './icons.js';
 import {abilities,unitIcons} from './planning.js';
 
 export class EventTimeline {
@@ -28,9 +27,11 @@ export class FeedbackLayer {
  constructor(audio){this.audio=audio;this.timeline=new EventTimeline();this.nodes=[];this.root=document.createElement('div');this.root.id='action-feedback';this.root.setAttribute('aria-hidden','true');document.body.append(this.root);}
  accept(state){
   for(const e of this.timeline.accept(state)){
-   const el=document.createElement('div');el.className=`feedback-float ${e.action==='pickup'?'pickup-reward':e.action==='hit'?'damage-number':e.action==='heal'?'heal-number':'action-number'}`;
-   el.innerHTML=e.action==='pickup'?icon('plus')+pickupSymbols(e).map(icon).join(''):e.action==='hit'?`−${Math.ceil(e.amount)}`:e.action==='heal'?`+${Math.ceil(e.amount)}`:icon(actionSymbol(e));
-   this.root.append(el);this.nodes.push({el,e});
+   // Keep numeric combat feedback without putting icons back over the map.
+   if(e.action==='hit'||e.action==='heal'){
+    const el=document.createElement('div');el.className=`feedback-float ${e.action==='hit'?'damage-number':'heal-number'}`;
+    el.textContent=`${e.action==='hit'?'−':'+'}${Math.ceil(e.amount)}`;this.root.append(el);this.nodes.push({el,e});
+   }
    if(e.action==='pickup'){this.audio.pickup();continue;}
    this.audio.play(e.action==='hit'?'impact':e.action==='shot'?'launch':e.action==='move'?'order':e.action==='ability'?'launch':'confirm',e.action==='hit'?.3:.18,0,e.kind===2?1.6:e.kind===4?.7:1);
   }
