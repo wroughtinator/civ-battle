@@ -89,9 +89,9 @@ const command=(kind,data={})=>send('command',{kind,...data}).catch(()=>{});
 setInterval(()=>{if(connected&&ws?.readyState===1)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));},10000);
 function renderControls(){if(!state)return;if($('ending').open)$('back-lobby').disabled=!connected||!!inflight;if(state.phase==='running'){if(pointerHeld)pendingRender=true;else{renderProvince();renderResearch();}}const lobby=state.phase==='lobby'||state.phase==='preview';$('start').disabled=!!inflight||!!creating||lobby&&state.phase!=='preview'&&(!connected||!state.host||state.awaitingResults);$('invite').disabled=!!creating;if(lobby){const locked=!!inflight||!!creating||state.phase!=='preview'&&(!connected||!state.host);$('fewer-players').disabled=locked||count<=(state.minCount||2);$('more-players').disabled=locked||count>=8;$('difficulty').disabled=locked;}}
 function render(){
- const title=state.phase==='preview',lobby=state.phase==='lobby'||title;show('title-screen',title);show('topbar',!title);document.body.classList.toggle('on-title',title);document.body.classList.toggle('in-lobby',lobby);show('lobby',lobby&&!title);show('roster',!lobby);show('dock',!lobby);$('resources').innerHTML=lobby?'':resources();
+ const title=state.phase==='preview',lobby=state.phase==='lobby'||title;show('title-screen',title);show('topbar',!title);document.body.classList.toggle('on-title',title);document.body.classList.toggle('in-lobby',lobby);show('lobby',lobby&&!title);show('show-scoreboard',!lobby);if(lobby&&$('scoreboard').open)$('scoreboard').close();show('dock',!lobby);$('resources').innerHTML=lobby?'':resources();
  $('clock').innerHTML=icon('clock')+`<span>${time(state.tick)}</span>`;
- if(lobby)renderLobby();else{renderRoster();renderProvince();renderResearch();}
+ if(lobby)renderLobby();else{if($('scoreboard').open)renderScoreboard();renderProvince();renderResearch();}
  $('tech-toggle').disabled=!!state.spectator;renderControls();if(state.spectator){clearRoute();techOpen=false;show('research',false);}$('leave-room').setAttribute('aria-label',lobby?'Back to title':'Leave game');if(state.result||state.phase==='ended')renderEnding();else if($('ending').open)$('ending').close();
 }
 function resources(){if(state.spectator)return `<div class="resource spectator" aria-label="Spectating">${icon('spectate')}</div>`;return `<div class="resource gold" aria-label="Treasury">${icon('coin')}<span>${num(state.players[slot].gold)}</span></div>`;}
@@ -115,9 +115,8 @@ function showShowcase(){
  if(!showcase||showcase.seed!==seed)showcase=createShowcase(world,state.rules,seed);
  globe.setState(showcase,0);globe.showcasePose=(u,now)=>showcasePosition(u,world,now);
 }
-function renderRoster(){
- $('roster').innerHTML=state.players.map((p,i)=>`<button class="roster-item ${i===slot?'me':''} ${!p.alive?'dead':''}" style="--faction:${colors[i]}" aria-label="${html(p.name)}, ${!p.alive?'Spectating':p.bot?'AI control':'Human online'}, influence ${p.mandate} of ${state.rules.mandate_goal}" data-player="${i}"><i class="player-color" aria-hidden="true"></i><span class="roster-name">${html(p.name)}</span><span class="victory-count">${icon('crown')}${p.mandate}</span><i class="launch-track" style="width:${Math.min(100,100*Math.max(p.mandate/state.rules.mandate_goal,p.launch/state.rules.space_goal))}%"></i></button>`).join('');
- $('roster').querySelectorAll('button').forEach(b=>b.onclick=()=>{const c=state.cities.find(c=>c.capital===Number(b.dataset.player));if(c){globe.focus(c.tile);selectCity(c.tile);}});
+function renderScoreboard(){
+ $('scoreboard-players').innerHTML=state.players.map((p,i)=>`<tr class="${i===slot?'me':''}"><td><i class="player-color" style="--faction:${colors[i]}" role="img" aria-label="Player color ${colors[i]}"></i></td><th scope="row">${html(p.name)}</th><td>${num(p.mandate)}</td></tr>`).join('');
 }
 const price=n=>`<span class="price">${icon('coin')}${n}</span>`;
 const stat=(symbol,n)=>`<span class="stat">${icon(symbol)}${n}</span>`;
@@ -241,7 +240,7 @@ function renderEnding(){
  const result=state.result||{winner:state.winner,victory:state.victory,tick:state.tick,player:state.players[state.winner]},p=result.player;
  const dialog=$('ending');
  if(!dialog.open){
-  manual.close();clearRoute();techOpen=false;show('research',false);show('province',false);
+  manual.close();if($('scoreboard').open)$('scoreboard').close();clearRoute();techOpen=false;show('research',false);show('province',false);
   dialog.innerHTML=`<div class="winner-icon">${icon(result.victory===2?'rocket':'crown')}</div><h1 id="victory-title">${result.winner===slot?'Victory!':'Match complete'}</h1><div class="end-emblem" style="color:${colors[result.winner]}"><span>${html(p.name)} wins!</span></div><p>${result.victory===2?'Space victory':'Capital victory'} · ${time(result.tick)}</p><div class="result-actions">${btn('back-lobby','home','Back to lobby','Back to lobby')}${btn('leave-result','close','Leave game','Leave')}</div>`;
   $('back-lobby').onclick=async()=>{try{await send('lobby');}catch{}};
   $('leave-result').onclick=confirmLeave;
@@ -257,7 +256,10 @@ function rebuildMarkers(){
 function updateMarkers(now){if(!globe)return;if(globe.state?.showcase){showcaseFeedback(showcase,world,now);globe.effects.accept(showcase,now);}for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y-10}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
  if(state?.phase==='running')$('clock').innerHTML=icon('clock')+`<span>${time(lastTick+Math.min(2,Math.floor((now-lastStateAt)/1000)))}</span>`;feedbackLayer.update(now,globe);soundscape.mix(globe,state,now);
 }
-$('navigation').innerHTML=btn('leave-room','arrow','Back to title');
+$('navigation').innerHTML=btn('leave-room','arrow','Back to title')+btn('show-scoreboard','crown','Show scoreboard','','aria-haspopup="dialog" aria-controls="scoreboard"');
+$('show-scoreboard').onclick=()=>{renderScoreboard();if(!$('scoreboard').open)$('scoreboard').showModal();};
+$('close-scoreboard').onclick=()=>$('scoreboard').close();
+$('scoreboard').addEventListener('click',e=>{if(e.target!==$('scoreboard'))return;const r=$('scoreboard').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('scoreboard').close();});
 $('top-actions').innerHTML=btn('sound','mute','Toggle sound')+btn('help','book','Open manual','<span>Manual</span>');
 function confirmLeave(){if(!$('leave-confirm').open)$('leave-confirm').showModal();}
 $('leave-room').onclick=()=>state.phase==='lobby'?leaveRoom():confirmLeave();
@@ -272,7 +274,7 @@ function renderSound(){$('sound').innerHTML=icon(sound?'sound':'mute');$('sound'
 $('invite').onclick=async()=>{try{await createRoom();const url=`${location.origin}/?room=${room}`;try{await navigator.clipboard.writeText(url);toast('check');}catch{if(navigator.share)await navigator.share({url});else toast('link');}}catch(e){toast('warning',Number(e.message)||503,true);}};
 $('start').onclick=async()=>{try{$('lobby').classList.add('busy');if(state.phase==='preview')await createRoom();await flushProfile();await send('start');}catch(e){toast('warning',Number(e.message)||503,true);}finally{$('lobby').classList.remove('busy');}};
 window.addEventListener('resize',()=>{const u=state?.squads.find(u=>u.id===activeUnit);if(u)globe.focus(u.tile);});
-document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||manual.opened)return;if(e.key==='Escape'){closeSelection();techOpen=false;show('research',false);manual.close();}if(e.key.toLowerCase()==='h'&&state?.phase==='running')home();if(e.key.toLowerCase()==='t'&&state?.phase==='running')toggleResearch();});
+document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||manual.opened||$('scoreboard').open)return;if(e.key==='Escape'){closeSelection();techOpen=false;show('research',false);manual.close();}if(e.key.toLowerCase()==='h'&&state?.phase==='running')home();if(e.key.toLowerCase()==='t'&&state?.phase==='running')toggleResearch();});
 document.addEventListener('visibilitychange',()=>{if(ws?.readyState===1){ws.send(JSON.stringify({type:'presence',active:!document.hidden}));if(!document.hidden)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));}});
 try{
  globe=new Globe($('globe'),select);globe.onFrame=updateMarkers;
