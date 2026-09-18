@@ -1,3 +1,4 @@
+import {assetBytes,assetsReady,finishLoading,loadingFailed,loadingStage} from './loading.js';
 import { Globe } from './globe.js';
 import { icon, colors, civs, civNames, buildings, techs } from './icons.js';
 import { Soundscape } from './audio.js';
@@ -267,7 +268,11 @@ document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement|
 document.addEventListener('visibilitychange',()=>{if(ws?.readyState===1){ws.send(JSON.stringify({type:'presence',active:!document.hidden}));if(!document.hidden)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));}});
 try{
  globe=new Globe($('globe'),select);globe.onFrame=updateMarkers;
- const module=await WebAssembly.compileStreaming(fetch('/engine.wasm'));const e=new WebAssembly.Instance(module,{}).exports,enc=new TextEncoder(),dec=new TextDecoder();
+ const module=await WebAssembly.compile(await assetBytes('/engine.wasm'));const e=new WebAssembly.Instance(module,{}).exports,enc=new TextEncoder(),dec=new TextDecoder();
  previewEngine=request=>{const bytes=enc.encode(JSON.stringify(request)),p=e.alloc(bytes.length);new Uint8Array(e.memory.buffer,p,bytes.length).set(bytes);e.run(p,bytes.length);return JSON.parse(dec.decode(new Uint8Array(e.memory.buffer,e.output_ptr(),e.output_len())));};
- makePreview();const id=new URL(location.href).searchParams.get('room');if(id){if(!/^[a-f0-9]{20}$/.test(id))throw Error('404');await joinRoom(id);}else $('connection').innerHTML=icon('globe');
-}catch(e){console.error(e);toast('warning',Number(e.message)||503,true);$('start').disabled=true;}
+ makePreview();const id=new URL(location.href).searchParams.get('room');if(id){if(!/^[a-f0-9]{20}$/.test(id))throw Error('404');loadingStage('Joining your game…');await joinRoom(id);}else $('connection').innerHTML=icon('globe');
+ await assetsReady();
+ // Let the renderer upload and draw the completed scene before revealing it.
+ await new Promise(resolve=>{globe.onFrame=now=>{updateMarkers(now);globe.onFrame=updateMarkers;resolve();};});
+ await finishLoading();
+}catch(e){console.error(e);loadingFailed(e);$('start').disabled=true;}

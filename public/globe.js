@@ -1,3 +1,4 @@
+import {assetBytes,assetImage,trackLoad} from './loading.js';
 import {OutlinePass} from './outline-pass.js';
 import {GlobeControls} from './globe-controls.js';
 import {attackTiming,drawAttack,unitScales,ballisticPose} from './combat-visuals.js';
@@ -153,21 +154,21 @@ export class Globe {
   this.program=g.createProgram();g.attachShader(this.program,shader(g.VERTEX_SHADER,vertex));g.attachShader(this.program,shader(g.FRAGMENT_SHADER,fragment));['position','normal','color','material','joints','weights','uv','treeOrigin','treeShape','teamColor'].forEach((n,i)=>g.bindAttribLocation(this.program,i,n));g.linkProgram(this.program);if(!g.getProgramParameter(this.program,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(this.program));
   this.u=Object.fromEntries(['camera','viewport','offset','mode','time','oceanNormal','oceanRough','fogTexture','preview','weather[0]','modelBasis','modelOrigin','modelScale','modelTint','modelFlash','skinned','bones[0]','foliage','treeTexture','terrainTexture','outline','outlineSceneDepth'].map(n=>[n,g.getUniformLocation(this.program,n)]));
   this.outlines=new OutlinePass(g);
-  this.textures=['ocean-normal.png','ocean-roughness.png'].map((file,unit)=>{const texture=g.createTexture();g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array(unit?[160,160,160,255]:[128,128,255,255]));const img=new Image();img.onload=()=>{g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,img);g.generateMipmap(g.TEXTURE_2D);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR_MIPMAP_LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.REPEAT);};img.src='/assets/forge/'+file;return texture;});
-  this.terrainTexture=g.createTexture();g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array([110,120,80,255]));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);loadTexture(g,'terrain',4).then(t=>this.terrainTexture=t).catch(e=>console.warn(e));
+  this.textures=['ocean-normal.png','ocean-roughness.png'].map((file,unit)=>{const texture=g.createTexture();g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array(unit?[160,160,160,255]:[128,128,255,255]));trackLoad(assetImage('/assets/forge/'+file).then(img=>{g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,img);g.generateMipmap(g.TEXTURE_2D);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR_MIPMAP_LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.REPEAT);})).catch(e=>console.warn(e));return texture;});
+  this.terrainTexture=g.createTexture();g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array([110,120,80,255]));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);trackLoad(loadTexture(g,'terrain',4).then(t=>this.terrainTexture=t)).catch(e=>console.warn(e));
   this.fogTexture=g.createTexture();g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.texImage2D(g.TEXTURE_2D,0,g.R8,128,64,0,g.RED,g.UNSIGNED_BYTE,new Uint8Array(8192).fill(255));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
   this.land=new Mesh(g);this.lines=new Mesh(g);this.props=new Mesh(g);this.air=new Mesh(g);this.selection=new Mesh(g);this.routes=new Mesh(g);this.clouds=new Mesh(g);this.units=new Mesh(g);
   this.effects=new EventTimeline();this.effectsMesh=new Mesh(g);this.territories=new Mesh(g);this.territoryBorders=new Mesh(g);this.models={};this.modelLoads=new Map();
   this.loadModel=kind=>{
    if(this.models[kind]||performance.now()-(this.modelLoads.get(kind)??-Infinity)<15000)return;
    const name=modelNames[kind];if(!name)return;this.modelLoads.set(kind,performance.now());
-   Promise.all([fetch('/assets/forge/'+name+'.rig').then(r=>{if(!r.ok)throw Error('Model unavailable: '+name);return r.arrayBuffer();}),loadTexture(g,name)]).then(([buffer,texture])=>this.models[kind]=new RiggedMesh(g,buffer,texture)).catch(e=>console.warn(e));
+   trackLoad(Promise.all([assetBytes('/assets/forge/'+name+'.rig'),loadTexture(g,name)]).then(([buffer,texture])=>this.models[kind]=new RiggedMesh(g,buffer,texture))).catch(e=>console.warn(e));
   };
   this.treeInstances=[];this.treeGroups=new Map();this.propInstances=new Map();this.staticMeshes=new Map();
   this.loadStatic=(name,sway=false)=>{
    if(this.staticMeshes.has(name)||performance.now()-(this.modelLoads.get(name)??-Infinity)<15000)return;
    this.modelLoads.set(name,performance.now());
-   Promise.all([fetch('/assets/forge/'+name+'.mesh').then(r=>{if(!r.ok)throw Error('Prop unavailable: '+name);return r.arrayBuffer();}),loadTexture(g,name)]).then(([buffer,texture])=>this.staticMeshes.set(name,new Woodland(g,buffer,texture,sway))).catch(e=>console.warn(e));
+   trackLoad(Promise.all([assetBytes('/assets/forge/'+name+'.mesh'),loadTexture(g,name)]).then(([buffer,texture])=>this.staticMeshes.set(name,new Woodland(g,buffer,texture,sway)))).catch(e=>console.warn(e));
   };
   treeNames.forEach(name=>this.loadStatic(name,true));
   this.yaw=.15;this.pitch=.18;this.distance=3.15;this.targetDistance=3.15;this.offset=.24;this.targetOffset=.24;this.selected=-1;this.hovered=-1;this.preview=true;this.world=[];this.state=null;this.slot=0;this.clock=0;this.pointer=null;this.lastTouch=0;

@@ -1,3 +1,4 @@
+import {assetImage} from './loading.js';
 // Asset Forge packed rigid rigs and instanced props. No runtime glTF dependency.
 export const modelNames=['guard','cavalry','archer','tank','artillery','recon','drone','fleet','submarine','carrier','engineer','launcher','scout','settler','missile','nuke','satellite','arrow','shell','mortar','bullet','bomb','torpedo','rocket','aircraft'];
 export const treeNames=['tree-oak','tree-pine','tree-birch'];
@@ -8,7 +9,7 @@ export function orientationBasis(up,forward,flight=false){
  return [...east,...vertical,...north];
 }
 export async function loadTexture(gl,name,unit=3){
- const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error(`Texture unavailable: ${name}`));img.src=`/assets/forge/${name}.png`;});
+ const img=await assetImage(`/assets/forge/${name}.png`);
  const texture=gl.createTexture();gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);gl.generateMipmap(gl.TEXTURE_2D);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return texture;
 }
 export function parseRig(buffer) {
