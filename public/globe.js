@@ -4,6 +4,7 @@ import {coastalEdges,shoreDistance,beachWeight} from './terrain.js';
 import {UnitMotion} from './movement.js';
 import { colors } from './icons.js';
 import {EventTimeline} from './feedback.js';
+import {terrainSlows} from './terrain.js';
 const norm=p=>{const l=Math.hypot(...p);return p.map(x=>x/l);};
 const add=(a,b)=>a.map((x,i)=>x+b[i]);
 const mul=(a,s)=>a.map(x=>x*s);
@@ -161,6 +162,7 @@ export class Globe {
  focus(i){if(!this.world[i])return;const p=this.world[i].p;let yaw=-Math.atan2(p[0],p[2]);while(yaw-this.yaw>Math.PI)yaw-=Math.PI*2;while(yaw-this.yaw<-Math.PI)yaw+=Math.PI*2;this.targetFocus=[yaw,Math.atan2(p[1],Math.hypot(p[0],p[2]))];}
  frameCity(tile){if(tile==null||tile<0||!this.world[tile])return;const city=this.state?.cities?.find(c=>c.tile===tile);if(!city)return;const center=this.world[tile].p;let spread=0;for(let i=0;i<this.world.length;i++)if(this.state.tiles[i]?.city===tile)for(const p of this.world[i].poly)spread=Math.max(spread,Math.acos(Math.max(-1,Math.min(1,p.reduce((v,x,k)=>v+x*center[k],0)))));const w=this.canvas.clientWidth,h=this.canvas.clientHeight;this.targetDistance=Math.max(this.targetDistance,Math.min(4.8,Math.cos(spread)+2.75*h*Math.sin(spread)/Math.min(w*.78,h*.58)));this.focus(tile);}
  choose(i,city=false){this.selected=i;this.selectedCity=city?i:-1;this.rebuildTerritory();this.rebuildSelection();}
+ setBlockedTargets(targets){this.blockedTargets=targets;this.rebuildSelection();}
  setTargets(targets){this.targets=targets;this.rebuildSelection();}
  rotate(p){const c=Math.cos(this.yaw),s=Math.sin(this.yaw),x=c*p[0]+s*p[2],z=-s*p[0]+c*p[2];return[x,Math.cos(this.pitch)*p[1]-Math.sin(this.pitch)*z,Math.sin(this.pitch)*p[1]+Math.cos(this.pitch)*z];}
  project(p){const v=this.rotate(p),w=this.canvas.clientWidth,h=this.canvas.clientHeight,z=this.distance-v[2];return{x:w*(.5+this.offset/2)+v[0]*h*1.375/z,y:h/2-v[1]*h*1.375/z,visible:v[2]>1/this.distance,z:v[2]};}
@@ -212,6 +214,10 @@ export class Globe {
      this.treeInstances.push([...mul(p,surface(p,0)),rnd(i,j,5)*6.283,h*width,h,h*(.7+rnd(i,j,6)*.5),.85+rnd(i,j,7)*.25]);
     }
    }
+   // Farms appear automatically on owned grassland, leaving the center open for units.
+   if(!this.preview&&s.visible&&s.owner>=0&&t.terrain===1&&!this.state.cities.some(c=>c.tile===i)){
+    for(const side of [-1,1])for(let row=0;row<5;row++)box(side*.025,(row-2)*.007,.026,.0035,.0035,row%2?[.72,.59,.23]:[.50,.43,.19]);
+   }
    const discovery=this.state?.discoveries?.find(d=>d.tile===i);if(discovery&&s.visible){const d=discovery,k=d.kind,ochre=[.68,.47,.21],teal=[.28,.65,.64],stone=[.55,.57,.48];const angle=(d.variant%628)/100,ox=Math.cos(angle)*.013,oz=Math.sin(angle)*.013;if(k===0){pyramid(ox,oz,.026,.033,[.45,.24,.15],4);box(-.023,.015,.005,.045,.005,ochre);}else if(k===1){box(0,0,.031,.016,.025,ochre);box(0,0,.034,.022,.028,[.8,.61,.24]);}else if(k===2||k===3||k===9){pyramid(0,0,.028,.03,k===9?teal:stone,4);box(.025,.008,.003,.06,.003,ochre);tri(props,point(.025,.06,.008),point(.048,.05,.008),point(.025,.043,.008),teal);}else if(k===4){box(0,0,.027,.014,.065,ochre);box(0,0,.004,.05,.004,stone);}else if(k===5){box(0,0,.026,.028,.026,stone);pyramid(0,0,.025,.056,teal,8);box(.024,0,.004,.055,.004,ochre);}else if(k===6){for(const x of[-.017,.017])box(x,0,.008,.037,.008,stone);box(0,0,.044,.04,.012,stone);}else if(k===7){for(const x of[-.018,0,.018])box(x,0,.012,.016,.017,ochre);}else if(k===8){box(0,0,.006,.07,.006,stone);pyramid(0,0,.02,.06,teal,8);for(const x of[-.028,.028])box(x,0,.02,.022,.02,stone);}if(d.used)box(0,.022,.004,.025,.004,teal);}
    if(t.site){const steel=[.27,.36,.37];box(-.023,.022,.013,.019,.016,steel);box(.022,.022,.012,.026,.013,steel);for(const x of [-.017,0,.017])box(x,-.025,.012,.008,.013,[.46,.44,.34]);}
    if(s.building===7){const steel=[.36,.45,.46],x=t.capital>=0?.045:0;box(x,0,.034,.019,.025,steel);box(x-.012,-.01,.005,.048,.005,[.48,.40,.30]);box(x+.008,-.01,.006,.035,.006,[.56,.50,.37]);}
@@ -237,8 +243,19 @@ export class Globe {
   const fill=[],borders=[];fill.materials=[];borders.materials=[];
   const push=(list,p,color,alpha)=>{list.push(...p,...norm(p),...color);list.materials.push(1,3,alpha);};
   const cities=new Map((this.state?.cities||[]).map(c=>[c.tile,c]));
+  const expansion=new Set(cities.get(this.selectedCity)?.expansion_tiles||[]);
   if(!this.preview)for(let i=0;i<this.world.length;i++){
    const s=this.state?.tiles[i],city=s?.city!=null?cities.get(s.city):null;
+   if(s?.visible&&expansion.has(i)){
+    const surface=this.territorySurfaces[i]||[];
+    const color=this.world[i].terrain===1?[.75,.95,.40]:[.42,.88,.82];
+    for(let k=0;k<surface.length;k+=3)push(fill,surface.slice(k,k+3),color,.27);
+    for(const cached of this.borderCache[i]||[]){
+     const [a,b,ha,hb]=cached,pa=mul(a,ha+.003),pb=mul(b,hb+.003);
+     const ia=mul(norm(mix(a,this.world[i].p,.065)),ha+.003),ib=mul(norm(mix(b,this.world[i].p,.065)),hb+.003);
+     for(const p of [pa,pb,ib,pa,ib,ia])push(borders,p,color,.95);
+    }
+   }
    if(!s?.visible||!city)continue;
    const selected=city.tile===this.selectedCity,base=palette[city.owner],shade=(city.tile*137%19)/19;
    const color=selected?[1,.81,.38]:mix(base,shade>.5?[.52,.85,.85]:[.9,.82,.62],.18+shade*.2),t=this.world[i],surface=this.territorySurfaces[i]||[];
@@ -259,9 +276,21 @@ export class Globe {
   }
   this.territories.update(fill);this.territoryBorders.update(borders);
  }
- rebuildSelection(){const data=[];const rings=[...[...(this.targets||[])].map(i=>[i,[.45,.85,.78]]),[this.selected,[1,.86,.55]]];for(const [i,color] of rings){if(!this.world[i])continue;const t=this.world[i];for(let k=0;k<t.poly.length;k++){const a=mul(t.poly[k],1.032),b=mul(t.poly[(k+1)%t.poly.length],1.032),inner=p=>mul(norm(mix(p,t.p,.07)),1.033);for(const p of [a,b,inner(b),a,inner(b),inner(a)])data.push(...p,...norm(p),...color);}}this.selection.update(data);}
+ rebuildSelection(){
+  const data=[],rings=[...[...(this.blockedTargets||[])].map(i=>[i,[.85,.35,.23]]),...[...(this.targets||[])].map(i=>[i,[.45,.85,.78]]),[this.selected,[1,.86,.55]]];
+  for(const [i,color] of rings){
+   if(!this.world[i])continue;
+   const t=this.world[i];
+   for(const [a,b,ha,hb] of this.borderCache[i]||[]){
+    const pa=mul(a,t.terrain===0?1.008:ha+.004),pb=mul(b,t.terrain===0?1.008:hb+.004);
+    const ia=mul(norm(mix(a,t.p,.07)),t.terrain===0?1.009:ha+.004),ib=mul(norm(mix(b,t.p,.07)),t.terrain===0?1.009:hb+.004);
+    for(const p of [pa,pb,ib,pa,ib,ia])data.push(...p,...norm(p),...color);
+   }
+  }
+  this.selection.update(data);
+ }
  updateRoutes(time){const data=[];const segment=(a,b,col,height=1.02)=>{if(!a||!b)return;for(let j=0;j<8;j++){for(const t of[j/8,(j+1)/8]){const p=norm(mix(a,b,t));data.push(...mul(p,height),...p,...col);}}};
-  for(const u of this.state?.squads||[]){if(u.owner!==this.slot||u.id!==this.routeUnit)continue;for(let i=1;i<u.path.length;i++)segment(this.world[u.path[i-1]].p,this.world[u.path[i]].p,palette[u.owner],Math.max(1.02,...[u.path[i-1],u.path[i]].map(t=>this.world[t].terrain===4?1.085:1.025)));}
+  for(const u of this.state?.squads||[]){if(u.owner!==this.slot||u.id!==this.routeUnit)continue;for(let i=1;i<u.path.length;i++)segment(this.world[u.path[i-1]].p,this.world[u.path[i]].p,terrainSlows(this.world[u.path[i]].terrain,u.kind)?[.95,.65,.24]:palette[u.owner],Math.max(1.02,...[u.path[i-1],u.path[i]].map(t=>this.world[t].terrain===4?1.085:1.025)));}
   for(let i=1;i<(this.previewPath?.length||0);i++)segment(this.world[this.previewPath[i-1]].p,this.world[this.previewPath[i]].p,[1,.87,.55],Math.max(1.028,...[this.previewPath[i-1],this.previewPath[i]].map(t=>this.world[t].terrain===4?1.087:1.028)));
   for(const m of this.state?.strikes||[]){const a=this.world[m.from]?.p,b=this.world[m.to]?.p;if(!a||!b)continue;for(let j=1;j<=24;j++)segment(norm(mix(a,b,(j-1)/24)),norm(mix(a,b,j/24)),[1,.45,.2],1.04+Math.sin(j/24*Math.PI)*.27);}
   this.routes.update(data);

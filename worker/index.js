@@ -34,25 +34,18 @@ export default {
 };
 
 export class Room extends DurableObject {
-  constructor(ctx, env) {
+  constructor(ctx, env, loaded) {
     super(ctx, env);
     this.ctx = ctx;
-    this.room = null;
+    this.room = loaded?.room ?? null;
+    if (loaded) return;
     // A single SQLite row is atomic and avoids the KV 128 KiB value limit for globe geometry.
     ctx.blockConcurrencyWhile(async () => {
       ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS room (id INTEGER PRIMARY KEY, data TEXT NOT NULL)');
       const rows = [...ctx.storage.sql.exec('SELECT data FROM room WHERE id=1')];
       if (rows.length) {
         this.room = JSON.parse(rows[0].data);
-        // Upgrade unstarted lobbies; active matches retain their original simulation.
-        if (this.room.rulesVersion !== 4 && this.room.phase === 'lobby') {
-          const old = this.room.game;
-          this.room.game = engine({op:'new',hidden_rolls:Array.from(crypto.getRandomValues(new Uint32Array(642))),seed:old.seed,count:old.players.length,difficulty:old.difficulty}).state;
-          this.room.seats.forEach((seat,i)=>Object.assign(this.room.game.players[i],{bot:!!seat.disconnectedAt,civ:old.players[i].civ,tag:old.players[i].tag,name:old.players[i].name}));
-          this.room.rulesVersion = 4;
-          this.room.intel = [];
-          this.save();
-        }
+
       }
     });
   }
@@ -193,8 +186,7 @@ export class Room extends DurableObject {
           const seed=Number.isInteger(msg.seed)?msg.seed>>>0:this.room.game.seed;
           const difficulty=msg.difficulty===undefined?this.room.game.difficulty:Math.max(0,Math.min(2,msg.difficulty));
           const old=this.room.game.players;
-          this.room.game=engine({op:'new',hidden_rolls:Array.from(crypto.getRandomValues(new Uint32Array(642))),seed,count,difficulty}).state;
-          this.room.rulesVersion=4;
+          this.room.game=this.simulate({op:'new',hidden_rolls:Array.from(crypto.getRandomValues(new Uint32Array(642))),seed,count,difficulty}).state;
           this.room.intel=[];
           this.room.seats.forEach((seat,i)=>{this.room.game.players[i].bot=!!seat.disconnectedAt;this.room.game.players[i].civ=old[i]?.civ??i;this.room.game.players[i].tag=old[i]?.tag??1001+i;this.room.game.players[i].name=old[i]?.name||`Wandering Fox ${i+1}`;});
           for(const w of this.ctx.getWebSockets())w.send(JSON.stringify({type:'world',world:this.room.game.tiles.map(t=>({p:t.p,poly:t.poly,near:t.near,terrain:t.terrain,capital:t.capital,site:t.site}))}));

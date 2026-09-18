@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "dev": "wrangler dev --port 8793",
-    "deploy": "npm run build && wrangler deploy",
-    "test": "cargo test --release --lib --tests && node --test tests/*.test.mjs"
+    "dev": "node scripts/dev.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "test": "cargo test --release --lib --tests && node --test tests/*.test.mjs",
+    "prepare:release": "node scripts/prepare.mjs"
   },
-  "devDependencies": { "wrangler": "4.134.0" }
+  "devDependencies": {
+    "wrangler": "4.134.0"
+  }
 }

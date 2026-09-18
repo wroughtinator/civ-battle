@@ -1,6 +1,95 @@
 use super::*;
 
 #[test]
+fn terrain_farms_pay_once_and_expansion_preview_matches_income() {
+    let mut g = Game::with_players(42, 2, 1);
+    g.squads.clear();
+    for t in &mut g.tiles { t.terrain = 1; }
+    g.control();
+    let before = g.view(0);
+    let city = &before["cities"][0];
+    let old_income = city["income"].as_f64().unwrap();
+    let gain = city["expansion_income"].as_f64().unwrap();
+    let tiles = city["expansion_tiles"].as_array().unwrap().clone();
+    assert!(gain > 0.);
+    g.cities[0].radius += 1;
+    g.control();
+    let after = g.view(0);
+    assert_eq!(after["cities"][0]["income"].as_f64().unwrap(), old_income + gain);
+    for tile in tiles {
+        assert_eq!(g.tiles[tile.as_u64().unwrap() as usize].owner, 0);
+    }
+    let gold = g.players[0].gold;
+    g.tick = 5;
+    g.development();
+    assert_eq!(g.players[0].gold - gold, (old_income + gain) as f32);
+
+    // Overlapping friendly cities never count the same farm twice.
+    g.cities[0].radius = 3;
+    let mut extra = g.cities[0].clone();
+    extra.tile = g.tiles[extra.tile].near[0];
+    extra.capital = -1;
+    extra.radius = 1;
+    g.cities.push(extra);
+    g.control();
+    let sources = g.territory_sources();
+    let farms = g.farm_counts(&sources);
+    assert_eq!(farms.iter().sum::<usize>(), sources.iter().enumerate()
+        .filter(|(i, s)| s.is_some() && g.farmland(*i)).count());
+    let preview = g.view(0);
+    assert_eq!(preview["cities"][2]["expansion_income"], 0.);
+    g.cities[0].owner = 1;
+    g.control();
+    assert_eq!(g.tiles[g.cities[0].tile].owner, 1);
+    assert_eq!(g.farm_counts(&g.territory_sources()), farms);
+}
+
+#[test]
+fn farm_income_obeys_sabotage_and_blockade() {
+    let mut g = Game::with_players(42, 2, 1);
+    g.squads.clear();
+    let tile = g.cities[0].tile;
+    for &i in &g.tiles[tile].near.clone() { g.tiles[i].terrain = 1; }
+    let sea = g.tiles[tile].near[0];
+    g.tiles[sea].terrain = 0;
+    g.control();
+    let income = g.view(0)["cities"][0]["income"].as_f64().unwrap() as f32;
+    assert!(income > 5.);
+    g.spawn(1, 7, sea);
+    let gold = g.players[0].gold;
+    g.tick = 5;
+    g.development();
+    assert_eq!(g.players[0].gold - gold, income / 2.);
+    g.cities[0].disabled_until = 30;
+    let gold = g.players[0].gold;
+    g.tick = 15;
+    g.development();
+    assert_eq!(g.players[0].gold, gold);
+}
+
+#[test]
+fn forest_cover_protects_ground_units_from_every_attacker_but_not_aircraft() {
+    let mut g = Game::with_players(42, 2, 1);
+    let mut a = g.squads[0].clone();
+    let mut b = g.squads.iter().find(|u| u.owner == 1).unwrap().clone();
+    a.mode = 0;
+    b.mode = 0;
+    b.kind = 0;
+    g.tick = 100;
+    a.moved = 0;
+    for kind in [0, 1, 2, 3, 4, 5, 6, 7, 9, 12] {
+        a.kind = kind;
+        g.tiles[b.tile].terrain = 3;
+        let exposed = g.damage(&a, &b);
+        g.tiles[b.tile].terrain = 2;
+        assert!((g.damage(&a, &b) - exposed * 0.75).abs() < 0.001);
+    }
+    assert_eq!(g.cover(&b), 0.75);
+    b.kind = 6;
+    assert_eq!(g.cover(&b), 1.);
+}
+
+#[test]
 fn smaller_lobbies_keep_the_full_globe_and_neighbouring_eight_player_starts() {
     for seed in [1, 42, 43, 6201, 12345, 4294967295] {
         let full = Game::new(seed, 1);
