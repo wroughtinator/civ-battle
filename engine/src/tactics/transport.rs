@@ -95,6 +95,7 @@ impl Game {
         self.squads[i].path = vec![ship.tile];
         self.squads[i].to = ship.tile;
         self.squads[i].locked_until = self.tick + 2;
+        let _ = self.claim(passenger);
         Ok(())
     }
 }

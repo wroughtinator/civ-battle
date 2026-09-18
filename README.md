@@ -14,14 +14,14 @@ Two to eight players on a full-size procedural WebGL2 globe, with an authoritati
 - Coins are the only spendable resource. Recruit units, research unit unlocks, expand city control, improve production, or pay for special operations. Friendly-territory refits provide another way to change composition.
 - One connected research tree unlocks cavalry/tank/commando, archer/artillery/drone, fleet/submarine/carrier, then orbital engineer and nuclear launcher through visible prerequisites. The tree shows costs, statistics, counters and abilities.
 - Cannons and bombing runs punish clumps, with friendly fire. Cavalry dislodges defenders. Commandos conceal themselves or sabotage production. Submarines submerge, ping sonar and launch ballistic missiles. Weather, range, setup time and commitment windows create positional tradeoffs.
-- Eligible unexplored land has a seeded 25% chance of a discovery. Ten weighted encounter types include hostile camps, salvage, rescued units, repairs, reconnaissance, weather control and hireable cavalry. Production matches use independent secret randomness for each tile.
+- Eligible unexplored land has a seeded 25% chance of a discovery. Every discovery is the same large gold-banded treasure chest. Walking onto it automatically collects coins, a rescued unit, repairs, reconnaissance, weather protection or free cavalry, with wordless reward symbols and a bright pickup chime. Unit rewards that cannot fit and repairs at full health pay 35 coins instead. Production matches use independent secret randomness for each tile.
 - A green circle means human control; the robot icon means AI control. Hidden tabs and disconnected players hand over to a bot. Returning to the tab or reconnecting restores the same human seat and name.
 
 Win through a capital hold, accumulated territorial influence or an occupied orbital launch program. There is no 20-minute score timeout. Normal play targets 20–25 minutes; persistent territorial progress supplies a finite end condition. See `docs/DESIGN.md` for exact rules and `docs/BALANCE.md` for measured results and limitations.
 
 ## Run, test, deploy
 
-Use Node and Rust with `wasm32-unknown-unknown`. `npm ci`, `npm run build`, `npm run dev` starts port 8793. `npm run deploy` builds and deploys to the configured Cloudflare account. Credentials are not stored in this repository.
+Use Node and Rust with `wasm32-unknown-unknown`. `npm ci`, `npm run build`, `npm run dev` starts port 8793. `bash deploy.sh` builds and deploys to the configured Cloudflare account; add `--dry-run` to check without publishing. `npm run deploy` uses the same pipeline. Existing rooms keep their exact server rules and browser assets. See [deployment instructions](docs/DEPLOYMENT.md). Credentials are not stored in this repository.
 
 `npm test` includes archived-engine regression tests plus current native, WASM and live network tests. Keep `npm run dev` running for network tests. Focused current checks: `cargo test --release --lib tactics::tests` and `node --test tests/*.test.mjs`.
 
@@ -31,7 +31,7 @@ Use Node and Rust with `wasm32-unknown-unknown`. `npm ci`, `npm run build`, `npm
 
 Current rules are in `engine/src/tactics.rs` and `engine/src/tactics/`. Earlier engines remain available only for old running matches. `worker/index.js` handles admission, names, credentials, sequence replay, presence, snapshots and SQLite persistence. `public` contains custom WebGL2 rendering, icon controls and Web Audio. `docs/ASSETS.md` and `docs/asset-manifest.json` preserve asset provenance.
 
-The graphics are stylized procedural 3D. Tests establish specific invariants and compare selected policies; they do not prove chess-level depth, universal dominance of a stronger bot, or that all cheating is impossible. Physical-device performance and prolonged real-player balance testing remain useful follow-up work.
+The graphics combine a procedural 3D globe with authored CC0 skeletal characters, instanced textured trees, coastal beaches, alpine ridges and animated ocean shading. Models load on demand. `node scripts/graphics-preview.mjs` opens a focused local graphics and weapon-cue review on port 8796. Tests establish specific invariants and compare selected policies; they do not prove chess-level depth, universal dominance of a stronger bot, or that all cheating is impossible. Physical-device performance and prolonged real-player balance testing remain useful follow-up work.
 
 ## License
 

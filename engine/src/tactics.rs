@@ -845,10 +845,14 @@ impl Game {
         });
     }
     fn territory_sources(&self) -> Vec<Option<usize>> {
+        self.territory_sources_expanding(None)
+    }
+    fn territory_sources_expanding(&self, expanding: Option<usize>) -> Vec<Option<usize>> {
         let mut best = vec![(u16::MAX, usize::MAX); self.tiles.len()];
         for (n, c) in self.cities.iter().enumerate() {
             for (i, d) in self.distances(c.tile).into_iter().enumerate() {
-                if d <= c.radius as u16 && self.tiles[i].terrain > 0 && (d, n) < best[i] {
+                let radius = c.radius as u16 + u16::from(expanding == Some(n) && c.radius < 3);
+                if d <= radius && self.tiles[i].terrain > 0 && (d, n) < best[i] {
                     best[i] = (d, n);
                 }
             }
@@ -856,6 +860,21 @@ impl Game {
         best.into_iter()
             .map(|(_, n)| if n == usize::MAX { None } else { Some(n) })
             .collect()
+    }
+    fn farmland(&self, tile: usize) -> bool {
+        self.tiles[tile].terrain == 1 && !self.cities.iter().any(|c| c.tile == tile)
+    }
+    fn farm_counts(&self, sources: &[Option<usize>]) -> Vec<usize> {
+        let mut counts = vec![0; self.cities.len()];
+        for (tile, source) in sources.iter().enumerate() {
+            if self.farmland(tile) {
+                if let Some(city) = source { counts[*city] += 1; }
+            }
+        }
+        counts
+    }
+    fn cover(&self, u: &Unit) -> f32 {
+        if self.tiles[u.tile].terrain == 2 && !matches!(u.kind, 6..=9) { 0.75 } else { 1. }
     }
     fn control(&mut self) {
         let sources = self.territory_sources();
@@ -952,6 +971,7 @@ impl Game {
         s.left = cooldown;
         s.total = cooldown;
         self.sync_passengers();
+        let _ = self.claim(i);
     }
     fn line_of_sight(&self, from: usize, to: usize) -> bool {
         let d = self.distances(to);
@@ -999,9 +1019,7 @@ impl Game {
         if a.kind == 8 && self.tiles[b.tile].terrain != 0 {
             return 0.;
         }
-        if self.tiles[b.tile].terrain == 2 && matches!(a.kind, 2 | 6) {
-            x *= 0.75;
-        }
+        x *= self.cover(b);
         if b.mode == 3 && b.effect_until > self.tick && matches!(b.kind, 0 | 3 | 7 | 9) {
             x *= 0.55;
         }
@@ -1122,7 +1140,7 @@ impl Game {
             let d = self.distances(s.to);
             for (i, u) in self.squads.iter().enumerate() {
                 if u.boarded_on.is_none() && d[u.tile] <= if s.kind == 2 { 1 } else { 0 } {
-                    hits[i] += if s.kind == 2 { 140. } else { 75. };
+                    hits[i] += (if s.kind == 2 { 140. } else { 75. }) * self.cover(u);
                 }
             }
             self.event(2, s.owner, s.to);
@@ -1144,6 +1162,7 @@ impl Game {
     }
     fn development(&mut self) {
         let mut changed = false;
+        let farms = self.farm_counts(&self.territory_sources());
         for p in &mut self.players {
             if p.research >= 0 {
                 p.research_left = p.research_left.saturating_sub(1);
@@ -1207,7 +1226,8 @@ impl Game {
                         && self.tiles[c.tile].near.contains(&u.tile)
                 });
                 self.players[c.owner].gold +=
-                    (3. + c.production as f32 * 2.) * if blockade { 0.5 } else { 1. };
+                    (3. + c.production as f32 * 2. + farms[i] as f32 * 0.25)
+                        * if blockade { 0.5 } else { 1. };
             }
         }
         self.eliminate_landless();
@@ -1360,6 +1380,7 @@ impl Game {
             self.vision(p)
         };
         let sources = self.territory_sources();
+        let farms = self.farm_counts(&sources);
         let tiles:Vec<_>=self.tiles.iter().enumerate().map(|(i,t)|json!({"owner":if v[i]{t.owner}else{-2},"city":sources[i].filter(|&n| v[i] && (spectator || self.cities[n].owner == p || v[self.cities[n].tile])).map(|n|self.cities[n].tile),"building":if v[i]{t.building}else{0},"visible":v[i],"storm":self.storm(i)})).collect();
         let players:Vec<_>=self.players.iter().enumerate().map(|(i,a)|if i==p{serde_json::to_value(a).unwrap()}else{json!({"civ":a.civ,"tag":a.tag,"name":a.name,"bot":a.bot,"alive":a.alive,"score":a.score,"mandate":a.mandate,"launch":a.launch,"domination":a.domination})}).collect();
         let squads: Vec<_> = self
@@ -1386,8 +1407,9 @@ impl Game {
         let cities: Vec<_> = self
             .cities
             .iter()
-            .filter(|c| v[c.tile] || c.owner == p || c.capital >= 0)
-            .map(|c| {
+            .enumerate()
+            .filter(|(_, c)| v[c.tile] || c.owner == p || c.capital >= 0)
+            .map(|(n, c)| {
                 let mut a = c.clone();
                 if c.owner != p {
                     a.training = -1;
@@ -1400,7 +1422,22 @@ impl Game {
                         a.claimant = -1;
                     }
                 }
-                a
+                let mut value = serde_json::to_value(a).unwrap();
+                if c.owner == p || spectator {
+                    value["farms"] = json!(farms[n]);
+                    value["income"] = json!(3. + c.production as f32 * 2. + farms[n] as f32 * 0.25);
+                    if c.owner == p && c.radius < 3 {
+                        let expanded = self.territory_sources_expanding(Some(n));
+                        let tiles: Vec<_> = expanded.iter().enumerate()
+                            .filter(|(i, source)| **source == Some(n) && sources[*i] != Some(n) && v[*i])
+                            .map(|(i, _)| i).collect();
+                        let new_farms = tiles.iter().filter(|&&i| self.farmland(i)
+                            && sources[i].is_none_or(|other| self.cities[other].owner != p)).count();
+                        value["expansion_tiles"] = json!(tiles);
+                        value["expansion_income"] = json!(new_farms as f32 * 0.25);
+                    }
+                }
+                value
             })
             .collect();
         let strikes: Vec<_> = self

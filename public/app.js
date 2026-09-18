@@ -1,10 +1,11 @@
 import { Globe } from './globe.js';
 import { icon, colors, civs, civNames, buildings, techs } from './icons.js';
 import { Soundscape } from './audio.js';
-import {passengers,boardingCapacity,branches,unitIcons,unitNames,counters,prerequisites,researchCost,researchGate,distances,route,abilities} from './planning.js';
+import {passengers,boardingCapacity,boardingTarget,branches,unitIcons,unitNames,counters,prerequisites,researchCost,researchGate,distances,route,abilities,canEnter} from './planning.js';
 import {orderBlock,targetTiles,refitChoices,abilityCost} from './controls.js';
 import {Manual} from './manual.js';
 import {FeedbackLayer} from './feedback.js';
+import {terrainIcons,inForestCover,rate,incomeBenefit} from './terrain.js';
 const $=id=>document.getElementById(id),show=(id,yes)=>$(id).classList.toggle('hidden',!yes);
 const btn=(id,symbol,label,body='',extra='')=>`<button ${id?`id="${id}"`:''} aria-label="${label}" ${extra}>${icon(symbol)}${body}</button>`;
 const num=n=>Math.floor(n??0),time=n=>`${Math.floor(n/60).toString().padStart(2,'0')}:${Math.floor(n%60).toString().padStart(2,'0')}`;
@@ -17,7 +18,7 @@ document.addEventListener('pointerdown',()=>pointerHeld=true,true);
 const finishPointer=()=>requestAnimationFrame(()=>{pointerHeld=false;if(pendingRender&&state){pendingRender=false;render();rebuildMarkers();}});
 document.addEventListener('pointerup',finishPointer,true);document.addEventListener('pointercancel',finishPointer,true);
 let arsenal=false,activeUnit=-1,targetOrder=null;
-let callsign=1000+crypto.getRandomValues(new Uint32Array(1))[0]%9000;const encountered=new Set(),seenDiscoveries=new Set();
+let callsign=1000+crypto.getRandomValues(new Uint32Array(1))[0]%9000;const encountered=new Set();
 const pick=values=>values[crypto.getRandomValues(new Uint32Array(1))[0]%values.length];
 let username=pick(['Mighty','Cosmic','Brave','Golden','Quiet','Lucky','Nimble','Velvet','Wandering','Daring','Sunny','Clever','Silver','Wild','Royal','Hidden'])+' '+pick(['Mango','Fox','Owl','Otter','Peach','Panda','Falcon','Tiger','Lynx','Kiwi','Badger','Orca','Cedar','Comet','Walrus','Lotus']);
 try{const saved=document.cookie.split('; ').find(x=>x.startsWith('meridian_name='));if(saved)username=Array.from(decodeURIComponent(saved.slice(14))).slice(0,32).join('')||username;}catch{}
@@ -29,8 +30,6 @@ async function syncProfile(){while(profileDirty&&connected&&state?.phase==='lobb
 function queueProfile(){profileDirty=true;clearTimeout(profileTimer);profileTimer=setTimeout(()=>{profilePromise=profilePromise.catch(()=>{}).then(syncProfile).catch(()=>{});},350);}
 async function flushProfile(){clearTimeout(profileTimer);await profilePromise;profileDirty=true;await syncProfile();}
 let selectedTech=1,abilityTarget=null,refitOpen=false;
-const discoveryIcons=['swords','coin','scout','shield','sail','telescope','gear','heart','cloud','horse'];
-const discoveryNames=['Hostile camp','Buried treasury','Stranded scouts','Abandoned guard post','Wrecked caravan','Observatory','Repair workshop','Supply depot','Weather station','Mercenary camp'];
 let globe;
 const soundscape=new Soundscape();sound=soundscape.enabled;
 document.addEventListener('pointerdown',()=>soundscape.unlock(),{passive:true});
@@ -64,7 +63,6 @@ function connect(){
    if(!connected){setConnected(true);retry=0;}lastTick=msg.tick;lastStateAt=performance.now();globe.setState(msg,slot);feedbackLayer.accept(msg);
    if(msg.phase==='running'&&!hasStarted){hasStarted=true;home();}
    soundscape.events(msg,previous,world,globe,slot);
-   if(msg.phase==='running')for(const d of msg.discoveries||[]){if(!seenDiscoveries.has(d.tile)){seenDiscoveries.add(d.tile);if(!d.used){toast(discoveryIcons[d.kind]);soundscape.play('confirm',.2);break;}}}
    if(msg.phase==='running'){for(const t of msg.tiles)if(t.visible&&t.owner>=0&&t.owner!==slot&&!encountered.has(t.owner)){encountered.add(t.owner);toast(civs[msg.players[t.owner].civ],html(msg.players[t.owner].name));break;}}
    if(pointerHeld)pendingRender=true;else{render();rebuildMarkers();}if(readyResolve){readyResolve();readyResolve=null;}
   }
@@ -118,7 +116,7 @@ const price=n=>`<span class="price">${icon('coin')}${n}</span>`;
 const stat=(symbol,n)=>`<span class="stat">${icon(symbol)}${n}</span>`;
 function unitStats(k){const s=state.rules.specs[k];return `<div class="unit-stats">${stat('heart',s.hp)}${s.damage?stat('swords',s.damage)+stat('eye',s.min===s.range?s.range:`${s.min}–${s.range}`):''}${stat('route',s.speed)}${s.damage?stat('clock',s.reload):''}</div>`;}
 function unitCounters(k){return counters[k].length?`<div class="counter-strip">${icon(unitIcons[k])}${icon('swords')}${counters[k].map(i=>icon(unitIcons[i])).join('')}</div>`:'';}
-function clearRoute(){abilityTarget=null;document.body.classList.remove('targeting');globe.previewPath=[];globe.setTargets(new Set());}
+function clearRoute(){abilityTarget=null;document.body.classList.remove('targeting');globe.previewPath=[];globe.setTargets(new Set());globe.setBlockedTargets(new Set());}
 function selectCity(tile){clearRoute();activeUnit=-1;globe.routeUnit=-1;selected=tile;techOpen=false;show('research',false);globe.choose(tile,true);globe.frameCity(tile);renderProvince();}
 function selectUnit(id){refitOpen=false;const u=state.squads.find(u=>u.id===id);if(!u)return;if(u.boarded_on!=null){selectUnit(u.boarded_on);return;}clearRoute();activeUnit=id;selected=u.tile;techOpen=false;show('research',false);globe.choose(u.tile);globe.routeUnit=id;globe.focus(u.tile);renderProvince();}
 function availability(kind,data={}){
@@ -134,6 +132,7 @@ function aim(u,kind,value,iconName){
  const same=abilityTarget?.kind===kind&&abilityTarget?.value===value;
  clearRoute();refitOpen=false;
  if(!same){abilityTarget={icon:iconName,kind,value};document.body.classList.add('targeting');
+  if(kind==='move'){const d=distances(world,u.tile);globe.setBlockedTargets(new Set(world.flatMap((t,i)=>state.tiles[i]?.visible&&d[i]<=3&&!canEnter(world,u.kind,i)&&!boardingTarget(world,state,u,i)?[i]:[])));}
   if(kind!=='move')globe.setTargets(new Set(targetTiles(world,state,u,kind,value)));
  }
  renderProvince();
@@ -162,15 +161,15 @@ function renderProvince(){
  if(state.phase!=='running'||techOpen||!u&&!city){show('province',false);return;}show('province',true);
  if(u&&selected!==u.tile){selected=u.tile;globe.choose(u.tile);}
  if(u){
-  const own=u.owner===slot&&!state.spectator,sp=state.rules.specs[u.kind],discovery=state.discoveries?.find(d=>d.tile===u.tile&&!d.used);
+  const own=u.owner===slot&&!state.spectator,sp=state.rules.specs[u.kind];
   const options=own?refitChoices(state,u):[],actions=abilities(u.kind),block=(kind,value=0,to=null)=>availability(kind,{from:u.id,value,to});
   const cargo=passengers(state,u),capacity=boardingCapacity(state,u);
   const refitBlock=options.length?block('refit',options[0]):null;
   const canRefit=options.some(k=>!block('refit',k));
   const actionMarkup=actions.map((a,i)=>actionButton(`ability-${i}`,a.icon,a.label,abilityCost(state,u,a.value)?price(abilityCost(state,u,a.value)):'',block('ability',a.value),u.kind===13||u.kind===10)).join('');
-  $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[u.owner]}">${icon(unitIcons[u.kind])}</span><div><span class="owner-name">${html(state.players[u.owner]?.name||'')}</span><div class="health"><i style="width:${100*u.hp/sp.hp}%"></i></div>${stat('heart',num(u.hp))}</div><span class="spacer"></span>${city?btn('select-city','city','Select city here'):''}${btn('close-piece','close','Close selection')}</div>
+  $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[u.owner]}">${icon(unitIcons[u.kind])}</span><div><span class="owner-name">${html(state.players[u.owner]?.name||'')}</span><div class="health"><i style="width:${100*u.hp/sp.hp}%"></i></div>${stat('heart',num(u.hp))}<span class="terrain-status">${icon(terrainIcons[world[u.tile].terrain])}${inForestCover(world,u)?`<span aria-label="Forest cover: 25% less incoming damage">${icon('shield')}−25%</span>`:''}</span></div><span class="spacer"></span>${city?btn('select-city','city','Select city here'):''}${btn('close-piece','close','Close selection')}</div>
    ${capacity&&(own||state.spectator)?`<div class="passenger-status" aria-label="${cargo.length} of ${capacity} passengers aboard">${icon('board')}<strong>${cargo.length}/${capacity}</strong><span class="passenger-manifest">${cargo.map(s=>`<span title="${unitNames[s.kind]}: ${num(s.hp)} health" aria-label="${unitNames[s.kind]}, ${num(s.hp)} health">${icon(unitIcons[s.kind])}</span>`).join('')}</span></div>`:''}
-   ${own&&!state.spectator?`<div class="action-row unit-actions">${actionButton('move-order','route','Move: choose a destination hex','',block('move'))}${sp.damage?actionButton('attack-order','swords','Attack: choose a hex in range; committed until recovery','',block('attack')):''}${actionMarkup}${capacity?actionButton('disembark-order','disembark','Disembark one passenger: choose adjacent empty land; first passenger able to enter it','',block('disembark')):''}${actionButton('stop-order','hand',u.founding?'Cancel city construction':'Clear remaining path; keep current tile and cooldown','',block('stop'),u.path.length>1)}${discovery?actionButton('claim-site',discoveryIcons[discovery.kind],`Explore ${discoveryNames[discovery.kind]}`,discovery.kind===9?price(50):'',block('explore')):''}${options.length?actionButton('refit-toggle','refit','Choose a different military unit', '',canRefit?null:refitBlock):''}${actionButton('disband-unit','disband','Disband this unit',state.tiles[u.tile].owner===slot?price(Math.floor(sp.cost*.25)):'',block('disband'))}</div>`:''}
+   ${own&&!state.spectator?`<div class="action-row unit-actions">${actionButton('move-order','route','Move: choose a destination hex','',block('move'))}${sp.damage?actionButton('attack-order','swords','Attack: choose a hex in range; committed until recovery','',block('attack')):''}${actionMarkup}${capacity?actionButton('disembark-order','disembark','Disembark one passenger: choose adjacent empty land; first passenger able to enter it','',block('disembark')):''}${actionButton('stop-order','hand',u.founding?'Cancel city construction':'Clear remaining path; keep current tile and cooldown','',block('stop'),u.path.length>1)}${options.length?actionButton('refit-toggle','refit','Choose a different military unit', '',canRefit?null:refitBlock):''}${actionButton('disband-unit','disband','Disband this unit',state.tiles[u.tile].owner===slot?price(Math.floor(sp.cost*.25)):'',block('disband'))}</div>`:''}
    ${abilityTarget?`<div class="aim-hint" aria-label="Choose a map target">${icon(abilityTarget.icon)}${icon('arrow')}${icon('territory')}</div>`:''}
    ${refitOpen&&own&&options.length?`<div class="action-row recruit-row">${options.map(k=>actionButton(`refit-${k}`,unitIcons[k],`Refit as ${unitNames[k]}`,price(Math.max(30,state.rules.specs[k].cost-sp.cost*.5)),block('refit',k))).join('')}</div>`:''}
    ${u.path.length>1||u.left>0?`<div class="movement-status" aria-label="Remaining steps and movement cooldown">${stat('route',u.path.length-1)}${stat('clock',u.left)}</div>`:''}
@@ -186,7 +185,6 @@ function renderProvince(){
    if(sp.damage)$('attack-order').onclick=()=>aim(u,'attack',0,'swords');
    if(options.length)$('refit-toggle').onclick=()=>{clearRoute();refitOpen=!refitOpen;renderProvince();};
    if(refitOpen)options.forEach(k=>{const b=$(`refit-${k}`);if(b)b.onclick=()=>{refitOpen=false;command('refit',{from:u.id,value:k});};});
-   if(discovery)$('claim-site').onclick=()=>{clearRoute();command('explore',{from:u.id});};
    $('stop-order').onclick=()=>{clearRoute();command('stop',{from:u.id});};
    actions.forEach((a,i)=>$(`ability-${i}`).onclick=()=>{if(a.target)aim(u,'ability',a.value,a.icon);else{clearRoute();command('ability',{from:u.id,value:a.value});}});
   }
@@ -194,8 +192,11 @@ function renderProvince(){
  }else if(city){
   const own=city.owner===slot&&!state.spectator,p=state.players[slot],unit=state.squads.find(u=>u.tile===city.tile),units=own?p.unlocked:[];
   const block=(kind,value)=>availability(kind,{from:city.tile,value});
-  $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[city.owner]}">${icon(city.capital>=0?'crown':'city')}</span><div><span class="owner-name">${html(state.players[city.owner].name)}</span><div class="unit-stats">${stat('territory',city.radius)}${stat('factory',city.production)}${own?stat('coin',3+city.production*2)+stat('clock',5):''}</div></div><span class="spacer"></span>${unit?btn('select-occupant',unitIcons[unit.kind],'Select occupying unit'):''}${btn('close-piece','close','Close selection')}</div>
-   ${own?`<div class="city-upgrades">${actionButton('radius-upgrade','territory','Expand city control radius',city.radius<3?`<span class="radius-change">${city.radius}${icon('arrow')}${city.radius+1}</span>${price([0,80,140][city.radius])}`:'',block('upgrade',0))}${actionButton('production-upgrade','factory','Upgrade production and income',city.production<3?price([0,110,180][city.production]):'',block('upgrade',1))}</div>
+  const capacityGain=state.rules.unit_cap<16?1:0;
+  const landBenefits=city.radius<3?`<span class="radius-change">${city.radius}${icon('arrow')}${city.radius+1}</span><span class="upgrade-benefit">${icon('shield')}+${capacityGain}</span>${incomeBenefit(icon,city.expansion_income??0)}${price([0,80,140][city.radius])}`:'';
+  const productionBenefits=city.production<3?`<span class="upgrade-benefit">${icon('coin')}+0.4<span class="upgrade-per">/${icon('clock')}1</span></span><span class="upgrade-benefit">${icon('hourglass')}−${city.production===1?'20':'16.7'}%</span>${price([0,110,180][city.production])}`:'';
+  $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[city.owner]}">${icon(city.capital>=0?'crown':'city')}</span><div><span class="owner-name">${html(state.players[city.owner].name)}</span><div class="unit-stats">${stat('territory',city.radius)}${stat('factory',city.production)}${own?stat('wheat',city.farms??0)+stat('coin',rate(city.income??(3+city.production*2)))+stat('clock',5):''}</div></div><span class="spacer"></span>${unit?btn('select-occupant',unitIcons[unit.kind],'Select occupying unit'):''}${btn('close-piece','close','Close selection')}</div>
+   ${own?`<div class="city-upgrades">${actionButton('radius-upgrade','territory',city.radius<3?`Expand city control radius to ${city.radius+1}; +${rate((city.expansion_income??0)/5)} coins per second from new farmland; +${capacityGain} unit capacity${capacityGain?'':'; capacity limit reached'}`:'Expand city control radius',landBenefits,block('upgrade',0))}${actionButton('production-upgrade','factory',city.production<3?`Upgrade production: +0.4 coins per second (2 every 5 seconds); approximately ${city.production===1?'20':'16.7'}% shorter training time for new recruits`:'Upgrade production and income',productionBenefits,block('upgrade',1))}</div>
    <div class="action-row recruit-row">${units.map(k=>actionButton(`train-${k}`,unitIcons[k],`Train ${unitNames[k]}, ${state.rules.specs[k].cost} coins`,price(state.rules.specs[k].cost),block('train',k))).join('')}</div>
    ${city.training>=0?`<div class="training">${icon(unitIcons[city.training])}${stat('clock',city.left)}<div class="job-progress"><i style="width:${100*(1-city.left/city.total)}%"></i></div></div>`:''}`:''}
    ${city.capture?`<div class="training">${icon('swords')}${city.capture}/12</div>`:''}`;
@@ -218,10 +219,9 @@ function renderEnding(){const p=state.players[state.winner];show('ending',true);
 function rebuildMarkers(){
  $('markers').innerHTML='';markerNodes=[];const preview=state.phase==='preview'||state.phase==='lobby';
  for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.innerHTML=`<span class="marker-name">${html(state.players[c.owner].name)}</span>${icon(c.capital>=0?'crown':'city')}${c.capture?`<span>${c.capture}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
- if(!preview)for(const d of state.discoveries||[]){if(d.used)continue;const el=document.createElement('button');el.className='marker discovery-marker';el.style.setProperty('--faction',d.kind===0?'#cd7755':'#86d4c7');el.setAttribute('aria-label',`Explore ${discoveryNames[d.kind]} at hex ${d.tile}`);el.innerHTML=icon(discoveryIcons[d.kind]);el.onclick=()=>{if(abilityTarget)select(d.tile);else{globe.focus(d.tile);toast(discoveryIcons[d.kind]);}};$('markers').append(el);markerNodes.push({el,p:world[d.tile].p,i:d.tile,discovery:true});}
- if(!preview)for(const u of state.squads){if(u.boarded_on!=null)continue;const el=document.createElement('button');el.className=`marker unit-marker ${u.founding?'founding':''} ${u.mode===1?'concealed':''}`;el.style.setProperty('--faction',colors[u.owner]);el.setAttribute('aria-label',`${(state.players[u.owner]?.name||'')}, ${unitNames[u.kind]} ${u.id}, health ${num(u.hp)}`);el.innerHTML=icon(unitIcons[u.kind])+`<i class="piece-health" style="width:${100*u.hp/state.rules.specs[u.kind].hp}%"></i>${u.founding?`<span class="work-count">${u.work}</span>`:u.locked_until>state.tick?`<span class="work-count">${u.locked_until-state.tick}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(u.tile);else selectUnit(u.id);};$('markers').append(el);markerNodes.push({el,p:world[u.tile].p,i:-1,u});}
+ if(!preview)for(const u of state.squads){if(u.boarded_on!=null)continue;const el=document.createElement('button');el.className=`marker unit-marker ${u.founding?'founding':''} ${u.mode===1?'concealed':''}`;el.style.setProperty('--faction',colors[u.owner]);el.setAttribute('aria-label',`${(state.players[u.owner]?.name||'')}, ${unitNames[u.kind]} ${u.id}, health ${num(u.hp)}`);el.innerHTML=icon(unitIcons[u.kind])+(inForestCover(world,u)?`<span class="cover-badge" aria-label="Forest cover">${icon('shield')}</span>`:'')+`<i class="piece-health" style="width:${100*u.hp/state.rules.specs[u.kind].hp}%"></i>${u.founding?`<span class="work-count">${u.work}</span>`:u.locked_until>state.tick?`<span class="work-count">${u.locked_until-state.tick}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(u.tile);else selectUnit(u.id);};$('markers').append(el);markerNodes.push({el,p:world[u.tile].p,i:-1,u});}
 }
-function updateMarkers(now){if(!globe)return;for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y+(u?22:n.discovery?-15:-34)}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
+function updateMarkers(now){if(!globe)return;for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y+(u?22:-34)}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
  if(state?.phase==='running')$('clock').innerHTML=icon('clock')+`<span>${time(lastTick+Math.min(2,Math.floor((now-lastStateAt)/1000)))}</span>`;feedbackLayer.update(now,globe);soundscape.mix(globe,state,now);
 }
 $('tools').innerHTML=btn('home','home','Focus your capital')+btn('zoom-in','plus','Zoom in')+btn('zoom-out','minus','Zoom out')+btn('sound','mute','Toggle sound')+btn('help','book','Open icon manual');

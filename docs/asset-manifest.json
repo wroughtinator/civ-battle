@@ -8,6 +8,14 @@
       "sha256": "400bf5401f2bbe5dfbb69727ebdf2e48d681a606f4d6224f35521f8ceef862a2"
     },
     {
+      "file": "public/assets/archer.rig",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "source": "https://opengameart.org/content/lowpoly-rpg-characters",
+      "bytes": 349548,
+      "sha256": "0a37eb3b15e68d9a6fe1993f0832d62795f6f5fc7191f39aa0aa15637989b978"
+    },
+    {
       "file": "public/assets/artillery.mesh",
       "license": "CC0-1.0",
       "bytes": 10176,
@@ -62,6 +70,14 @@
       "sha256": "3af5c68bc989a5c614f23ae71247e30f052578fa03ca63d887610f9616c0f155"
     },
     {
+      "file": "public/assets/guard.rig",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "source": "https://opengameart.org/content/lowpoly-rpg-characters",
+      "bytes": 421108,
+      "sha256": "309ce0e7dc829f1610a377bf95595100d8dd34c458adc76139b85050ee65b8bb"
+    },
+    {
       "file": "public/assets/launcher.mesh",
       "license": "CC0-1.0",
       "bytes": 21408,
@@ -110,6 +126,14 @@
       "sha256": "3374e8e5674c2a49443c68605ad8a87ff5d5ea5680e9a0bdc1c6a9fe04f65f19"
     },
     {
+      "file": "public/assets/scout.rig",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "source": "https://opengameart.org/content/lowpoly-rpg-characters",
+      "bytes": 294948,
+      "sha256": "17dd433187c96ac8bb305bb6126def1356555dd6e6a0b12cad577be291566ccc"
+    },
+    {
       "file": "public/assets/settler.mesh",
       "license": "CC0-1.0",
       "bytes": 19968,
@@ -126,6 +150,22 @@
       "bytes": 51456,
       "sha256": "19269403c12d290e5ec030ec56440a1bd11a241192f00ace0f58e17d64566c77",
       "license": "CC0-1.0"
+    },
+    {
+      "file": "public/assets/woodland.mesh",
+      "license": "CC0-1.0",
+      "author": "carlosjorgereis",
+      "source": "https://opengameart.org/content/very-low-poly-and-texture-tree",
+      "bytes": 39660,
+      "sha256": "344b33477f7b3e8510fc4bf98276b004d163f96274af08cfc7025ce03f5283ca"
+    },
+    {
+      "file": "public/assets/woodland.webp",
+      "license": "CC0-1.0",
+      "author": "carlosjorgereis",
+      "source": "https://opengameart.org/content/very-low-poly-and-texture-tree",
+      "bytes": 37950,
+      "sha256": "f3b11b41bbeebdf59e4c5e296769e17526e6ee60b1feb631479e3ec4e9b0273f"
     }
   ]
 }
