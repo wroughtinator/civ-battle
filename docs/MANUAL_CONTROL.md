@@ -23,3 +23,11 @@ Planning baseline: PASS. Candidate: INCONCLUSIVE; combat breadth and peaceful sp
 Coverage was extended: the guards portfolio explicitly enables robot control, and focused combat search can enable or disable it. Other full-game policies issue discrete manual shots. Consequently before/after results mix the intended rule change with necessary controller coverage changes; they are not a pure balance comparison. Evaluators and thresholds were not changed.
 
 Fresh-seed holdouts: full game (43000) FAIL on policy diversity, with space winning 82.1% of its opponent-weighted matchups; input restraint remains inconclusive (70.3% fast-side wins), and no complete compute seed pairs were obtained within the deadline. Planning (61000) remains INCONCLUSIVE on foresight and input restraint, while breadth and peaceful space pass. These results do not override the candidate input-restraint failure.
+
+## Landing integration
+
+Merged the current space-balance and combat-visual changes from main. The launch-counter bot now issues each manual shot explicitly; its regression test runs the bot continuously instead of relying on automatic fire after one order. All 68 tactical Rust tests, 41 focused JavaScript/WASM tests, and the WASM build pass. No archived release was edited.
+
+The post-merge 120-second full-game run (42000) remains FAIL: input restraint and completion fail; thinking, diversity and multiplayer are inconclusive. The same-policy fast side wins 98.6%, and 111 of 355 resolved experiments hit the diagnostic cap. This combined code does not satisfy the input-restraint design requirement or establish strategic depth. The exact summary is preserved in manual-control-audit/design-land.json.
+
+The post-merge planning run (51000, 120 seconds) is INCONCLUSIVE: breadth and peaceful space pass, foresight and input restraint remain inconclusive. Its summary is preserved in manual-control-audit/planning-land.json.
