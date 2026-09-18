@@ -45,3 +45,15 @@ Preserved results:
 - [Design after](manufacture-design-after.json)
 - [Planning baseline](manufacture-planning-baseline.json)
 - [Planning after](manufacture-planning-after.json)
+
+## Main integration verification
+
+After merging the current space/conquest, combat-visual and manual-control
+changes from main, all four queue engine tests and six focused client/lifecycle
+tests pass. JavaScript syntax checks pass. The final 120-second design run
+(seed 42000) reports **FAIL**, including input restraint and completion; the
+planning run (seed 51000) reports **INCONCLUSIVE**. These are recorded in
+[design integration results](manufacture-design-land.json) and
+[planning integration results](manufacture-planning-land.json). The incoming
+rule changes mean these runs are integration evidence, not an isolated
+before/after estimate of the manufacture interface.
