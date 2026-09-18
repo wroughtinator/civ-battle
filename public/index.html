@@ -22,10 +22,10 @@
  <header id="topbar"><div class="sigil" data-help="globe" aria-label="Meridian"><svg viewBox="0 0 60 60" fill="none" stroke="currentColor"><circle cx="30" cy="30" r="19"/><ellipse cx="30" cy="30" rx="9" ry="19"/><path d="M11 30h38M30 2v12M30 46v12M2 30h12M46 30h12"/><circle cx="30" cy="30" r="26" stroke-dasharray="1 5"/></svg></div><div id="resources"></div><div id="clock"></div><div id="connection" aria-label="Connection status"></div></header>
  <main id="lobby" class="panel"><div class="lobby-emblem" id="emblem"></div><div class="rule-line"><i></i><span id="era"></span><i></i></div><div id="civilizations" class="civilizations"></div><div id="bonus" class="bonus"></div><div class="divider"></div><div id="seats" class="seats"></div><div id="config" class="config"></div><div class="divider"></div><div id="victory-hint" class="victory-hint"></div><div class="launch-row"><button id="invite" class="secondary" aria-label="Create lobby and copy invitation link"></button><button id="start" class="primary" aria-label="Start match"></button></div><div id="seed" class="seed"></div></main>
  <aside id="roster" class="hidden"></aside><nav id="tools"></nav>
- <section id="province" class="panel hidden" aria-label="Selected unit or city actions"></section>
+ <section id="province" class="panel hidden" aria-label="Selected tile, unit or city details"></section>
  <section id="research" class="panel hidden" aria-label="Technology tree"></section>
  <section id="guide" class="panel hidden" aria-label="Icon manual"></section>
- <section id="ending" class="panel hidden" aria-label="Match result"></section>
+ <dialog id="ending" class="panel" aria-labelledby="victory-title"></dialog>
  <div id="toast" role="status"></div><div id="march-hint" class="hidden"></div>
  <footer id="dock"></footer>
  <script type="module" src="/app.js"></script>
