@@ -1,0 +1,85 @@
+{
+  "name": "site",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "crate0",
+      "position": [
+        -0.25,
+        0.12,
+        0.2
+      ],
+      "size": [
+        0.25,
+        0.24,
+        0.25
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ]
+    },
+    {
+      "name": "crate1",
+      "position": [
+        0.25,
+        0.12,
+        0.2
+      ],
+      "size": [
+        0.25,
+        0.24,
+        0.25
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ]
+    },
+    {
+      "name": "crate2",
+      "position": [
+        0,
+        0.12,
+        -0.25
+      ],
+      "size": [
+        0.25,
+        0.24,
+        0.25
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ]
+    },
+    {
+      "name": "antenna",
+      "position": [
+        0,
+        0.4,
+        0
+      ],
+      "size": [
+        0.025,
+        0.8,
+        0.025
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "shape": "cylinder",
+      "segments": 4
+    }
+  ],
+  "animations": []
+}

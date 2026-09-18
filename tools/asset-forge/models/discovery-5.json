@@ -1,0 +1,67 @@
+{
+  "name": "discovery-5",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "shrine",
+      "position": [
+        0,
+        0.2,
+        0
+      ],
+      "size": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ]
+    },
+    {
+      "name": "crystal",
+      "position": [
+        0,
+        0.6,
+        0
+      ],
+      "size": [
+        0.32,
+        0.45,
+        0.32
+      ],
+      "material": 15,
+      "color": [
+        33,
+        58,
+        72
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "taper": 0.06
+    },
+    {
+      "name": "used-marker",
+      "position": [
+        0.35,
+        0.08,
+        0.3
+      ],
+      "size": [
+        0.035,
+        0.16,
+        0.035
+      ],
+      "material": 13,
+      "color": [
+        159,
+        129,
+        55
+      ]
+    }
+  ],
+  "animations": []
+}

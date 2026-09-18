@@ -1,0 +1,64 @@
+{
+  "name": "discovery-1",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "chest",
+      "position": [
+        0,
+        0.16,
+        0
+      ],
+      "size": [
+        0.55,
+        0.32,
+        0.4
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ]
+    },
+    {
+      "name": "band",
+      "position": [
+        0,
+        0.165,
+        0.21
+      ],
+      "size": [
+        0.08,
+        0.3,
+        0.018
+      ],
+      "material": 13,
+      "color": [
+        159,
+        129,
+        55
+      ]
+    },
+    {
+      "name": "used-marker",
+      "position": [
+        0.35,
+        0.08,
+        0.3
+      ],
+      "size": [
+        0.035,
+        0.16,
+        0.035
+      ],
+      "material": 13,
+      "color": [
+        159,
+        129,
+        55
+      ]
+    }
+  ],
+  "animations": []
+}

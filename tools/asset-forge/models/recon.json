@@ -1,0 +1,497 @@
+{
+  "name": "recon",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "body",
+      "position": [
+        0,
+        0.59,
+        0
+      ],
+      "size": [
+        0.31,
+        0.35,
+        0.19
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ],
+      "taper": 0.86
+    },
+    {
+      "name": "head",
+      "position": [
+        0,
+        0.3,
+        0
+      ],
+      "size": [
+        0.21,
+        0.23,
+        0.2
+      ],
+      "material": 9,
+      "color": [
+        179,
+        132,
+        98
+      ],
+      "parent": 0
+    },
+    {
+      "name": "helmet",
+      "position": [
+        0,
+        0.11,
+        0
+      ],
+      "size": [
+        0.25,
+        0.1,
+        0.24
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ],
+      "parent": 1
+    },
+    {
+      "name": "left-arm",
+      "position": [
+        -0.215,
+        0.11,
+        0
+      ],
+      "size": [
+        0.11,
+        0.35,
+        0.12
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.13,
+        0
+      ]
+    },
+    {
+      "name": "left-leg",
+      "position": [
+        -0.09244999999999999,
+        -0.2,
+        0
+      ],
+      "size": [
+        0.12,
+        0.39,
+        0.14
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.16,
+        0
+      ]
+    },
+    {
+      "name": "right-arm",
+      "position": [
+        0.215,
+        0.11,
+        0
+      ],
+      "size": [
+        0.11,
+        0.35,
+        0.12
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.13,
+        0
+      ]
+    },
+    {
+      "name": "right-leg",
+      "position": [
+        0.09244999999999999,
+        -0.2,
+        0
+      ],
+      "size": [
+        0.12,
+        0.39,
+        0.14
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.16,
+        0
+      ]
+    },
+    {
+      "name": "eye-0.045",
+      "position": [
+        -0.045,
+        0.02,
+        0.103
+      ],
+      "size": [
+        0.027,
+        0.027,
+        0.008
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "parent": 1
+    },
+    {
+      "name": "eye0.045",
+      "position": [
+        0.045,
+        0.02,
+        0.103
+      ],
+      "size": [
+        0.027,
+        0.027,
+        0.008
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "parent": 1
+    },
+    {
+      "name": "vest",
+      "position": [
+        0,
+        0.02,
+        0.105
+      ],
+      "size": [
+        0.28,
+        0.24,
+        0.035
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ],
+      "parent": 0
+    },
+    {
+      "name": "rifle",
+      "position": [
+        0,
+        -0.18,
+        0.24
+      ],
+      "size": [
+        0.05,
+        0.08,
+        0.42
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "parent": 5
+    },
+    {
+      "name": "stock",
+      "position": [
+        0,
+        -0.17,
+        0.015
+      ],
+      "size": [
+        0.045,
+        0.1,
+        0.12
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "parent": 5
+    }
+  ],
+  "animations": [
+    {
+      "name": "idle",
+      "duration": 2,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -1.5
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                0,
+                1.5
+              ]
+            },
+            {
+              "time": 2,
+              "rotation": [
+                0,
+                0,
+                -1.5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "walk",
+      "duration": 0.8,
+      "tracks": [
+        {
+          "part": 4,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 6,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                25,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 3,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 5,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                25,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "attack",
+      "duration": 0.6,
+      "tracks": [
+        {
+          "part": 5,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "rotation": [
+                -90,
+                0,
+                -15
+              ]
+            },
+            {
+              "time": 0.36,
+              "rotation": [
+                30,
+                0,
+                10
+              ]
+            },
+            {
+              "time": 0.6,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "rotation": [
+                0,
+                -12,
+                0
+              ]
+            },
+            {
+              "time": 0.6,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

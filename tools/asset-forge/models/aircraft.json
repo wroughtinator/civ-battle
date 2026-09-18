@@ -1,0 +1,237 @@
+{
+  "name": "aircraft",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "hull",
+      "position": [
+        0,
+        0.1,
+        0
+      ],
+      "size": [
+        0.1,
+        0.85,
+        0.1
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "shape": "cylinder",
+      "segments": 8,
+      "rotation": [
+        90,
+        0,
+        0
+      ],
+      "taper": 0.45
+    },
+    {
+      "name": "wing",
+      "position": [
+        0,
+        0.1,
+        0
+      ],
+      "size": [
+        0.96,
+        0.035,
+        0.15
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ],
+      "taper": 0.75
+    },
+    {
+      "name": "tail-wing",
+      "position": [
+        0,
+        0.13,
+        -0.33
+      ],
+      "size": [
+        0.35,
+        0.025,
+        0.08
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ]
+    },
+    {
+      "name": "tail",
+      "position": [
+        0,
+        0.19,
+        -0.32
+      ],
+      "size": [
+        0.025,
+        0.19,
+        0.13
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ]
+    },
+    {
+      "name": "canopy",
+      "position": [
+        0,
+        0.15,
+        0.22
+      ],
+      "size": [
+        0.07,
+        0.055,
+        0.19
+      ],
+      "material": 15,
+      "color": [
+        33,
+        58,
+        72
+      ]
+    },
+    {
+      "name": "propeller",
+      "position": [
+        0,
+        -0.43,
+        0
+      ],
+      "size": [
+        0.29,
+        0.02,
+        0.022
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "parent": 0
+    }
+  ],
+  "animations": [
+    {
+      "name": "idle",
+      "duration": 0.4,
+      "tracks": [
+        {
+          "part": 5,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                -80,
+                0
+              ]
+            },
+            {
+              "time": 0.2,
+              "rotation": [
+                0,
+                80,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                0,
+                -80,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "walk",
+      "duration": 0.8,
+      "tracks": [
+        {
+          "part": 1,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -3
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                0,
+                0,
+                3
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                0,
+                0,
+                -3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "attack",
+      "duration": 0.5,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -7,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "rotation": [
+                7,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                -7,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

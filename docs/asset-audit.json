@@ -1,0 +1,437 @@
+{
+  "verified": "2026-09-18",
+  "environment": "Desktop WebGL; synthetic fixtures in actual game renderer",
+  "passed": true,
+  "assets": 57,
+  "errors": [],
+  "projectiles": [
+    "arrow",
+    "bullet",
+    "shell",
+    "mortar",
+    "rocket",
+    "aircraft",
+    "torpedo",
+    "bomb"
+  ],
+  "results": [
+    {
+      "name": "guard",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "archer",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "scout",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "engineer",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "recon",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "tank",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "artillery",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "launcher",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "cavalry",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "settler",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "fleet",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "carrier",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "submarine",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "drone",
+      "loaded": true,
+      "poses": [
+        "idle",
+        "attack",
+        "walk"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "aircraft",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "missile",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "nuke",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "rocket",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "torpedo",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "bomb",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "shell",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "mortar",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "bullet",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "arrow",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "satellite",
+      "loaded": true,
+      "poses": [
+        "idle"
+      ],
+      "webglErrors": 0
+    },
+    {
+      "name": "tree-oak",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "tree-pine",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "tree-birch",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-0",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-1",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-2",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-3",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-4",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-5",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-6",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "capital-7",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "building-1",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "building-2",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "building-3",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "building-4",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "building-5",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "building-6",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "building-7",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "farm",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "site",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-0",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-1",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-2",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-3",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-4",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-5",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-6",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-7",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-8",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "discovery-9",
+      "loaded": true,
+      "poses": [],
+      "webglErrors": 0
+    },
+    {
+      "name": "ballistic-flight",
+      "loaded": true,
+      "webglErrors": 0
+    },
+    {
+      "name": "nuclear-flight",
+      "loaded": true,
+      "webglErrors": 0
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "name": "building-7",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "factory",
+      "position": [
+        0,
+        0.16000000000000003,
+        0
+      ],
+      "size": [
+        0.48,
+        0.32000000000000006,
+        0.4
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ]
+    },
+    {
+      "name": "factory-roof",
+      "position": [
+        0,
+        0.4,
+        0
+      ],
+      "size": [
+        0.576,
+        0.2,
+        0.496
+      ],
+      "material": 11,
+      "color": [
+        135,
+        81,
+        53
+      ],
+      "taper": 0.08
+    },
+    {
+      "name": "factory-door",
+      "position": [
+        0,
+        0.096,
+        0.20240000000000002
+      ],
+      "size": [
+        0.10400000000000001,
+        0.192,
+        0.012
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ]
+    },
+    {
+      "name": "stack-0.23",
+      "position": [
+        -0.23,
+        0.55,
+        -0.16
+      ],
+      "size": [
+        0.1,
+        0.75,
+        0.1
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "shape": "cylinder",
+      "segments": 6
+    },
+    {
+      "name": "stack0.2",
+      "position": [
+        0.2,
+        0.55,
+        -0.16
+      ],
+      "size": [
+        0.1,
+        0.75,
+        0.1
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "shape": "cylinder",
+      "segments": 6
+    }
+  ],
+  "animations": []
+}

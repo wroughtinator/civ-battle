@@ -23,7 +23,7 @@ export function attackTiming(event,now){
 }
 
 export function drawAttack(event,now,ctx){
- const {style,progress:f}=attackTiming(event,now),{a,b,base,ring,ribbon,triangle,norm,add,mul,mix,cross}=ctx;
+ const {style,progress:f}=attackTiming(event,now),{a,b,base,ring,ribbon,triangle,norm,add,mul,mix,cross,model}=ctx;
  const color=style.color,origin=mul(a,base(event.from)),target=mul(b,base(event.to));
  const delta=add(b,mul(a,-1)),forward=Math.hypot(...delta)>.00001?norm(delta):norm(cross(a,Math.abs(a[1])>.98?[1,0,0]:[0,1,0])),side=norm(cross(a,forward));
  if(f<0){ring(b,.033,.0025,color.map(x=>x*.6),base(event.to));return;}
@@ -52,17 +52,19 @@ export function drawAttack(event,now,ctx){
   let height=base(event.from)*(1-t)+base(event.to)*t+Math.sin(t*Math.PI)*arc;
   if(style.type==='bomb')height+=(1-t)*.085;
   const p=add(mul(up,height),mul(side,(j-(count-1)/2)*.008)),tail=add(p,mul(forward,style.type==='burst'?-.075:-.032));
+  const projectile=({arrow:'arrow',shell:'shell',mortar:'mortar',burst:'bullet',bomb:'bomb',broadside:'shell',torpedo:'torpedo',rocket:'rocket',sortie:'aircraft'})[style.type];
+  if(model&&projectile){const tangent=add(forward,mul(up,Math.cos(t*Math.PI)*arc*3));model(projectile,p,tangent,style.type==='sortie'?.043:style.type==='torpedo'?.037:style.type==='arrow'?.030:style.type==='burst'?.015:.026);}
   ribbon(tail,p,style.type==='torpedo'?.004:style.type==='mortar'?.005:.0028,color);
-  if(style.type==='arrow'){
+  if(style.type==='arrow'&&!model){
    triangle(add(p,mul(forward,.013)),add(p,mul(side,.008)),add(p,mul(side,-.008)),[1,.94,.70]);
    const feather=add(tail,mul(forward,.012));triangle(add(tail,mul(side,.007)),feather,add(tail,mul(side,-.007)),[.94,.96,.91]);
-  }else if(style.type==='sortie'){
+  }else if(style.type==='sortie'&&!model){
    triangle(add(p,mul(forward,.027)),add(p,mul(side,.023)),add(p,mul(side,-.023)),color);
   }else if(style.type==='torpedo'){
    for(const sign of [-1,1])ribbon(tail,add(add(tail,mul(forward,-.045)),mul(side,sign*.013)),.002,[.7,.94,1]);
   }else if(style.type==='rocket'){
    triangle(tail,add(tail,mul(side,.009)),add(tail,mul(forward,-.035)),[1,.47,.12]);
-  }else if(style.type==='bomb'){
+  }else if(style.type==='bomb'&&!model){
    ring(up,.009,.006,[.18,.20,.23],height);
   }
   if(['shell','mortar','broadside','rocket'].includes(style.type))for(let k=1;k<5;k++){
@@ -70,4 +72,13 @@ export function drawAttack(event,now,ctx){
    ring(trail,.003+k*.001,.003,[.65,.62,.53].map(v=>v*(1-k*.12)),h);
   }
  }
+}
+
+// Full 3D flight tangent: missiles climb and descend along the visible ballistic arc.
+export function ballisticPose(a,b,f){
+ const norm=p=>{const l=Math.hypot(...p);return p.map(v=>v/l);};
+ const point=t=>norm(a.map((v,i)=>v+(b[i]-v)*t)).map(v=>v*(1.045+Math.sin(t*Math.PI)*.27));
+ const p=point(f),before=point(Math.max(0,f-.001)),after=point(Math.min(1,f+.001));
+ let forward=after.map((v,i)=>v-before[i]);if(Math.hypot(...forward)<1e-9)forward=[1,0,0];
+ return {p,up:norm(p),radius:Math.hypot(...p),forward:norm(forward)};
 }

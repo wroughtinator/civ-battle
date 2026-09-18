@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "assets": "node scripts/build-forge-assets.mjs",
+    "assets:preview": "node scripts/forge-preview.mjs",
     "dev": "node scripts/dev.mjs",
     "deploy": "node scripts/deploy.mjs",
     "test": "cargo test --release --lib --tests && node --test tests/*.test.mjs",

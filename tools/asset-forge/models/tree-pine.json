@@ -1,0 +1,95 @@
+{
+  "name": "tree-pine",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "trunk",
+      "position": [
+        0,
+        0.342,
+        0
+      ],
+      "size": [
+        0.117,
+        0.684,
+        0.117
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "shape": "cylinder",
+      "segments": 6,
+      "taper": 0.65
+    },
+    {
+      "name": "crown0",
+      "position": [
+        0,
+        0.432,
+        0
+      ],
+      "size": [
+        0.63,
+        0.342,
+        0.63
+      ],
+      "material": 3,
+      "color": [
+        42,
+        67,
+        40
+      ],
+      "shape": "cylinder",
+      "segments": 7,
+      "taper": 0.04
+    },
+    {
+      "name": "crown1",
+      "position": [
+        0,
+        0.594,
+        0
+      ],
+      "size": [
+        0.513,
+        0.342,
+        0.513
+      ],
+      "material": 3,
+      "color": [
+        42,
+        67,
+        40
+      ],
+      "shape": "cylinder",
+      "segments": 7,
+      "taper": 0.04
+    },
+    {
+      "name": "crown2",
+      "position": [
+        0,
+        0.756,
+        0
+      ],
+      "size": [
+        0.39599999999999996,
+        0.342,
+        0.39599999999999996
+      ],
+      "material": 3,
+      "color": [
+        42,
+        67,
+        40
+      ],
+      "shape": "cylinder",
+      "segments": 7,
+      "taper": 0.04
+    }
+  ],
+  "animations": []
+}

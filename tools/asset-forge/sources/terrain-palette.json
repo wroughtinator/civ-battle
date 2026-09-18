@@ -1,0 +1,54 @@
+{
+  "source": "mini-earth.png",
+  "sampling": "Median RGB of central swatch regions, bottom strip",
+  "colors": {
+    "meadow": {
+      "rgb": [
+        151,
+        168,
+        105
+      ],
+      "hex": "#97a869"
+    },
+    "forest": {
+      "rgb": [
+        55,
+        92,
+        65
+      ],
+      "hex": "#375c41"
+    },
+    "sand": {
+      "rgb": [
+        240,
+        208,
+        160
+      ],
+      "hex": "#f0d0a0"
+    },
+    "slate": {
+      "rgb": [
+        122,
+        128,
+        143
+      ],
+      "hex": "#7a808f"
+    },
+    "snow": {
+      "rgb": [
+        235,
+        235,
+        230
+      ],
+      "hex": "#ebebe6"
+    },
+    "ocean": {
+      "rgb": [
+        6,
+        73,
+        105
+      ],
+      "hex": "#064969"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "name": "building-5",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "quay",
+      "position": [
+        0,
+        0.05,
+        0
+      ],
+      "size": [
+        0.9,
+        0.1,
+        0.7
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ]
+    },
+    {
+      "name": "mast",
+      "position": [
+        0,
+        0.4,
+        0
+      ],
+      "size": [
+        0.035,
+        0.7,
+        0.035
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 4
+    },
+    {
+      "name": "sail",
+      "position": [
+        0.16,
+        0.51,
+        0
+      ],
+      "size": [
+        0.29,
+        0.37,
+        0.02
+      ],
+      "material": 7,
+      "color": [
+        168,
+        151,
+        114
+      ],
+      "taper": 0.12
+    }
+  ],
+  "animations": []
+}

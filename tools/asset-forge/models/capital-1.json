@@ -1,0 +1,46 @@
+{
+  "name": "capital-1",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "pyramid",
+      "position": [
+        0,
+        0.32,
+        0
+      ],
+      "size": [
+        0.8,
+        0.64,
+        0.8
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ],
+      "taper": 0.04
+    },
+    {
+      "name": "steps",
+      "position": [
+        0,
+        0.025,
+        0.41
+      ],
+      "size": [
+        0.4,
+        0.05,
+        0.18
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ]
+    }
+  ],
+  "animations": []
+}

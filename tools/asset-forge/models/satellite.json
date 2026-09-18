@@ -1,0 +1,125 @@
+{
+  "name": "satellite",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "bus",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.25,
+        0.25,
+        0.25
+      ],
+      "material": 13,
+      "color": [
+        159,
+        129,
+        55
+      ]
+    },
+    {
+      "name": "panel-0.35",
+      "position": [
+        -0.35,
+        0,
+        0
+      ],
+      "size": [
+        0.42,
+        0.025,
+        0.35
+      ],
+      "material": 12,
+      "color": [
+        29,
+        49,
+        76
+      ],
+      "parent": 0
+    },
+    {
+      "name": "panel0.35",
+      "position": [
+        0.35,
+        0,
+        0
+      ],
+      "size": [
+        0.42,
+        0.025,
+        0.35
+      ],
+      "material": 12,
+      "color": [
+        29,
+        49,
+        76
+      ],
+      "parent": 0
+    },
+    {
+      "name": "dish",
+      "position": [
+        0,
+        0.23,
+        0
+      ],
+      "size": [
+        0.3,
+        0.11,
+        0.3
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "shape": "cylinder",
+      "segments": 8,
+      "taper": 0.1,
+      "parent": 0
+    }
+  ],
+  "animations": [
+    {
+      "name": "idle",
+      "duration": 3,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                -15,
+                0
+              ]
+            },
+            {
+              "time": 1.5,
+              "rotation": [
+                0,
+                15,
+                0
+              ]
+            },
+            {
+              "time": 3,
+              "rotation": [
+                0,
+                -15,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "name": "discovery-2",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "tent",
+      "position": [
+        0,
+        0.24,
+        0
+      ],
+      "size": [
+        0.65,
+        0.48,
+        0.55
+      ],
+      "material": 7,
+      "color": [
+        168,
+        151,
+        114
+      ],
+      "taper": 0.05
+    },
+    {
+      "name": "pole",
+      "position": [
+        0.4,
+        0.4,
+        0
+      ],
+      "size": [
+        0.025,
+        0.8,
+        0.025
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 4
+    },
+    {
+      "name": "banner",
+      "position": [
+        0.5,
+        0.65,
+        0
+      ],
+      "size": [
+        0.2,
+        0.18,
+        0.018
+      ],
+      "material": 4,
+      "color": [
+        88,
+        95,
+        70
+      ]
+    },
+    {
+      "name": "used-marker",
+      "position": [
+        0.35,
+        0.08,
+        0.3
+      ],
+      "size": [
+        0.035,
+        0.16,
+        0.035
+      ],
+      "material": 13,
+      "color": [
+        159,
+        129,
+        55
+      ]
+    }
+  ],
+  "animations": []
+}

@@ -1,0 +1,189 @@
+{
+  "name": "tree-birch",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "trunk",
+      "position": [
+        0,
+        0.342,
+        0
+      ],
+      "size": [
+        0.081,
+        0.684,
+        0.117
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "shape": "cylinder",
+      "segments": 6,
+      "taper": 0.65
+    },
+    {
+      "name": "crown0",
+      "position": [
+        0,
+        0.7020000000000001,
+        0
+      ],
+      "size": [
+        0.54,
+        0.333,
+        0.54
+      ],
+      "material": 2,
+      "color": [
+        71,
+        96,
+        39
+      ],
+      "shape": "cylinder",
+      "segments": 7,
+      "taper": 0.5,
+      "rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "crown1",
+      "position": [
+        -0.171,
+        0.5670000000000001,
+        0.07200000000000001
+      ],
+      "size": [
+        0.36000000000000004,
+        0.333,
+        0.36000000000000004
+      ],
+      "material": 2,
+      "color": [
+        71,
+        96,
+        39
+      ],
+      "shape": "cylinder",
+      "segments": 7,
+      "taper": 0.5,
+      "rotation": [
+        0,
+        47,
+        0
+      ]
+    },
+    {
+      "name": "crown2",
+      "position": [
+        0.18000000000000002,
+        0.63,
+        -0.036000000000000004
+      ],
+      "size": [
+        0.387,
+        0.333,
+        0.387
+      ],
+      "material": 2,
+      "color": [
+        71,
+        96,
+        39
+      ],
+      "shape": "cylinder",
+      "segments": 7,
+      "taper": 0.5,
+      "rotation": [
+        0,
+        94,
+        0
+      ]
+    },
+    {
+      "name": "crown3",
+      "position": [
+        0.036000000000000004,
+        0.774,
+        0.162
+      ],
+      "size": [
+        0.378,
+        0.333,
+        0.378
+      ],
+      "material": 2,
+      "color": [
+        71,
+        96,
+        39
+      ],
+      "shape": "cylinder",
+      "segments": 7,
+      "taper": 0.5,
+      "rotation": [
+        0,
+        141,
+        0
+      ]
+    },
+    {
+      "name": "branch-0.15",
+      "position": [
+        -0.135,
+        0.468,
+        0
+      ],
+      "size": [
+        0.036000000000000004,
+        0.36000000000000004,
+        0.036000000000000004
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "rotation": [
+        0,
+        0,
+        34.5
+      ]
+    },
+    {
+      "name": "branch0.15",
+      "position": [
+        0.135,
+        0.468,
+        0
+      ],
+      "size": [
+        0.036000000000000004,
+        0.36000000000000004,
+        0.036000000000000004
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "rotation": [
+        0,
+        0,
+        -34.5
+      ]
+    }
+  ],
+  "animations": []
+}

@@ -6,21 +6,6 @@
       "brotli_bytes": 10318
     },
     {
-      "file": "assets/archer.mesh",
-      "bytes": 16992,
-      "brotli_bytes": 2622
-    },
-    {
-      "file": "assets/archer.rig",
-      "bytes": 349548,
-      "brotli_bytes": 93011
-    },
-    {
-      "file": "assets/artillery.mesh",
-      "bytes": 10176,
-      "brotli_bytes": 1507
-    },
-    {
       "file": "assets/audio/cues.json",
       "bytes": 648,
       "brotli_bytes": 197
@@ -31,29 +16,584 @@
       "brotli_bytes": 459567
     },
     {
-      "file": "assets/carrier.mesh",
-      "bytes": 7392,
-      "brotli_bytes": 960
-    },
-    {
-      "file": "assets/cavalry.mesh",
-      "bytes": 17280,
-      "brotli_bytes": 2380
-    },
-    {
       "file": "assets/drone.mesh",
-      "bytes": 9792,
-      "brotli_bytes": 1376
-    },
-    {
-      "file": "assets/engineer.mesh",
-      "bytes": 12096,
-      "brotli_bytes": 1737
+      "bytes": 4416,
+      "brotli_bytes": 878
     },
     {
       "file": "assets/fleet.mesh",
-      "bytes": 14976,
-      "brotli_bytes": 2073
+      "bytes": 8064,
+      "brotli_bytes": 1431
+    },
+    {
+      "file": "assets/forge/aircraft.png",
+      "bytes": 39442,
+      "brotli_bytes": 39446
+    },
+    {
+      "file": "assets/forge/aircraft.rig",
+      "bytes": 22232,
+      "brotli_bytes": 1764
+    },
+    {
+      "file": "assets/forge/archer.png",
+      "bytes": 48095,
+      "brotli_bytes": 48099
+    },
+    {
+      "file": "assets/forge/archer.rig",
+      "bytes": 83672,
+      "brotli_bytes": 7117
+    },
+    {
+      "file": "assets/forge/arrow.png",
+      "bytes": 31361,
+      "brotli_bytes": 31251
+    },
+    {
+      "file": "assets/forge/arrow.rig",
+      "bytes": 15612,
+      "brotli_bytes": 2126
+    },
+    {
+      "file": "assets/forge/artillery.png",
+      "bytes": 43836,
+      "brotli_bytes": 43840
+    },
+    {
+      "file": "assets/forge/artillery.rig",
+      "bytes": 51808,
+      "brotli_bytes": 3481
+    },
+    {
+      "file": "assets/forge/bomb.png",
+      "bytes": 40084,
+      "brotli_bytes": 40088
+    },
+    {
+      "file": "assets/forge/bomb.rig",
+      "bytes": 16284,
+      "brotli_bytes": 2192
+    },
+    {
+      "file": "assets/forge/building-1.mesh",
+      "bytes": 3600,
+      "brotli_bytes": 467
+    },
+    {
+      "file": "assets/forge/building-1.png",
+      "bytes": 89769,
+      "brotli_bytes": 89774
+    },
+    {
+      "file": "assets/forge/building-2.mesh",
+      "bytes": 2160,
+      "brotli_bytes": 431
+    },
+    {
+      "file": "assets/forge/building-2.png",
+      "bytes": 56956,
+      "brotli_bytes": 56960
+    },
+    {
+      "file": "assets/forge/building-3.mesh",
+      "bytes": 3360,
+      "brotli_bytes": 607
+    },
+    {
+      "file": "assets/forge/building-3.png",
+      "bytes": 56148,
+      "brotli_bytes": 56152
+    },
+    {
+      "file": "assets/forge/building-4.mesh",
+      "bytes": 4320,
+      "brotli_bytes": 585
+    },
+    {
+      "file": "assets/forge/building-4.png",
+      "bytes": 78202,
+      "brotli_bytes": 78207
+    },
+    {
+      "file": "assets/forge/building-5.mesh",
+      "bytes": 2400,
+      "brotli_bytes": 475
+    },
+    {
+      "file": "assets/forge/building-5.png",
+      "bytes": 40849,
+      "brotli_bytes": 40853
+    },
+    {
+      "file": "assets/forge/building-6.mesh",
+      "bytes": 4320,
+      "brotli_bytes": 751
+    },
+    {
+      "file": "assets/forge/building-6.png",
+      "bytes": 32343,
+      "brotli_bytes": 32337
+    },
+    {
+      "file": "assets/forge/building-7.mesh",
+      "bytes": 5040,
+      "brotli_bytes": 857
+    },
+    {
+      "file": "assets/forge/building-7.png",
+      "bytes": 47017,
+      "brotli_bytes": 47021
+    },
+    {
+      "file": "assets/forge/bullet.png",
+      "bytes": 34209,
+      "brotli_bytes": 34213
+    },
+    {
+      "file": "assets/forge/bullet.rig",
+      "bytes": 6848,
+      "brotli_bytes": 957
+    },
+    {
+      "file": "assets/forge/capital-0.mesh",
+      "bytes": 7200,
+      "brotli_bytes": 1092
+    },
+    {
+      "file": "assets/forge/capital-0.png",
+      "bytes": 38249,
+      "brotli_bytes": 38036
+    },
+    {
+      "file": "assets/forge/capital-1.mesh",
+      "bytes": 1440,
+      "brotli_bytes": 286
+    },
+    {
+      "file": "assets/forge/capital-1.png",
+      "bytes": 57465,
+      "brotli_bytes": 57469
+    },
+    {
+      "file": "assets/forge/capital-2.mesh",
+      "bytes": 7200,
+      "brotli_bytes": 1092
+    },
+    {
+      "file": "assets/forge/capital-2.png",
+      "bytes": 38249,
+      "brotli_bytes": 38036
+    },
+    {
+      "file": "assets/forge/capital-3.mesh",
+      "bytes": 7200,
+      "brotli_bytes": 1092
+    },
+    {
+      "file": "assets/forge/capital-3.png",
+      "bytes": 38249,
+      "brotli_bytes": 38036
+    },
+    {
+      "file": "assets/forge/capital-4.mesh",
+      "bytes": 5040,
+      "brotli_bytes": 873
+    },
+    {
+      "file": "assets/forge/capital-4.png",
+      "bytes": 63899,
+      "brotli_bytes": 63903
+    },
+    {
+      "file": "assets/forge/capital-5.mesh",
+      "bytes": 2160,
+      "brotli_bytes": 404
+    },
+    {
+      "file": "assets/forge/capital-5.png",
+      "bytes": 61745,
+      "brotli_bytes": 61749
+    },
+    {
+      "file": "assets/forge/capital-6.mesh",
+      "bytes": 5040,
+      "brotli_bytes": 873
+    },
+    {
+      "file": "assets/forge/capital-6.png",
+      "bytes": 63899,
+      "brotli_bytes": 63903
+    },
+    {
+      "file": "assets/forge/capital-7.mesh",
+      "bytes": 7200,
+      "brotli_bytes": 1092
+    },
+    {
+      "file": "assets/forge/capital-7.png",
+      "bytes": 38249,
+      "brotli_bytes": 38036
+    },
+    {
+      "file": "assets/forge/carrier.png",
+      "bytes": 45420,
+      "brotli_bytes": 45424
+    },
+    {
+      "file": "assets/forge/carrier.rig",
+      "bytes": 68824,
+      "brotli_bytes": 2477
+    },
+    {
+      "file": "assets/forge/catalog.json",
+      "bytes": 6806,
+      "brotli_bytes": 468
+    },
+    {
+      "file": "assets/forge/cavalry.png",
+      "bytes": 47756,
+      "brotli_bytes": 47760
+    },
+    {
+      "file": "assets/forge/cavalry.rig",
+      "bytes": 80484,
+      "brotli_bytes": 5583
+    },
+    {
+      "file": "assets/forge/discovery-0.mesh",
+      "bytes": 3120,
+      "brotli_bytes": 573
+    },
+    {
+      "file": "assets/forge/discovery-0.png",
+      "bytes": 30767,
+      "brotli_bytes": 30771
+    },
+    {
+      "file": "assets/forge/discovery-1.mesh",
+      "bytes": 2160,
+      "brotli_bytes": 385
+    },
+    {
+      "file": "assets/forge/discovery-1.png",
+      "bytes": 38873,
+      "brotli_bytes": 38877
+    },
+    {
+      "file": "assets/forge/discovery-2.mesh",
+      "bytes": 3120,
+      "brotli_bytes": 573
+    },
+    {
+      "file": "assets/forge/discovery-2.png",
+      "bytes": 30767,
+      "brotli_bytes": 30771
+    },
+    {
+      "file": "assets/forge/discovery-3.mesh",
+      "bytes": 3120,
+      "brotli_bytes": 573
+    },
+    {
+      "file": "assets/forge/discovery-3.png",
+      "bytes": 30767,
+      "brotli_bytes": 30771
+    },
+    {
+      "file": "assets/forge/discovery-4.mesh",
+      "bytes": 2400,
+      "brotli_bytes": 537
+    },
+    {
+      "file": "assets/forge/discovery-4.png",
+      "bytes": 46211,
+      "brotli_bytes": 46215
+    },
+    {
+      "file": "assets/forge/discovery-5.mesh",
+      "bytes": 2640,
+      "brotli_bytes": 507
+    },
+    {
+      "file": "assets/forge/discovery-5.png",
+      "bytes": 34440,
+      "brotli_bytes": 34444
+    },
+    {
+      "file": "assets/forge/discovery-6.mesh",
+      "bytes": 2880,
+      "brotli_bytes": 472
+    },
+    {
+      "file": "assets/forge/discovery-6.png",
+      "bytes": 76346,
+      "brotli_bytes": 76351
+    },
+    {
+      "file": "assets/forge/discovery-7.mesh",
+      "bytes": 2880,
+      "brotli_bytes": 468
+    },
+    {
+      "file": "assets/forge/discovery-7.png",
+      "bytes": 60796,
+      "brotli_bytes": 60800
+    },
+    {
+      "file": "assets/forge/discovery-8.mesh",
+      "bytes": 5280,
+      "brotli_bytes": 929
+    },
+    {
+      "file": "assets/forge/discovery-8.png",
+      "bytes": 41579,
+      "brotli_bytes": 41583
+    },
+    {
+      "file": "assets/forge/discovery-9.mesh",
+      "bytes": 3120,
+      "brotli_bytes": 573
+    },
+    {
+      "file": "assets/forge/discovery-9.png",
+      "bytes": 30370,
+      "brotli_bytes": 30194
+    },
+    {
+      "file": "assets/forge/drone.png",
+      "bytes": 39442,
+      "brotli_bytes": 39446
+    },
+    {
+      "file": "assets/forge/drone.rig",
+      "bytes": 22232,
+      "brotli_bytes": 1764
+    },
+    {
+      "file": "assets/forge/engineer.png",
+      "bytes": 43448,
+      "brotli_bytes": 43452
+    },
+    {
+      "file": "assets/forge/engineer.rig",
+      "bytes": 74564,
+      "brotli_bytes": 6344
+    },
+    {
+      "file": "assets/forge/farm.mesh",
+      "bytes": 5760,
+      "brotli_bytes": 768
+    },
+    {
+      "file": "assets/forge/farm.png",
+      "bytes": 108202,
+      "brotli_bytes": 108207
+    },
+    {
+      "file": "assets/forge/fleet.png",
+      "bytes": 41182,
+      "brotli_bytes": 41186
+    },
+    {
+      "file": "assets/forge/fleet.rig",
+      "bytes": 65816,
+      "brotli_bytes": 2883
+    },
+    {
+      "file": "assets/forge/guard.png",
+      "bytes": 48985,
+      "brotli_bytes": 48989
+    },
+    {
+      "file": "assets/forge/guard.rig",
+      "bytes": 66984,
+      "brotli_bytes": 5799
+    },
+    {
+      "file": "assets/forge/launcher.png",
+      "bytes": 39533,
+      "brotli_bytes": 39502
+    },
+    {
+      "file": "assets/forge/launcher.rig",
+      "bytes": 92644,
+      "brotli_bytes": 5154
+    },
+    {
+      "file": "assets/forge/missile.png",
+      "bytes": 40084,
+      "brotli_bytes": 40088
+    },
+    {
+      "file": "assets/forge/missile.rig",
+      "bytes": 16284,
+      "brotli_bytes": 2192
+    },
+    {
+      "file": "assets/forge/mortar.png",
+      "bytes": 37157,
+      "brotli_bytes": 37161
+    },
+    {
+      "file": "assets/forge/mortar.rig",
+      "bytes": 6848,
+      "brotli_bytes": 978
+    },
+    {
+      "file": "assets/forge/nuke.png",
+      "bytes": 41474,
+      "brotli_bytes": 41478
+    },
+    {
+      "file": "assets/forge/nuke.rig",
+      "bytes": 16284,
+      "brotli_bytes": 2178
+    },
+    {
+      "file": "assets/forge/ocean-normal.png",
+      "bytes": 21156,
+      "brotli_bytes": 18106
+    },
+    {
+      "file": "assets/forge/ocean-roughness.png",
+      "bytes": 3291,
+      "brotli_bytes": 3295
+    },
+    {
+      "file": "assets/forge/recon.png",
+      "bytes": 45635,
+      "brotli_bytes": 45639
+    },
+    {
+      "file": "assets/forge/recon.rig",
+      "bytes": 66984,
+      "brotli_bytes": 5760
+    },
+    {
+      "file": "assets/forge/rocket.png",
+      "bytes": 40084,
+      "brotli_bytes": 40088
+    },
+    {
+      "file": "assets/forge/rocket.rig",
+      "bytes": 16284,
+      "brotli_bytes": 2192
+    },
+    {
+      "file": "assets/forge/satellite.png",
+      "bytes": 33342,
+      "brotli_bytes": 33205
+    },
+    {
+      "file": "assets/forge/satellite.rig",
+      "bytes": 21480,
+      "brotli_bytes": 2047
+    },
+    {
+      "file": "assets/forge/scout.png",
+      "bytes": 43851,
+      "brotli_bytes": 43855
+    },
+    {
+      "file": "assets/forge/scout.rig",
+      "bytes": 61424,
+      "brotli_bytes": 5181
+    },
+    {
+      "file": "assets/forge/settler.png",
+      "bytes": 50730,
+      "brotli_bytes": 50734
+    },
+    {
+      "file": "assets/forge/settler.rig",
+      "bytes": 66804,
+      "brotli_bytes": 3450
+    },
+    {
+      "file": "assets/forge/shell.png",
+      "bytes": 37157,
+      "brotli_bytes": 37161
+    },
+    {
+      "file": "assets/forge/shell.rig",
+      "bytes": 6848,
+      "brotli_bytes": 978
+    },
+    {
+      "file": "assets/forge/site.mesh",
+      "bytes": 3120,
+      "brotli_bytes": 489
+    },
+    {
+      "file": "assets/forge/site.png",
+      "bytes": 44321,
+      "brotli_bytes": 44325
+    },
+    {
+      "file": "assets/forge/submarine.png",
+      "bytes": 46993,
+      "brotli_bytes": 46997
+    },
+    {
+      "file": "assets/forge/submarine.rig",
+      "bytes": 36364,
+      "brotli_bytes": 2055
+    },
+    {
+      "file": "assets/forge/tank.png",
+      "bytes": 37499,
+      "brotli_bytes": 37503
+    },
+    {
+      "file": "assets/forge/tank.rig",
+      "bytes": 77804,
+      "brotli_bytes": 4307
+    },
+    {
+      "file": "assets/forge/terrain.png",
+      "bytes": 348357,
+      "brotli_bytes": 348362
+    },
+    {
+      "file": "assets/forge/torpedo.png",
+      "bytes": 40701,
+      "brotli_bytes": 40705
+    },
+    {
+      "file": "assets/forge/torpedo.rig",
+      "bytes": 16284,
+      "brotli_bytes": 2192
+    },
+    {
+      "file": "assets/forge/tree-birch.mesh",
+      "bytes": 10560,
+      "brotli_bytes": 1873
+    },
+    {
+      "file": "assets/forge/tree-birch.png",
+      "bytes": 47784,
+      "brotli_bytes": 47788
+    },
+    {
+      "file": "assets/forge/tree-oak.mesh",
+      "bytes": 10560,
+      "brotli_bytes": 1875
+    },
+    {
+      "file": "assets/forge/tree-oak.png",
+      "bytes": 46397,
+      "brotli_bytes": 46401
+    },
+    {
+      "file": "assets/forge/tree-pine.mesh",
+      "bytes": 6480,
+      "brotli_bytes": 1089
+    },
+    {
+      "file": "assets/forge/tree-pine.png",
+      "bytes": 36841,
+      "brotli_bytes": 36843
     },
     {
       "file": "assets/globe-share.jpg",
@@ -61,84 +601,44 @@
       "brotli_bytes": 65468
     },
     {
-      "file": "assets/guard.mesh",
-      "bytes": 11328,
-      "brotli_bytes": 1644
-    },
-    {
-      "file": "assets/guard.rig",
-      "bytes": 421108,
-      "brotli_bytes": 103467
-    },
-    {
-      "file": "assets/launcher.mesh",
-      "bytes": 21408,
-      "brotli_bytes": 2490
-    },
-    {
       "file": "assets/missile.mesh",
-      "bytes": 7296,
-      "brotli_bytes": 1001
+      "bytes": 4608,
+      "brotli_bytes": 799
     },
     {
       "file": "assets/nuke.mesh",
-      "bytes": 7296,
-      "brotli_bytes": 1010
+      "bytes": 4608,
+      "brotli_bytes": 801
     },
     {
       "file": "assets/ocean-normal.png",
-      "bytes": 929899,
-      "brotli_bytes": 929904
+      "bytes": 21156,
+      "brotli_bytes": 18106
     },
     {
       "file": "assets/ocean-roughness.png",
-      "bytes": 189653,
-      "brotli_bytes": 182764
+      "bytes": 3291,
+      "brotli_bytes": 3295
     },
     {
       "file": "assets/recon.mesh",
-      "bytes": 29088,
-      "brotli_bytes": 4859
+      "bytes": 6912,
+      "brotli_bytes": 1190
     },
     {
       "file": "assets/satellite.mesh",
-      "bytes": 13728,
-      "brotli_bytes": 1610
-    },
-    {
-      "file": "assets/scout.mesh",
-      "bytes": 10080,
-      "brotli_bytes": 1522
-    },
-    {
-      "file": "assets/scout.rig",
-      "bytes": 294948,
-      "brotli_bytes": 78788
-    },
-    {
-      "file": "assets/settler.mesh",
-      "bytes": 19968,
-      "brotli_bytes": 2507
+      "bytes": 3264,
+      "brotli_bytes": 614
     },
     {
       "file": "assets/submarine.mesh",
-      "bytes": 133152,
-      "brotli_bytes": 21066
+      "bytes": 4608,
+      "brotli_bytes": 874
     },
     {
       "file": "assets/tank.mesh",
-      "bytes": 51456,
-      "brotli_bytes": 7708
-    },
-    {
-      "file": "assets/woodland.mesh",
-      "bytes": 39660,
-      "brotli_bytes": 8422
-    },
-    {
-      "file": "assets/woodland.webp",
-      "bytes": 37950,
-      "brotli_bytes": 37954
+      "bytes": 11328,
+      "brotli_bytes": 1572
     },
     {
       "file": "audio.js",
@@ -147,8 +647,8 @@
     },
     {
       "file": "combat-visuals.js",
-      "bytes": 4877,
-      "brotli_bytes": 1603
+      "bytes": 5841,
+      "brotli_bytes": 1938
     },
     {
       "file": "controls.js",
@@ -172,8 +672,8 @@
     },
     {
       "file": "globe.js",
-      "bytes": 45234,
-      "brotli_bytes": 13843
+      "bytes": 44005,
+      "brotli_bytes": 13471
     },
     {
       "file": "icons.js",
@@ -237,8 +737,8 @@
     },
     {
       "file": "model-assets.js",
-      "bytes": 4538,
-      "brotli_bytes": 1567
+      "bytes": 6940,
+      "brotli_bytes": 2354
     },
     {
       "file": "movement.js",
@@ -262,12 +762,12 @@
     },
     {
       "file": "terrain.js",
-      "bytes": 1408,
-      "brotli_bytes": 636
+      "bytes": 2311,
+      "brotli_bytes": 1028
     }
   ],
-  "total_bytes": 4270304,
-  "estimated_brotli_bytes": 2309474,
+  "total_bytes": 5824764,
+  "estimated_brotli_bytes": 3863960,
   "audio_lazy_bytes": 473732,
   "note": "Brotli figures are local compression measurements, not a claim about negotiated CDN content encoding. Audio loads after interaction. No physical mobile GPU benchmark has been made."
 }

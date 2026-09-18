@@ -1,0 +1,264 @@
+{
+  "animations": [
+    {
+      "tracks": [
+        {
+          "part": 4,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.12,
+              "rotation": [
+                -12,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ],
+      "duration": 1,
+      "name": "fire"
+    }
+  ],
+  "parts": [
+    {
+      "size": [
+        0.65,
+        0.3,
+        1.6
+      ],
+      "color": [
+        115,
+        89,
+        60
+      ],
+      "position": [
+        0,
+        0.55,
+        0
+      ],
+      "name": "carriage"
+    },
+    {
+      "color": [
+        115,
+        89,
+        60
+      ],
+      "segments": 8,
+      "name": "left-wheel",
+      "shape": "cylinder",
+      "position": [
+        -0.66,
+        0.48,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "size": [
+        0.9,
+        0.16,
+        0.9
+      ]
+    },
+    {
+      "color": [
+        115,
+        89,
+        60
+      ],
+      "segments": 8,
+      "name": "right-wheel",
+      "shape": "cylinder",
+      "position": [
+        0.66,
+        0.48,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        90
+      ],
+      "size": [
+        0.9,
+        0.16,
+        0.9
+      ]
+    },
+    {
+      "size": [
+        1.45,
+        0.12,
+        0.12
+      ],
+      "color": [
+        78,
+        84,
+        80
+      ],
+      "position": [
+        0,
+        0.48,
+        0
+      ],
+      "name": "axle"
+    },
+    {
+      "color": [
+        78,
+        84,
+        80
+      ],
+      "segments": 10,
+      "taper": 0.85,
+      "name": "barrel",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.95,
+        0.15
+      ],
+      "rotation": [
+        82,
+        0,
+        0
+      ],
+      "size": [
+        0.42,
+        1.65,
+        0.42
+      ]
+    },
+    {
+      "color": [
+        78,
+        84,
+        80
+      ],
+      "segments": 10,
+      "name": "muzzle-band",
+      "shape": "cylinder",
+      "parent": 4,
+      "position": [
+        0,
+        0.72,
+        0
+      ],
+      "size": [
+        0.46,
+        0.14,
+        0.46
+      ]
+    },
+    {
+      "size": [
+        0.12,
+        0.4,
+        0.55
+      ],
+      "color": [
+        115,
+        89,
+        60
+      ],
+      "position": [
+        -0.28,
+        0.79,
+        -0.1
+      ],
+      "name": "left-mount"
+    },
+    {
+      "size": [
+        0.12,
+        0.4,
+        0.55
+      ],
+      "color": [
+        115,
+        89,
+        60
+      ],
+      "position": [
+        0.28,
+        0.79,
+        -0.1
+      ],
+      "name": "right-mount"
+    },
+    {
+      "rotation": [
+        -15,
+        0,
+        0
+      ],
+      "size": [
+        0.38,
+        0.22,
+        1.4
+      ],
+      "color": [
+        115,
+        89,
+        60
+      ],
+      "position": [
+        0,
+        0.34,
+        -1.08
+      ],
+      "name": "trail"
+    },
+    {
+      "color": [
+        17,
+        18,
+        17
+      ],
+      "segments": 10,
+      "name": "muzzle-inset",
+      "shape": "cylinder",
+      "parent": 4,
+      "position": [
+        0,
+        0.8,
+        0
+      ],
+      "size": [
+        0.3,
+        0.012,
+        0.3
+      ]
+    }
+  ],
+  "name": "Weathered field cannon",
+  "texture_size": 256
+}

@@ -1,0 +1,92 @@
+{
+  "name": "bullet",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "body",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        0.65,
+        0.06
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "shape": "cylinder",
+      "segments": 6,
+      "rotation": [
+        90,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "nose",
+      "position": [
+        0,
+        0.4,
+        0
+      ],
+      "size": [
+        0.06,
+        0.2,
+        0.06
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "shape": "cylinder",
+      "segments": 6,
+      "parent": 0,
+      "taper": 0.03
+    }
+  ],
+  "animations": [
+    {
+      "name": "idle",
+      "duration": 1,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                -5,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                0,
+                5,
+                0
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                -5,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

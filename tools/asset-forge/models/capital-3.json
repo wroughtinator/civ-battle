@@ -1,0 +1,147 @@
+{
+  "name": "capital-3",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "floor",
+      "position": [
+        0,
+        0.04,
+        0
+      ],
+      "size": [
+        0.8,
+        0.08,
+        0.65
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ]
+    },
+    {
+      "name": "column-0.28",
+      "position": [
+        -0.28,
+        0.26,
+        0.21
+      ],
+      "size": [
+        0.08,
+        0.44,
+        0.08
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ],
+      "shape": "cylinder",
+      "segments": 6
+    },
+    {
+      "name": "column0",
+      "position": [
+        0,
+        0.26,
+        0.21
+      ],
+      "size": [
+        0.08,
+        0.44,
+        0.08
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ],
+      "shape": "cylinder",
+      "segments": 6
+    },
+    {
+      "name": "column0.28",
+      "position": [
+        0.28,
+        0.26,
+        0.21
+      ],
+      "size": [
+        0.08,
+        0.44,
+        0.08
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ],
+      "shape": "cylinder",
+      "segments": 6
+    },
+    {
+      "name": "hall",
+      "position": [
+        0,
+        0.23,
+        -0.13
+      ],
+      "size": [
+        0.65,
+        0.4,
+        0.34
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ]
+    },
+    {
+      "name": "roof",
+      "position": [
+        0,
+        0.54,
+        0
+      ],
+      "size": [
+        0.86,
+        0.23,
+        0.7
+      ],
+      "material": 11,
+      "color": [
+        135,
+        81,
+        53
+      ],
+      "taper": 0.1
+    },
+    {
+      "name": "steps",
+      "position": [
+        0,
+        0.025,
+        0.41
+      ],
+      "size": [
+        0.4,
+        0.05,
+        0.18
+      ],
+      "material": 10,
+      "color": [
+        136,
+        133,
+        116
+      ]
+    }
+  ],
+  "animations": []
+}

@@ -1,26 +1,7 @@
 {
-  "verified": "2026-09-17",
+  "verified": "2026-09-18",
+  "pipeline": "Asset Forge",
   "assets": [
-    {
-      "file": "public/assets/archer.mesh",
-      "license": "CC0-1.0",
-      "bytes": 16992,
-      "sha256": "400bf5401f2bbe5dfbb69727ebdf2e48d681a606f4d6224f35521f8ceef862a2"
-    },
-    {
-      "file": "public/assets/archer.rig",
-      "license": "CC0-1.0",
-      "author": "Quaternius",
-      "source": "https://opengameart.org/content/lowpoly-rpg-characters",
-      "bytes": 349548,
-      "sha256": "0a37eb3b15e68d9a6fe1993f0832d62795f6f5fc7191f39aa0aa15637989b978"
-    },
-    {
-      "file": "public/assets/artillery.mesh",
-      "license": "CC0-1.0",
-      "bytes": 10176,
-      "sha256": "f9711e66a7e0ada2aa1ced11a19c262ab67c9bab4f607447fce970e1795aec2b"
-    },
     {
       "file": "public/assets/audio/cues.json",
       "bytes": 648,
@@ -34,138 +15,878 @@
       "license": "99Sounds game-use license"
     },
     {
-      "file": "public/assets/carrier.mesh",
-      "license": "CC0-1.0",
-      "bytes": 7392,
-      "sha256": "1861393423c034da7d41213bd559c30e23f96e410fc101542424ccc70940fff8"
-    },
-    {
-      "file": "public/assets/cavalry.mesh",
-      "license": "CC0-1.0",
-      "bytes": 17280,
-      "sha256": "12cfdc442dd00716a09c8fc5bee2d43c048b93f8132e4bac9c79f3f6903d42b8"
-    },
-    {
       "file": "public/assets/drone.mesh",
-      "bytes": 9792,
-      "sha256": "15941b507b209d478e187db0e052810fcfd392270d71aea5b1f2baa53419eea7",
-      "license": "CC0-1.0"
-    },
-    {
-      "file": "public/assets/engineer.mesh",
-      "license": "CC0-1.0",
-      "bytes": 12096,
-      "sha256": "cb4e47e30219ace9d64c88b584120f0344f6152ed0c7d36ad65f8f535139e6a5"
+      "bytes": 4416,
+      "sha256": "b8ba811513c58640704893be09ad3f682142e775b61d01cbb1873a6f5c0156f6",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/fleet.mesh",
-      "bytes": 14976,
-      "sha256": "a122113041ff65da498a9031fd32b3c543a1838c84d2bf58634fae6c8ae420c4",
-      "license": "CC0-1.0"
+      "bytes": 8064,
+      "sha256": "cfcce200751608611945bd662a31d451bfdcf527483b0f98023c547d567971ed",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
-      "file": "public/assets/guard.mesh",
-      "license": "CC0-1.0",
-      "bytes": 11328,
-      "sha256": "3af5c68bc989a5c614f23ae71247e30f052578fa03ca63d887610f9616c0f155"
+      "file": "public/assets/forge/aircraft.png",
+      "bytes": 39442,
+      "sha256": "0262b5b56ee19c949b0bc671875afe911a97576a7516a5563d4d2163eba18be0",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
-      "file": "public/assets/guard.rig",
-      "license": "CC0-1.0",
-      "author": "Quaternius",
-      "source": "https://opengameart.org/content/lowpoly-rpg-characters",
-      "bytes": 421108,
-      "sha256": "309ce0e7dc829f1610a377bf95595100d8dd34c458adc76139b85050ee65b8bb"
+      "file": "public/assets/forge/aircraft.rig",
+      "bytes": 22232,
+      "sha256": "d9a385bfc32527d6f97c9e88eec32a0647b40383c1add53f597ff338d4fc28ed",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
-      "file": "public/assets/launcher.mesh",
-      "license": "CC0-1.0",
-      "bytes": 21408,
-      "sha256": "4261b22bf0c4c65eed3f5a0a7345a0e842692733eff0443dbb12bf408c7b1988"
+      "file": "public/assets/forge/archer.png",
+      "bytes": 48095,
+      "sha256": "b447801a92550aa3fcc8c537cc3e1a8461d416ff47921fe770de19444accd682",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/archer.rig",
+      "bytes": 83672,
+      "sha256": "717ea924774448fda24454882d0dac1b8da09fa87a50f7cbb94e66b9ee1a2fcd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/arrow.png",
+      "bytes": 31361,
+      "sha256": "85bff29e28b725e603eadf7615f74d5fd91e987591b19fb5a1794b65d1c6df23",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/arrow.rig",
+      "bytes": 15612,
+      "sha256": "29c03eb40f3922891326666e31972884d92bb03a444b3d80e8de64d54f28d037",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/artillery.png",
+      "bytes": 43836,
+      "sha256": "33463d234f2ca5b510730b099a5c8223837e3a440e004b4f9d05df0304173f21",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/artillery.rig",
+      "bytes": 51808,
+      "sha256": "8db4c2792555c7afeb2f9b7696cca8f24d38edbf9047e3e8f52d9b3176fd205b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/bomb.png",
+      "bytes": 40084,
+      "sha256": "15bf4a1a2d250db2b120746611ba026a395cb229aefd90f3c72571105b5c7c3c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/bomb.rig",
+      "bytes": 16284,
+      "sha256": "76988ff29c0e48abaae37e806d1c02642a564c11233a6ed74dd2d151be2236ef",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-1.mesh",
+      "bytes": 3600,
+      "sha256": "7823fc5b81ae7f65e0d0261a5da96cc9d2504f046cee0d0a500be5345e5be62c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-1.png",
+      "bytes": 89769,
+      "sha256": "6776706fc398abf86e15b79d233691f7462c699e0e6d244370e59d5501a656e1",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-2.mesh",
+      "bytes": 2160,
+      "sha256": "ad45cceda5219e610cb0864089b3f937603f6e765ec6f9f780d0e9a9dd42b389",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-2.png",
+      "bytes": 56956,
+      "sha256": "c8319a544e0c9f9d158aaa5d7ae6ed0efe76457cf211745f7e2df21dca476cad",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-3.mesh",
+      "bytes": 3360,
+      "sha256": "5d268fabc0d876bea29fa44396d2c8fb85f94d01679f033a91977a6a5240bd6a",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-3.png",
+      "bytes": 56148,
+      "sha256": "d084e2a3fe42419f44364b6ff59b85aaf5230f573b17172ac7eeb7d8fb541ed1",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-4.mesh",
+      "bytes": 4320,
+      "sha256": "db876cc002bc1b9a8b9a7bd1815634df0df8577a4d36c1381e1d064361808c73",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-4.png",
+      "bytes": 78202,
+      "sha256": "76a1282c4ea691749099f2eb9af2eb0a6e0e4290dfe7f1a91f4ac700156711d5",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-5.mesh",
+      "bytes": 2400,
+      "sha256": "bc5d95a528af990c61680fed357b858caffb448a820c0ffd7fee874a3cfc65bd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-5.png",
+      "bytes": 40849,
+      "sha256": "4bdadf2c7642e69444c138ae193e5e7817ac93fc663acba8ec21acabb6937adf",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-6.mesh",
+      "bytes": 4320,
+      "sha256": "d241f7b1bd598446e1a2978bd9583cd779db29929616ad75e920406f4ba5042f",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-6.png",
+      "bytes": 32343,
+      "sha256": "e2981456d5bd4fe7068643f1bf7a87c3fffaaae2de9657a88595a117098a0f69",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-7.mesh",
+      "bytes": 5040,
+      "sha256": "faa5c4f0cb580abf77f7b9aead61b464834e70bcedd589330b41fce9888a6484",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/building-7.png",
+      "bytes": 47017,
+      "sha256": "73285aeeb8cfcf7e644b3b4e48beeee8d9468bb7fe6876cd86b9f7411d15c3c2",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/bullet.png",
+      "bytes": 34209,
+      "sha256": "5505e0ef8aa9bbfa82b065a2274ee79722fbefb98ffa80d9faf2589f0c336405",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/bullet.rig",
+      "bytes": 6848,
+      "sha256": "1e2fb08ad6979bc45f0fa38e77981a053b9e7900d20bd19e2e69c7c692b9bbdd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-0.mesh",
+      "bytes": 7200,
+      "sha256": "b74738b292136c7eb63f6d4fdab50cad157ff6f5ff761f859af7330d0d46cd55",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-0.png",
+      "bytes": 38249,
+      "sha256": "83aa9afe126140d823fbe6b9e41c92f02ca7c12e53ac1be0b14457545b9b37ab",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-1.mesh",
+      "bytes": 1440,
+      "sha256": "c5d8787bfd97819941ed235ffff9eeba84c1efd62e894880312d3a66d41e9946",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-1.png",
+      "bytes": 57465,
+      "sha256": "b71b39c8d6bada8ed9f4f8ef7ec5fc2714186d7e9326e6a04a1f4bf417f56abb",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-2.mesh",
+      "bytes": 7200,
+      "sha256": "b74738b292136c7eb63f6d4fdab50cad157ff6f5ff761f859af7330d0d46cd55",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-2.png",
+      "bytes": 38249,
+      "sha256": "83aa9afe126140d823fbe6b9e41c92f02ca7c12e53ac1be0b14457545b9b37ab",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-3.mesh",
+      "bytes": 7200,
+      "sha256": "b74738b292136c7eb63f6d4fdab50cad157ff6f5ff761f859af7330d0d46cd55",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-3.png",
+      "bytes": 38249,
+      "sha256": "83aa9afe126140d823fbe6b9e41c92f02ca7c12e53ac1be0b14457545b9b37ab",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-4.mesh",
+      "bytes": 5040,
+      "sha256": "45e364e8d11abd9793b24da437d21bc7df4b41dee88d6f3c13af2a234044cb25",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-4.png",
+      "bytes": 63899,
+      "sha256": "f963fcd785e84b71d097290cda4b912f7e8abdb331e3e271f3786fff515ca4e2",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-5.mesh",
+      "bytes": 2160,
+      "sha256": "5e70984235a87420cbd8b0a6bd16040a30ce2acdddaa54a9a0a2af7daeee7e1c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-5.png",
+      "bytes": 61745,
+      "sha256": "0bee496465c57da8695b1babdbbb0a59380245452fc6c81c0328622e3b885c57",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-6.mesh",
+      "bytes": 5040,
+      "sha256": "45e364e8d11abd9793b24da437d21bc7df4b41dee88d6f3c13af2a234044cb25",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-6.png",
+      "bytes": 63899,
+      "sha256": "f963fcd785e84b71d097290cda4b912f7e8abdb331e3e271f3786fff515ca4e2",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-7.mesh",
+      "bytes": 7200,
+      "sha256": "b74738b292136c7eb63f6d4fdab50cad157ff6f5ff761f859af7330d0d46cd55",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/capital-7.png",
+      "bytes": 38249,
+      "sha256": "83aa9afe126140d823fbe6b9e41c92f02ca7c12e53ac1be0b14457545b9b37ab",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/carrier.png",
+      "bytes": 45420,
+      "sha256": "1a28b685d6e6d42e099248c95b83bf0ada9e9c967880e9d715d6d534ad5c0ea1",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/carrier.rig",
+      "bytes": 68824,
+      "sha256": "0f583d1fbbb2b180b22d80aefb598c2cc1fb98549d86e376f66f2a5bacb655e7",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/catalog.json",
+      "bytes": 6806,
+      "sha256": "fa411828b0a71b7b5ca0c058bcc33e479958e83d9dbb58c751b653b593dd0c62",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/cavalry.png",
+      "bytes": 47756,
+      "sha256": "b28e06c080c9f9508e9614b8d8f7de4ecce5dc8eb855014418a2689de2879329",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/cavalry.rig",
+      "bytes": 80484,
+      "sha256": "1b06e1b8c6c0e32dea26235faf54298ed8f048bb79a3163f0b31131dfe15f7e4",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-0.mesh",
+      "bytes": 3120,
+      "sha256": "f2fd6556b5017fc4dd0710c7499d52f346d8c681db74e4d9a1b8d1e168aa7986",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-0.png",
+      "bytes": 30767,
+      "sha256": "f31532d3cc4bcb5f914df7dd8b86824d94d525609c6d861789a3c82870759c6a",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-1.mesh",
+      "bytes": 2160,
+      "sha256": "fa262416683b7922f51e551ffe11b87cd52d75d302078a983b50459e8dd4dc1b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-1.png",
+      "bytes": 38873,
+      "sha256": "603c244ac8c2ceaf9feb603feacfd79aab2e7b1ddc8549acf90a8cfb2484901f",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-2.mesh",
+      "bytes": 3120,
+      "sha256": "f2fd6556b5017fc4dd0710c7499d52f346d8c681db74e4d9a1b8d1e168aa7986",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-2.png",
+      "bytes": 30767,
+      "sha256": "f31532d3cc4bcb5f914df7dd8b86824d94d525609c6d861789a3c82870759c6a",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-3.mesh",
+      "bytes": 3120,
+      "sha256": "f2fd6556b5017fc4dd0710c7499d52f346d8c681db74e4d9a1b8d1e168aa7986",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-3.png",
+      "bytes": 30767,
+      "sha256": "f31532d3cc4bcb5f914df7dd8b86824d94d525609c6d861789a3c82870759c6a",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-4.mesh",
+      "bytes": 2400,
+      "sha256": "bc30ef855f6ce86ee8056f793af9671153ccccb57fe55e8f876eb14e31a00d5b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-4.png",
+      "bytes": 46211,
+      "sha256": "767c308dff2649a791b15bf1c6e586710d0b0eb62c9305dc841cc43a80fc881c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-5.mesh",
+      "bytes": 2640,
+      "sha256": "40349e127370736c6c81ec76a6345610ed45bbe9e843255271ab02ece29f79a5",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-5.png",
+      "bytes": 34440,
+      "sha256": "48d69eca0302a394faff804cc915201e9719c83f8fb9317717dc725de274bd16",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-6.mesh",
+      "bytes": 2880,
+      "sha256": "1da20a966c922b211375db5f5e60e5e720c49fd7840a0057f69f00d0849fb8c1",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-6.png",
+      "bytes": 76346,
+      "sha256": "2e463981365df1209e3feffe563aee3651114804713f6d7e19d82ae6ac01217b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-7.mesh",
+      "bytes": 2880,
+      "sha256": "8d31575072b707b6826d1ded5571a5e2c5c24fe284d6056fa7e74d0683cdf578",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-7.png",
+      "bytes": 60796,
+      "sha256": "99b060de0428bb67c15b5e7592094ed88a61e795b53d46929eff370b1a7e1452",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-8.mesh",
+      "bytes": 5280,
+      "sha256": "7f6c3d8577588d671b8dc890bc004458588da74e41a78c0c435078516550e4a8",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-8.png",
+      "bytes": 41579,
+      "sha256": "747b03d43dc039cd4a09415cbebb5f5205302189102b2e410fb873c62f6920ac",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-9.mesh",
+      "bytes": 3120,
+      "sha256": "f2fd6556b5017fc4dd0710c7499d52f346d8c681db74e4d9a1b8d1e168aa7986",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/discovery-9.png",
+      "bytes": 30370,
+      "sha256": "46fc305a7cf85643d5315da75598f2281408e6d5fb32e4883031fcb6f8bfb29e",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/drone.png",
+      "bytes": 39442,
+      "sha256": "0262b5b56ee19c949b0bc671875afe911a97576a7516a5563d4d2163eba18be0",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/drone.rig",
+      "bytes": 22232,
+      "sha256": "d9a385bfc32527d6f97c9e88eec32a0647b40383c1add53f597ff338d4fc28ed",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/engineer.png",
+      "bytes": 43448,
+      "sha256": "f4303774006b882e360795ad6406695fb96e4c0d93e52d959e16db59c12f7e80",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/engineer.rig",
+      "bytes": 74564,
+      "sha256": "3390e93a84b57c6b225e841387f64f61272ffa93f4a0e14e1eda33281952e309",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/farm.mesh",
+      "bytes": 5760,
+      "sha256": "94c6fbcbe8e72b3f6da9210b5b5dd2868975bd357ea1f91a56739902c7e4a117",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/farm.png",
+      "bytes": 108202,
+      "sha256": "703841ce02767cd8d001cbb4b301bb7bd47a4dd8c1d0c1e7ce04fe8d195027ed",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/fleet.png",
+      "bytes": 41182,
+      "sha256": "993add074b973a33f9378120ce47f233b6387e34c13151d456569290982ca7e4",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/fleet.rig",
+      "bytes": 65816,
+      "sha256": "51c51207de8a6d3c15be59bfa254b5ff82ab884b250dc4f76350f98bc4f17690",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/guard.png",
+      "bytes": 48985,
+      "sha256": "c97c3c2e8cef156aa75ca9ad7f56e50dc2cc2f119cfeac9b14fbfc8f1b323efe",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/guard.rig",
+      "bytes": 66984,
+      "sha256": "cfc78d31c9c0349152bfba02f7fe2ee3a41384017e2b0b485edc11c683bfbcdd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/launcher.png",
+      "bytes": 39533,
+      "sha256": "cdcde049ec5e17a594e246754197f489d7c226d3b1d4d111c6bd1c0750807f8f",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/launcher.rig",
+      "bytes": 92644,
+      "sha256": "38d4c9c0463cf887dcec5fa49e99d744191643fee3ca5349f41db6e8cad514b4",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/missile.png",
+      "bytes": 40084,
+      "sha256": "15bf4a1a2d250db2b120746611ba026a395cb229aefd90f3c72571105b5c7c3c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/missile.rig",
+      "bytes": 16284,
+      "sha256": "76988ff29c0e48abaae37e806d1c02642a564c11233a6ed74dd2d151be2236ef",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/mortar.png",
+      "bytes": 37157,
+      "sha256": "4d7dc875f5159f087b469cb4c7a817219ec3bd476469b0bfb53f0994bc1c4c2b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/mortar.rig",
+      "bytes": 6848,
+      "sha256": "d9e1673d2424358009459635ba88ca1dfb42f91c012f19d3fe1d213864859921",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/nuke.png",
+      "bytes": 41474,
+      "sha256": "65b7ad85b89a2f833c4b8035f1bc1d96158f2e16d0e9ad364c889ea203f27b15",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/nuke.rig",
+      "bytes": 16284,
+      "sha256": "382b0925c269fc27caf2ac2ad8d45abbf7ae972bd331347e41bff33fdcc69df3",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/ocean-normal.png",
+      "bytes": 21156,
+      "sha256": "08133a9f7ddf2f4971e4c69f708244c3231528183527d62d91d96f9251435f77",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/ocean-roughness.png",
+      "bytes": 3291,
+      "sha256": "62d0c3e3f79ed7e30b838e60635798133e7def11d11d54615f9b71f60079e691",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/recon.png",
+      "bytes": 45635,
+      "sha256": "9a9e0b0ad23427baccb5d2c1bb161eb893153b2c64bb17de40e8a5eb666428dc",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/recon.rig",
+      "bytes": 66984,
+      "sha256": "90b9fae69237a7eeb12d5464d4934b7f014d9fb6cdb56ff09829d2f6d5e830d3",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/rocket.png",
+      "bytes": 40084,
+      "sha256": "15bf4a1a2d250db2b120746611ba026a395cb229aefd90f3c72571105b5c7c3c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/rocket.rig",
+      "bytes": 16284,
+      "sha256": "76988ff29c0e48abaae37e806d1c02642a564c11233a6ed74dd2d151be2236ef",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/satellite.png",
+      "bytes": 33342,
+      "sha256": "72b13cb254028f63a545b7d291f65d5e14d529b3d6a575a79f4b077cfd952778",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/satellite.rig",
+      "bytes": 21480,
+      "sha256": "4772b92d8b209328827c1e05732cbe84288e826a3687138d3aedec2125db3e75",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/scout.png",
+      "bytes": 43851,
+      "sha256": "0219358df759ebd8a5b2b1343655139742255b490da0dec6bf6d38f2c08f8253",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/scout.rig",
+      "bytes": 61424,
+      "sha256": "777e11fbc7abf1cef5fe4fd55683b2dbe2d422e64f5541af767dff2520d2c007",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/settler.png",
+      "bytes": 50730,
+      "sha256": "41b8961e373eb392edc61d57a093663b232715cf247e7c571d1751d26c7d3169",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/settler.rig",
+      "bytes": 66804,
+      "sha256": "2422cb22734272bb55014bf7ce0f3163e732574e37cc24b00c822bd0b473ddf9",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/shell.png",
+      "bytes": 37157,
+      "sha256": "4d7dc875f5159f087b469cb4c7a817219ec3bd476469b0bfb53f0994bc1c4c2b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/shell.rig",
+      "bytes": 6848,
+      "sha256": "d9e1673d2424358009459635ba88ca1dfb42f91c012f19d3fe1d213864859921",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/site.mesh",
+      "bytes": 3120,
+      "sha256": "1c67504c744699b7de1d29e08e4967e510303cc32b5467ff433da0e600b7e29b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/site.png",
+      "bytes": 44321,
+      "sha256": "4775ad7169e9460563186942efd8ff22353909bb490729b6be67e38ca88348a9",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/submarine.png",
+      "bytes": 46993,
+      "sha256": "7b7e00be188ee05b2e29bd058668ec5a82584f3784a082f2263229ca97f012e7",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/submarine.rig",
+      "bytes": 36364,
+      "sha256": "f96a0a4a850293f19fc982e8954699701d6eb84392b4145117a64d7241fe466d",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tank.png",
+      "bytes": 37499,
+      "sha256": "c8a5b2a29018f1ee914ca13071db7647797eba56718b9607afbc0967fa32b13d",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tank.rig",
+      "bytes": 77804,
+      "sha256": "7707c64224e01d20aaeb5f89900604fed28d042f9c24b90f29f5ee880965a629",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/terrain.png",
+      "bytes": 348357,
+      "sha256": "3d51527cf1bb1308b49fe1640ceced06c0115a086fbb0b745acd66a68a7ad539",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/torpedo.png",
+      "bytes": 40701,
+      "sha256": "c2ca29fe3b813e56fd42ea8f456fd1881ed58410aa54f84694dd37fca9763758",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/torpedo.rig",
+      "bytes": 16284,
+      "sha256": "76988ff29c0e48abaae37e806d1c02642a564c11233a6ed74dd2d151be2236ef",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tree-birch.mesh",
+      "bytes": 10560,
+      "sha256": "c2814124a7e4da069fd9c847d3620fe023fd8a2eee99c2760372fa125ba919b6",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tree-birch.png",
+      "bytes": 47784,
+      "sha256": "c71ab0fd3e22ded84910881f2214505d45e9297b73210fcd47f0dee429e94c76",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tree-oak.mesh",
+      "bytes": 10560,
+      "sha256": "4ba527ab34582be88f34a13b42d547beebf9db28f22f6540c352ef0a01828ac9",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tree-oak.png",
+      "bytes": 46397,
+      "sha256": "f168464ffd4df74141f7b1d779716c33ad0feff50e1ebecfe25a2ef4cd875e3a",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tree-pine.mesh",
+      "bytes": 6480,
+      "sha256": "152918884ef5a699573e370a19dad630ea3ed35f9520ac10f6bf96cb9aaf6813",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/tree-pine.png",
+      "bytes": 36841,
+      "sha256": "55141439032e0066e07dfb1f5740b7e34858d8d76bc54ce1c2b945ed01db1a76",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/globe-share.jpg",
+      "bytes": 70369,
+      "sha256": "d072da1a8427ce6a876da0ce391f251c6917d6b5bc30579219b2c04db90efe6f",
+      "license": "Original project visual"
     },
     {
       "file": "public/assets/missile.mesh",
-      "bytes": 7296,
-      "sha256": "cd42ce9f60ab39bec42efb002894d3f3a4467baeab159a5ffb07d7fd88803f21",
-      "license": "CC0-1.0"
+      "bytes": 4608,
+      "sha256": "d5bc32d0ecfc99e9fb50ad06ecef211d944ba3a56b1fc28ea18ddb1a8ec148bd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/nuke.mesh",
-      "bytes": 7296,
-      "sha256": "2df0cc66584e5dd0d568cc0c455bc1d7c1e0fd1645ce3e321dce096ab402ae11",
-      "license": "CC0-1.0"
+      "bytes": 4608,
+      "sha256": "306d30a1c77e95d194c4d3d66fb6283cc7271463c56780fa78e07b18b6e297a4",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/ocean-normal.png",
-      "bytes": 929899,
-      "sha256": "adc44dd8d95d138990369989cad79a067797e220e5ead4cc1de4da33cbf55cb0",
-      "license": "CC0-1.0"
+      "bytes": 21156,
+      "sha256": "08133a9f7ddf2f4971e4c69f708244c3231528183527d62d91d96f9251435f77",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/ocean-roughness.png",
-      "bytes": 189653,
-      "sha256": "9d6cea00c368952a7029db526f5c8836175290dd95c1647de4b7ccffbcbf2282",
-      "license": "CC0-1.0"
+      "bytes": 3291,
+      "sha256": "62d0c3e3f79ed7e30b838e60635798133e7def11d11d54615f9b71f60079e691",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/recon.mesh",
-      "bytes": 29088,
-      "sha256": "aa28290ca0a700bc096a1322a02e574b37a9bd5245a69567e62ad620e4dc6dd6",
-      "license": "CC0-1.0"
+      "bytes": 6912,
+      "sha256": "05a088aac81c4ebc5ed3f7e1ff12e524d72630c045f0c41328fcec64fdfba646",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/satellite.mesh",
-      "bytes": 13728,
-      "sha256": "ae92cff53ae6cf8b50316ef6b43dda4eee92871db46a22c9442f203979ae7325",
-      "license": "CC0-1.0"
-    },
-    {
-      "file": "public/assets/scout.mesh",
-      "license": "CC0-1.0",
-      "bytes": 10080,
-      "sha256": "3374e8e5674c2a49443c68605ad8a87ff5d5ea5680e9a0bdc1c6a9fe04f65f19"
-    },
-    {
-      "file": "public/assets/scout.rig",
-      "license": "CC0-1.0",
-      "author": "Quaternius",
-      "source": "https://opengameart.org/content/lowpoly-rpg-characters",
-      "bytes": 294948,
-      "sha256": "17dd433187c96ac8bb305bb6126def1356555dd6e6a0b12cad577be291566ccc"
-    },
-    {
-      "file": "public/assets/settler.mesh",
-      "license": "CC0-1.0",
-      "bytes": 19968,
-      "sha256": "1ebaa72953542ad114e3e8ce5aa9433d1b9b3081a115cf6269f2a0d398ccbfcb"
+      "bytes": 3264,
+      "sha256": "88e446ba7b79acb3b375cb823e192b6a60eb4512cc06d230bb9685c82d76cf8d",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/submarine.mesh",
-      "bytes": 133152,
-      "sha256": "a7c55c7452ae0d6f5e6789c0c67d9f5022e63c1f4c1e4514c1a4d0dcc895ad5c",
-      "license": "CC0-1.0"
+      "bytes": 4608,
+      "sha256": "da8de5bd4e1d239bd5952bd7ba7f9700a5f44bce280e2ad6c56bc079cbbf75ee",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/tank.mesh",
-      "bytes": 51456,
-      "sha256": "19269403c12d290e5ec030ec56440a1bd11a241192f00ace0f58e17d64566c77",
-      "license": "CC0-1.0"
-    },
-    {
-      "file": "public/assets/woodland.mesh",
-      "license": "CC0-1.0",
-      "author": "carlosjorgereis",
-      "source": "https://opengameart.org/content/very-low-poly-and-texture-tree",
-      "bytes": 39660,
-      "sha256": "344b33477f7b3e8510fc4bf98276b004d163f96274af08cfc7025ce03f5283ca"
-    },
-    {
-      "file": "public/assets/woodland.webp",
-      "license": "CC0-1.0",
-      "author": "carlosjorgereis",
-      "source": "https://opengameart.org/content/very-low-poly-and-texture-tree",
-      "bytes": 37950,
-      "sha256": "f3b11b41bbeebdf59e4c5e296769e17526e6ee60b1feb631479e3ec4e9b0273f"
+      "bytes": 11328,
+      "sha256": "cb98cfe3a9eddfd62cc3b384f5def74f26326b7056d094be2b933fe1139ab924",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
     }
   ]
 }
