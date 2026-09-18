@@ -1,5 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+
+test('streamed images decode through a URL allowed by the production image policy',async t=>{
+ const {assetImage}=await import('../public/loading.js');
+ const headers=readFileSync(new URL('../public/_headers',import.meta.url),'utf8');
+ const allowed=headers.match(/img-src\s+([^;]+)/)[1].split(/\s+/);
+ const bytes=new Uint8Array([137,80,78,71]);let requests=0;
+ t.mock.method(globalThis,'fetch',async()=>{requests++;return new Response(bytes);});
+ for(const name of ['FileReader','Image']){
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,name);
+  t.after(()=>{if(descriptor)Object.defineProperty(globalThis,name,descriptor);else delete globalThis[name];});
+ }
+ globalThis.FileReader=class {
+  readAsDataURL(blob){blob.arrayBuffer().then(buffer=>{this.result='data:application/octet-stream;base64,'+Buffer.from(buffer).toString('base64');this.onload();});}
+ };
+ globalThis.Image=class {
+  set src(value){this.url=value;queueMicrotask(()=>allowed.includes(new URL(value).protocol)?this.onload():this.onerror());}
+ };
+ const image=await assetImage('/texture.png');
+ assert.deepEqual(Buffer.from(image.url.split(',')[1],'base64'),Buffer.from(bytes));
+ assert.equal(requests,1,'decoding does not download the image again');
+});
 
 test('asset bytes preserve streamed chunks even without a length header',async t=>{
  const {assetBytes}=await import('../public/loading.js');

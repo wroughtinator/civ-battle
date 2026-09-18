@@ -94,12 +94,12 @@ test('packaging is deterministic, freezes all client URLs, shares engines, and r
  writeFileSync(join(root,'public/app.js'),"fetch('/api/rooms'); // changed client");
  const second=captureRelease(root,root);assert.notEqual(second,first);
  const catalog=stageReleases(root);assert.equal(catalog.current,second);assert.equal(catalog.bootstrap,first);
- // Streamed textures become blob images; the packaged policy must permit them.
+ // Streamed textures become data images; the packaged policy must permit them.
  const headers=JSON.parse(readFileSync(join(root,'releases',second,'release.json'))).headers;
  const policy=headers['Content-Security-Policy'];
  const directive=name=>policy.split(';').map(s=>s.trim().split(/\s+/)).find(parts=>parts[0]===name).slice(1);
- assert.ok(directive('img-src').includes('blob:'),'startup textures require blob: images');
- assert.ok(!directive('script-src').includes('blob:'),'blob access stays limited to images');
+ assert.ok(directive('img-src').includes('data:'),'startup textures require data: images');
+ assert.ok(!directive('script-src').includes('data:'),'data access stays limited to images and styles');
  retainPublished(catalog,{...catalog,releases:{[first]:catalog.releases[first]}});
  assert.throws(()=>retainPublished({...catalog,releases:{[second]:catalog.releases[second]}},catalog),/Refusing to remove/);
  writeFileSync(join(root,'releases',first,'public/app.js'),'tampered');
