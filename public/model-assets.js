@@ -44,15 +44,20 @@ export class RiggedMesh {
   if(this.rig.meta.version===2){gl.enableVertexAttribArray(6);gl.vertexAttribPointer(6,2,gl.UNSIGNED_SHORT,true,28,24);}
  }
  draw(mode,uniforms,animation={name:'idle',seconds:0}){
-  const g=this.gl;sampleRig(this.rig,animation.name,animation.seconds,this.pose,animation.name!=='attack');
-  // A short crossfade prevents the run/idle pose from popping at tile arrivals.
-  if(animation.id!==undefined){
-   let state=this.states.get(animation.id);
-   if(!state){state={name:animation.name,last:new Float32Array(this.pose),from:null,start:0};this.states.set(animation.id,state);}
-   if(state.name!==animation.name){state.name=animation.name;state.from=new Float32Array(state.last);state.start=animation.now;}
-   const blend=Math.min(1,(animation.now-state.start)/80);
-   if(state.from&&blend<1)for(let i=0;i<this.pose.length;i++)this.pose[i]=state.from[i]*(1-blend)+this.pose[i]*blend;
-   state.last.set(this.pose);
+  const g=this.gl;
+  let state=animation.id===undefined?null:this.states.get(animation.id);
+  // The color and outline passes share the exact sampled pose and crossfade.
+  if(state&&state.now===animation.now&&state.name===animation.name&&state.seconds===animation.seconds)this.pose.set(state.last);
+  else{
+   sampleRig(this.rig,animation.name,animation.seconds,this.pose,animation.name!=='attack');
+   if(animation.id!==undefined){
+    if(!state){state={name:animation.name,last:new Float32Array(this.pose),from:null,start:0};this.states.set(animation.id,state);}
+    if(state.name!==animation.name){state.name=animation.name;state.from=new Float32Array(state.last);state.start=animation.now;}
+    const blend=Math.min(1,(animation.now-state.start)/80);
+    if(state.from&&blend<1)for(let i=0;i<this.pose.length;i++)this.pose[i]=state.from[i]*(1-blend)+this.pose[i]*blend;
+    else state.from=null;
+    state.last.set(this.pose);state.now=animation.now;state.seconds=animation.seconds;
+   }
   }
   if(this.texture){g.activeTexture(g.TEXTURE3);g.bindTexture(g.TEXTURE_2D,this.texture);g.uniform1i(uniforms.treeTexture,3);}
   g.uniform1f(uniforms.skinned,1);g.uniformMatrix4fv(uniforms['bones[0]'],false,this.pose);g.bindVertexArray(this.vao);g.vertexAttrib3f(3,1,this.texture?4:2,0);g.drawArrays(mode,0,this.rig.meta.vertices);g.uniform1f(uniforms.skinned,0);
@@ -70,14 +75,28 @@ export class Woodland {
   gl.enableVertexAttribArray(9);gl.vertexAttribPointer(9,3,gl.FLOAT,false,44,32);gl.vertexAttribDivisor(9,1);
  }
  draw(globe,maskOnly=false){
-  const g=this.gl,visible=[];
-  for(let i=0;i<this.instances.length;i++){
-   const instance=this.instances[i];if(maskOnly&&!instance.slice(8,11).some(v=>v>0))continue;const p=instance.slice(0,3),v=globe.rotate(p);
-   if(v[2]<1/globe.distance-.10)continue;
-   visible.push(...instance.slice(0,8),...(instance.length===11?instance.slice(8,11):[0,0,0]));
+  const g=this.gl;
+  // Scenery instances only change on a map update or camera movement.
+  const key=[globe.yaw,globe.pitch,globe.distance].join(',');
+  this.visibleData??=new Float32Array(0);
+  if(this.visibleInstances!==this.instances||this.visibleKey!==key){
+   const needed=this.instances.length*11;
+   if(needed>this.visibleData.length)this.visibleData=new Float32Array(needed);
+   let used=0;
+   for(const instance of this.instances){
+    // The outline shader rejects unowned props; both passes reuse this upload.
+    if(globe.rotate(instance)[2]<1/globe.distance-.10)continue;
+    for(let k=0;k<11;k++)this.visibleData[used++]=instance[k]??0;
+   }
+   this.visibleCount=used/11;this.visibleInstances=this.instances;this.visibleKey=key;
+   if(used){
+    g.bindVertexArray(this.vao);g.bindBuffer(g.ARRAY_BUFFER,this.instanceBuffer);
+    if((this.instanceCapacity||0)<this.visibleData.length){this.instanceCapacity=this.visibleData.length;g.bufferData(g.ARRAY_BUFFER,this.visibleData.byteLength,g.DYNAMIC_DRAW);}
+    g.bufferSubData(g.ARRAY_BUFFER,0,this.visibleData.subarray(0,used));
+   }
   }
-  if(!visible.length)return;
+  if(!this.visibleCount)return;
   g.uniform1f(globe.u.foliage,this.sway?1:2);g.activeTexture(g.TEXTURE3);g.bindTexture(g.TEXTURE_2D,this.texture);g.uniform1i(globe.u.treeTexture,3);
-  g.bindVertexArray(this.vao);g.bindBuffer(g.ARRAY_BUFFER,this.instanceBuffer);g.bufferData(g.ARRAY_BUFFER,new Float32Array(visible),g.DYNAMIC_DRAW);g.vertexAttrib3f(2,1,1,1);g.vertexAttrib3f(3,1,4,0);g.drawArraysInstanced(g.TRIANGLES,0,this.count,visible.length/11);g.uniform1f(globe.u.foliage,0);
+  g.bindVertexArray(this.vao);g.vertexAttrib3f(2,1,1,1);g.vertexAttrib3f(3,1,4,0);g.drawArraysInstanced(g.TRIANGLES,0,this.count,this.visibleCount);g.uniform1f(globe.u.foliage,0);
  }
 }

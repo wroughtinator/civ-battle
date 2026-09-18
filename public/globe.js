@@ -1,4 +1,5 @@
 import {assetBytes,assetImage,trackLoad} from './loading.js';
+import {Mesh,UnitRings,sceneryKey} from './render-buffers.js';
 import {OutlinePass} from './outline-pass.js';
 import {GlobeControls} from './globe-controls.js';
 import {attackTiming,drawAttack,unitScales,ballisticPose} from './combat-visuals.js';
@@ -35,7 +36,7 @@ void main(){vec3 local=position,localNormal=normal;
 if(skinned>.5){mat4 skin=bones[int(joints.x)]*weights.x+bones[int(joints.y)]*weights.y+bones[int(joints.z)]*weights.z+bones[int(joints.w)]*weights.w;local=(skin*vec4(local,1.)).xyz;localNormal=mat3(skin)*localNormal;}
 vec3 world=modelScale>0.?modelOrigin+modelBasis*local*modelScale:local;vec3 n=modelScale>0.?modelBasis*localNormal:localNormal;
 if(foliage>.5){vec3 up=normalize(treeOrigin.xyz),east=normalize(cross(abs(up.y)>.98?vec3(1,0,0):vec3(0,1,0),up)),north=cross(up,east);float c=cos(treeOrigin.w),s=sin(treeOrigin.w);mat3 basis=mat3(east*c+north*s,up,north*c-east*s);vec3 branch=position*treeShape.xyz;if(foliage<1.5)branch.x+=sin(time*1.1+treeOrigin.w+position.y*3.)*.025*position.y*position.y*treeShape.y;world=treeOrigin.xyz+basis*branch;n=normalize(basis*(localNormal/treeShape.xyz));}
-vSurfaceNormal=n;vUV=uv;if(mode>2.5&&mode<3.5){vec3 q=normalize(world);float billow=sin(q.x*31.+sin(q.y*27.))*sin(q.z*28.+sin(q.x*19.));world=q*(1.078+billow*.009);}vec3 p=rotate(world);float z=camera.z-p.z;float scale=2.75;gl_Position=vec4(p.x*scale/viewport.x+offset*z,p.y*scale,z*1.001-0.02001,z);vTeamColor=foliage>1.5?teamColor:modelTint;gl_PointSize=2.;vColor=modelScale>0.?mix(mix(color,modelTint,.12),vec3(1.,.28,.10),modelFlash):color*(foliage>.5?treeShape.w:1.);vNormal=rotate(material.y>.5&&material.y<1.5?normalize(world):n);vPos=p;vWorld=world;vMaterial=material;}`;
+vSurfaceNormal=n;vUV=uv;if(mode>2.5&&mode<3.5){vec3 q=normalize(world);float billow=sin(q.x*31.+sin(q.y*27.))*sin(q.z*28.+sin(q.x*19.));world=q*(1.078+billow*.009);}vec3 p=rotate(world);float z=camera.z-p.z;float scale=2.75;gl_Position=vec4(p.x*scale/viewport.x+offset*z,p.y*scale,z*1.001-0.02001,z);vTeamColor=foliage>1.5?teamColor:modelTint;gl_PointSize=2.;vColor=foliage>2.5?teamColor:modelScale>0.?mix(mix(color,modelTint,.12),vec3(1.,.28,.10),modelFlash):color*(foliage>.5?treeShape.w:1.);vNormal=rotate(material.y>.5&&material.y<1.5?normalize(world):n);vPos=p;vWorld=world;vMaterial=material;}`;
 const fragment=`#version 300 es
 precision highp float;
 in vec2 vUV;
@@ -141,11 +142,6 @@ if(vMaterial.y>3.5&&mode<.5){vec4 leaf=texture(treeTexture,vUV);if(leaf.a<.48)di
 if(mode>.5)c=vColor;
 vec3 mist=mix(vec3(.01,.021,.032),vec3(.035,.065,.09),f);vec3 remembered=mix(vec3(dot(c,vec3(.21,.72,.07))*.43),c*.42,.35);c=mix(mix(mist,remembered,smoothstep(.05,.45,fog)),c,visibility);
 outColor=vec4(tone(c),1.);}`;
-class Mesh {
- constructor(gl){this.gl=gl;this.vao=gl.createVertexArray();this.buffer=gl.createBuffer();this.count=0;}
- update(data){const g=this.gl,packed=new Float32Array(data.length/9*12);for(let i=0,j=0;i<data.length;i+=9,j+=12){packed.set(data.slice(i,i+9),j);packed.set(data.materials?.slice(i/3,i/3+3)||[1,0,0],j+9);}g.bindVertexArray(this.vao);g.bindBuffer(g.ARRAY_BUFFER,this.buffer);g.bufferData(g.ARRAY_BUFFER,packed,g.STATIC_DRAW);[0,1,2,3].forEach((i)=>{g.enableVertexAttribArray(i);g.vertexAttribPointer(i,3,g.FLOAT,false,48,i*12);});this.count=data.length/9;}
- draw(mode){this.gl.bindVertexArray(this.vao);this.gl.drawArrays(mode,0,this.count);}
-}
 export class Globe {
  constructor(canvas,onSelect){
   this.canvas=canvas;this.onSelect=onSelect;this.gl=canvas.getContext('webgl2',{antialias:true,alpha:true,powerPreference:'high-performance'});
@@ -157,7 +153,7 @@ export class Globe {
   this.textures=['ocean-normal.png','ocean-roughness.png'].map((file,unit)=>{const texture=g.createTexture();g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array(unit?[160,160,160,255]:[128,128,255,255]));trackLoad(assetImage('/assets/forge/'+file).then(img=>{g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,img);g.generateMipmap(g.TEXTURE_2D);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR_MIPMAP_LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.REPEAT);})).catch(e=>console.warn(e));return texture;});
   this.terrainTexture=g.createTexture();g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array([110,120,80,255]));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);trackLoad(loadTexture(g,'terrain',4).then(t=>this.terrainTexture=t)).catch(e=>console.warn(e));
   this.fogTexture=g.createTexture();g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.texImage2D(g.TEXTURE_2D,0,g.R8,128,64,0,g.RED,g.UNSIGNED_BYTE,new Uint8Array(8192).fill(255));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
-  this.land=new Mesh(g);this.lines=new Mesh(g);this.props=new Mesh(g);this.air=new Mesh(g);this.selection=new Mesh(g);this.routes=new Mesh(g);this.clouds=new Mesh(g);this.units=new Mesh(g);
+  this.land=new Mesh(g,false);this.lines=new Mesh(g);this.props=new Mesh(g);this.air=new Mesh(g,false);this.selection=new Mesh(g);this.routes=new Mesh(g);this.clouds=new Mesh(g,false);this.units=new Mesh(g);this.unitRings=new UnitRings(g);
   this.effects=new EventTimeline();this.effectsMesh=new Mesh(g);this.territories=new Mesh(g);this.territoryBorders=new Mesh(g);this.models={};this.modelLoads=new Map();
   this.loadModel=kind=>{
    if(this.models[kind]||performance.now()-(this.modelLoads.get(kind)??-Infinity)<15000)return;
@@ -178,22 +174,23 @@ export class Globe {
   const c=this.canvas;this.controls=new GlobeControls(this,[c,document.getElementById('markers')].filter(Boolean));
   c.addEventListener('wheel',e=>{e.preventDefault();this.targetDistance=Math.max(1.12,Math.min(4.8,this.targetDistance+e.deltaY*.0015));},{passive:false});
  }
- setWorld(world){this.motion=new UnitMotion();this.headings=new Map();this.world=world;this.staticReady=false;this.borderCache=[];this.territorySurfaces=[];this.edgeNeighbors=world.map(t=>t.poly.map(()=>-1));const edges=new Map(),pointKey=p=>p.map(x=>x.toFixed(5)).join(',');world.forEach((t,i)=>t.poly.forEach((p,k)=>{const key=[pointKey(p),pointKey(t.poly[(k+1)%t.poly.length])].sort().join('|'),other=edges.get(key);if(other){this.edgeNeighbors[i][k]=other[0];this.edgeNeighbors[other[0]][other[1]]=i;}else edges.set(key,[i,k]);}));this.shoreEdges=coastalEdges(world,this.edgeNeighbors);this.fogLookup=new Uint16Array(8192);for(let y=0;y<64;y++)for(let x=0;x<128;x++){const lat=((y+.5)/64-.5)*Math.PI,lon=((x+.5)/128-.5)*Math.PI*2,p=[Math.cos(lat)*Math.cos(lon),Math.sin(lat),Math.cos(lat)*Math.sin(lon)];let best=-2,idx=0;for(let i=0;i<world.length;i++){const v=world[i].p,d=p[0]*v[0]+p[1]*v[1]+p[2]*v[2];if(d>best){best=d;idx=i;}}this.fogLookup[y*128+x]=idx;}this.rebuild();}
+ setWorld(world){this.motion=new UnitMotion();this.headings=new Map();this.world=world;this.staticReady=false;this.sceneryKey=null;this.territoryKey=null;this.territoryTiles=[];this.borderCache=[];this.territorySurfaces=[];this.edgeNeighbors=world.map(t=>t.poly.map(()=>-1));const edges=new Map(),pointKey=p=>p.map(x=>x.toFixed(5)).join(',');world.forEach((t,i)=>t.poly.forEach((p,k)=>{const key=[pointKey(p),pointKey(t.poly[(k+1)%t.poly.length])].sort().join('|'),other=edges.get(key);if(other){this.edgeNeighbors[i][k]=other[0];this.edgeNeighbors[other[0]][other[1]]=i;}else edges.set(key,[i,k]);}));this.shoreEdges=coastalEdges(world,this.edgeNeighbors);this.fogLookup=new Uint16Array(8192);for(let y=0;y<64;y++)for(let x=0;x<128;x++){const lat=((y+.5)/64-.5)*Math.PI,lon=((x+.5)/128-.5)*Math.PI*2,p=[Math.cos(lat)*Math.cos(lon),Math.sin(lat),Math.cos(lat)*Math.sin(lon)];let best=-2,idx=0;for(let i=0;i<world.length;i++){const v=world[i].p,d=p[0]*v[0]+p[1]*v[1]+p[2]*v[2];if(d>best){best=d;idx=i;}}this.fogLookup[y*128+x]=idx;}this.rebuild();}
  updateFog(){const g=this.gl,data=new Uint8Array(8192);for(let i=0;i<data.length;i++){const t=this.state?.tiles[this.fogLookup[i]];data[i]=this.preview||t?.visible?255:t?.explored?117:0;}g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.texSubImage2D(g.TEXTURE_2D,0,0,0,128,64,g.RED,g.UNSIGNED_BYTE,data);}
- setState(state,slot){if(!!state.showcase!==!!this.state?.showcase){this.effects=new EventTimeline();this.motion=new UnitMotion();this.headings=new Map();}const priorRadius=this.state?.cities?.find(c=>c.tile===this.selectedCity)?.radius;this.effects.accept(state);this.motion??=new UnitMotion();this.motion.accept(state.squads||[],performance.now());this.state=state;for(const kind of new Set((state.squads||[]).map(u=>u.kind)))this.loadModel(kind);for(const strike of state.strikes||[])this.loadModel(strike.kind===2?15:14);for(const e of this.effects.items)if(e.action==='shot'){const type=attackTiming(e,performance.now()).style.type;const name=({arrow:'arrow',shell:'shell',mortar:'mortar',burst:'bullet',bomb:'bomb',broadside:'shell',torpedo:'torpedo',rocket:'rocket',sortie:'aircraft'})[type];if(name)this.loadModel(modelNames.indexOf(name));}if(state.players?.some(p=>p.launch>0))this.loadModel(16);for(const mesh of Object.values(this.models))if(mesh.states)for(const id of mesh.states.keys())if(!state.squads?.some(u=>u.id===id))mesh.states.delete(id);this.slot=slot;this.receivedAt=performance.now();this.preview=state.phase!=='running'&&state.phase!=='ended';this.targetOffset=this.preview&&innerWidth>760?.24:0;this.updateFog();this.rebuild();if(priorRadius!==state.cities?.find(c=>c.tile===this.selectedCity)?.radius)this.frameCity(this.selectedCity);}
+ setState(state,slot){if(!!state.showcase!==!!this.state?.showcase){this.effects=new EventTimeline();this.motion=new UnitMotion();this.headings=new Map();}const priorRadius=this.state?.cities?.find(c=>c.tile===this.selectedCity)?.radius;this.effects.accept(state);this.motion??=new UnitMotion();this.motion.accept(state.squads||[],performance.now());this.state=state;for(const kind of new Set((state.squads||[]).map(u=>u.kind)))this.loadModel(kind);for(const strike of state.strikes||[])this.loadModel(strike.kind===2?15:14);for(const e of this.effects.items)if(e.action==='shot'){const type=attackTiming(e,performance.now()).style.type;const name=({arrow:'arrow',shell:'shell',mortar:'mortar',burst:'bullet',bomb:'bomb',broadside:'shell',torpedo:'torpedo',rocket:'rocket',sortie:'aircraft'})[type];if(name)this.loadModel(modelNames.indexOf(name));}if(state.players?.some(p=>p.launch>0))this.loadModel(16);for(const mesh of Object.values(this.models))if(mesh.states)for(const id of mesh.states.keys())if(!state.squads?.some(u=>u.id===id))mesh.states.delete(id);this.slot=slot;this.receivedAt=performance.now();this.preview=state.phase!=='running'&&state.phase!=='ended';this.targetOffset=this.preview&&innerWidth>760?.24:0;this.updateFog();const key=sceneryKey(state,this.preview);if(key!==this.sceneryKey){this.rebuild();this.sceneryKey=key;}if(priorRadius!==state.cities?.find(c=>c.tile===this.selectedCity)?.radius)this.frameCity(this.selectedCity);}
  focus(i){if(!this.world[i])return;const p=this.world[i].p;let yaw=-Math.atan2(p[0],p[2]);while(yaw-this.yaw>Math.PI)yaw-=Math.PI*2;while(yaw-this.yaw<-Math.PI)yaw+=Math.PI*2;this.targetFocus=[yaw,Math.atan2(p[1],Math.hypot(p[0],p[2]))];}
  frameCity(tile){if(tile==null||tile<0||!this.world[tile])return;const city=this.state?.cities?.find(c=>c.tile===tile);if(!city)return;const center=this.world[tile].p;let spread=0;for(let i=0;i<this.world.length;i++)if(this.state.tiles[i]?.city===tile)for(const p of this.world[i].poly)spread=Math.max(spread,Math.acos(Math.max(-1,Math.min(1,p.reduce((v,x,k)=>v+x*center[k],0)))));const w=this.canvas.clientWidth,h=this.canvas.clientHeight;this.targetDistance=Math.max(this.targetDistance,Math.min(4.8,Math.cos(spread)+2.75*h*Math.sin(spread)/Math.min(w*.78,h*.58)));this.focus(tile);}
  choose(i,city=false){this.selected=i;this.selectedCity=city?i:-1;this.rebuildTerritory();this.rebuildSelection();}
  setBlockedTargets(targets){this.blockedTargets=targets;this.rebuildSelection();}
  setTargets(targets){this.targets=targets;this.rebuildSelection();}
  rotate(p){const c=Math.cos(this.yaw),s=Math.sin(this.yaw),x=c*p[0]+s*p[2],z=-s*p[0]+c*p[2];return[x,Math.cos(this.pitch)*p[1]-Math.sin(this.pitch)*z,Math.sin(this.pitch)*p[1]+Math.cos(this.pitch)*z];}
- project(p){const v=this.rotate(p),w=this.canvas.clientWidth,h=this.canvas.clientHeight,z=this.distance-v[2];return{x:w*(.5+this.offset/2)+v[0]*h*1.375/z,y:h/2-v[1]*h*1.375/z,visible:v[2]>1/this.distance,z:v[2]};}
+ project(p){const v=this.rotate(p),w=this.viewWidth??this.canvas.clientWidth,h=this.viewHeight??this.canvas.clientHeight,z=this.distance-v[2];return{x:w*(.5+this.offset/2)+v[0]*h*1.375/z,y:h/2-v[1]*h*1.375/z,visible:v[2]>1/this.distance,z:v[2]};}
  pick(x,y){const rect=this.canvas.getBoundingClientRect();x-=rect.left;y-=rect.top;let best=-1,dist=Infinity;this.world.forEach((t,i)=>{const p=this.project(t.p);if(!p.visible)return;const d=Math.hypot(x-p.x,y-p.y);const size=this.canvas.clientHeight*.105/(this.distance-p.z);if(d<dist&&d<size){dist=d;best=i;}});return best;}
  rebuild(){if(!this.world.length)return;const land=[],lines=[],props=[],air=[],clouds=[],staticBuild=!this.staticReady;
+  const lineKey=JSON.stringify((this.state?.tiles||[]).map(t=>t.owner)),linesChanged=staticBuild||lineKey!==this.lineKey;
   if(staticBuild){this.treeInstances=[];this.treeGroups=new Map(treeNames.map(n=>[n,[]]));}this.propInstances=new Map();
-  let activeMat=[1,0,0];const cornerFog=new Map(),cornerTerrain=new Map();const key=p=>p.map(v=>v.toFixed(5)).join(',');
+  let activeMat=[1,0,0];const cornerFog=new Map(),cornerTerrain=staticBuild?(this.cornerTerrain=new Map()):this.cornerTerrain;const key=p=>p.map(v=>v.toFixed(5)).join(',');
   const fogValue=i=>this.preview?1:this.state?.tiles[i]?.visible?1:this.state?.tiles[i]?.explored?.46:0;
-  this.world.forEach((t,i)=>t.poly.forEach(p=>{const k=key(p),v=cornerFog.get(k)||[0,0];v[0]+=fogValue(i);v[1]++;cornerFog.set(k,v);const a=cornerTerrain.get(k)||[0,0,0];a[0]+=t.terrain===4?1:0;a[1]+=t.terrain===0?1:0;a[2]++;cornerTerrain.set(k,a);}));
+  if(staticBuild)this.world.forEach((t,i)=>t.poly.forEach(p=>{const k=key(p),v=cornerFog.get(k)||[0,0];v[0]+=fogValue(i);v[1]++;cornerFog.set(k,v);const a=cornerTerrain.get(k)||[0,0,0];a[0]+=t.terrain===4?1:0;a[1]+=t.terrain===0?1:0;a[2]++;cornerTerrain.set(k,a);}));
   const push=(list,p,n,c)=>{list.push(...p,...n,...c);list.materials??=[];list.materials.push(...activeMat);};
   const tri=(list,a,b,c,col)=>{const n=norm(cross(add(b,mul(a,-1)),add(c,mul(a,-1))));const outward=n[0]*a[0]+n[1]*a[1]+n[2]*a[2]<0?mul(n,-1):n;[a,b,c].forEach(p=>push(list,p,outward,col));};
   this.world.forEach((t,i)=>{
@@ -211,7 +208,7 @@ export class Globe {
     for(const p of ps)this.territorySurfaces[i].push(...mul(norm(p),Math.hypot(...p)+.0012));
     tri(land,...ps,col);for(let k=0;k<3;k++){land.materials[(at+k)*3]=t.terrain===0?0:beachWeight(shoreDistance([a,b,c][k],shores));land.materials[(at+k)*3+2]=t.terrain===0?Math.min(1,shoreDistance([a,b,c][k],shores)/.055):t.terrain;}
    };
-   for(let k=0;k<poly.length;k++){
+   if(linesChanged)for(let k=0;k<poly.length;k++){
     const q=t.poly[k],r=t.poly[(k+1)%poly.length],f=cornerFog.get(key(q)),h=cornerFog.get(key(r)),a=cornerTerrain.get(key(q)),b=cornerTerrain.get(key(r));
     if(staticBuild){drawGround(t.p,q,r,fogValue(i),f[0]/f[1],h[0]/h[1],t.terrain===4?1:0,a[0]/a[2],b[0]/b[2],t.terrain===0?1:0,a[1]/a[2],b[1]/b[2],t.terrain===4?4:3);
     tri(air,mul(t.p,1.078),mul(q,1.078),mul(r,1.078),[.2,.5,.6]);tri(clouds,mul(t.p,1.087),mul(q,1.087),mul(r,1.087),[1,1,1]);}
@@ -240,16 +237,24 @@ export class Globe {
    if(t.site)prop('site',0,0,.05);
    if(s.owner>=0&&(t.capital>=0||this.state?.cities.some(c=>c.tile===i)))prop('capital-'+(this.state?.players[s.owner]?.civ||0),0,0,.085,0,s.owner);
    if(s.owner>=0&&s.building)prop('building-'+s.building,t.capital>=0?.052:0,0,.065,0,s.owner);
-  });if(staticBuild){smoothTerrainNormals(land);this.land.update(land);this.air.update(air);this.clouds.update(clouds);this.staticReady=true;}this.lines.update(lines);this.props.update(props);this.rebuildTerritory();this.rebuildSelection();
+  });if(staticBuild){smoothTerrainNormals(land);this.land.update(land);this.air.update(air);this.clouds.update(clouds);this.staticReady=true;}if(linesChanged){this.lines.update(lines);this.lineKey=lineKey;}this.props.update(props);this.rebuildTerritory();if(staticBuild)this.rebuildSelection();
  }
  rebuildTerritory(){
   if(!this.territories)return;
-  const fill=[],borders=[];fill.materials=[];borders.materials=[];
-  const push=(list,p,color,alpha)=>{list.push(...p,...norm(p),...color);list.materials.push(1,3,alpha);};
+  const key=JSON.stringify([this.preview,this.selectedCity,(this.state?.tiles||[]).map(t=>[t.visible,t.city]),(this.state?.cities||[]).map(c=>[c.tile,c.owner,c.expansion_tiles])]);
+  if(key===this.territoryKey)return;this.territoryKey=key;
+  const fillChunks=[],borderChunks=[];this.territoryTiles??=[];
+  const push=(list,p,color,alpha)=>{list.push(...p,...norm(p),...color,1,3,alpha);};
   const cities=new Map((this.state?.cities||[]).map(c=>[c.tile,c]));
   const expansion=new Set(cities.get(this.selectedCity)?.expansion_tiles||[]);
   if(!this.preview)for(let i=0;i<this.world.length;i++){
    const s=this.state?.tiles[i],city=s?.city!=null?cities.get(s.city):null;
+   const selected=city?.tile===this.selectedCity;
+   const tileKey=JSON.stringify([s?.visible,s?.city,city?.owner,selected,expansion.has(i),(this.edgeNeighbors[i]||[]).map(j=>[this.state?.tiles[j]?.visible,this.state?.tiles[j]?.city])]);
+   let cached=this.territoryTiles[i];
+   if(cached?.key===tileKey){fillChunks.push(cached.fill);borderChunks.push(cached.borders);continue;}
+   const fill=[],borders=[];
+
    if(s?.visible&&expansion.has(i)){
     const surface=this.territorySurfaces[i]||[];
     const color=this.world[i].terrain===1?[.75,.95,.40]:[.42,.88,.82];
@@ -260,25 +265,28 @@ export class Globe {
      for(const p of [pa,pb,ib,pa,ib,ia])push(borders,p,color,.95);
     }
    }
-   if(!s?.visible||!city)continue;
-   const selected=city.tile===this.selectedCity,base=palette[city.owner],shade=(city.tile*137%19)/19;
-   const color=selected?[1,.81,.38]:mix(base,shade>.5?[.52,.85,.85]:[.9,.82,.62],.18+shade*.2),t=this.world[i],surface=this.territorySurfaces[i]||[];
-   for(let k=0;k<surface.length;k+=3)push(fill,surface.slice(k,k+3),color,selected?.25:.095);
-   for(let edge=0;edge<t.poly.length;edge++){
-    const neighbor=this.state.tiles[this.edgeNeighbors[i]?.[edge]];
-    if(neighbor?.visible&&neighbor.city===s.city)continue;
-    // Ground-following ribbons stay readable on mobile where GL lines are one pixel.
-    for(let step=0;step<8;step++){
-     const cached=this.borderCache[i]?.[edge*8+step];if(!cached)continue;
-     const [a,b,ha,hb]=cached;
-     for(const [width,col,alpha,lift] of [[selected?.13:.065,[.025,.08,.09],.9,.0016],[selected?.075:.03,color,selected?1:.82,.0021]]){
-      const pa=mul(a,ha+lift),pb=mul(b,hb+lift),ia=mul(norm(mix(a,t.p,width)),ha+lift),ib=mul(norm(mix(b,t.p,width)),hb+lift);
-      for(const p of [pa,pb,ib,pa,ib,ia])push(borders,p,col,alpha);
+   if(s?.visible&&city){
+    const base=palette[city.owner],shade=(city.tile*137%19)/19;
+    const color=selected?[1,.81,.38]:mix(base,shade>.5?[.52,.85,.85]:[.9,.82,.62],.18+shade*.2),t=this.world[i],surface=this.territorySurfaces[i]||[];
+    for(let k=0;k<surface.length;k+=3)push(fill,surface.slice(k,k+3),color,selected?.25:.095);
+    for(let edge=0;edge<t.poly.length;edge++){
+     const neighbor=this.state.tiles[this.edgeNeighbors[i]?.[edge]];
+     if(neighbor?.visible&&neighbor.city===s.city)continue;
+     // Ground-following ribbons stay readable on mobile where GL lines are one pixel.
+     for(let step=0;step<8;step++){
+      const cached=this.borderCache[i]?.[edge*8+step];if(!cached)continue;
+      const [a,b,ha,hb]=cached;
+      for(const [width,col,alpha,lift] of [[selected?.13:.065,[.025,.08,.09],.9,.0016],[selected?.075:.03,color,selected?1:.82,.0021]]){
+       const pa=mul(a,ha+lift),pb=mul(b,hb+lift),ia=mul(norm(mix(a,t.p,width)),ha+lift),ib=mul(norm(mix(b,t.p,width)),hb+lift);
+       for(const p of [pa,pb,ib,pa,ib,ia])push(borders,p,col,alpha);
+      }
      }
     }
    }
+   cached={key:tileKey,fill:new Float32Array(fill),borders:new Float32Array(borders)};this.territoryTiles[i]=cached;
+   fillChunks.push(cached.fill);borderChunks.push(cached.borders);
   }
-  this.territories.update(fill);this.territoryBorders.update(borders);
+  this.territories.updateChunks(fillChunks);this.territoryBorders.updateChunks(borderChunks);
  }
  rebuildSelection(){
   const data=[],rings=[...[...(this.blockedTargets||[])].map(i=>[i,[.85,.35,.23]]),...[...(this.targets||[])].map(i=>[i,[.45,.85,.78]]),[this.selected,[1,.86,.55]]];
@@ -301,8 +309,9 @@ export class Globe {
  }
  unitPosition(s,now=performance.now()){if(this.state?.showcase&&this.showcasePose)return this.showcasePose(s,now);return this.motion?.position(s,this.world,now)||{p:this.world[s.tile].p,forward:null,moving:false};}
  updateUnits(now){const data=[],elapsed=Math.min(2,(now-(this.receivedAt||now))/1000);const tri=(a,b,c,col)=>{const n=norm(cross(add(b,mul(a,-1)),add(c,mul(a,-1))));for(const p of[a,b,c])data.push(...p,...n,...col);};
-  const ring=(p,r,col,height)=>{const e=norm(cross(Math.abs(p[1])>.98?[1,0,0]:[0,1,0],p)),n=cross(p,e),point=(a,rad)=>add(mul(p,height),add(mul(e,Math.cos(a)*rad),mul(n,Math.sin(a)*rad)));for(let j=0;j<32;j++){const a=j/32*Math.PI*2,b=(j+1)/32*Math.PI*2;tri(point(a,r),point(b,r),point(b,r*.87),col);tri(point(a,r),point(b,r*.87),point(a,r*.87),col);}};
-  for(const s of this.state?.squads||[]){if(s.boarded_on!=null)continue;const{p}=this.unitPosition(s,now);const col=palette[s.owner]||[.75,.35,.22];ring(p,s.kind===9?.055:.032,col,this.world[s.tile].terrain===0?1.008:ground(p,this.world[s.tile].terrain===4?1:0)+.003);
+  // Keep a generous horizon margin for elevated and expanding rings at any zoom.
+  this.unitRings.reset();const ring=(p,r,col,height)=>this.unitRings.add(p,r,col,height);
+  for(const s of this.state?.squads||[]){if(s.boarded_on!=null)continue;const{p}=this.unitPosition(s,now);if(this.rotate(p)[2]<-.4)continue;const col=palette[s.owner]||[.75,.35,.22];ring(p,s.kind===9?.055:.032,col,this.world[s.tile].terrain===0?1.008:ground(p,this.world[s.tile].terrain===4?1:0)+.003);
    if(s.mode===2&&s.effect_until>this.state.tick){ring(p,.035+(now%1800)/1800*.13,[.25,.76,.76],1.018);}
    if(s.founding){ring(p,.038,[.94,.78,.42],ground(p,0)+.009);ring(p,.018+(now%1500)/1500*.025,[.94,.78,.42],ground(p,0)+.035);}
    if(s.mode===3&&s.effect_until>this.state.tick){ring(p,.039,[.38,.74,1],ground(p,0)+.03);}
@@ -334,8 +343,12 @@ export class Globe {
   }
   this.effectsMesh.update(data);
  }
- drawModels(now){const g=this.gl,elapsed=Math.min(2,(now-(this.receivedAt||now))/1000);
-  const draw=(kind,up,forward,radius,scale,owner,flash=0,animation)=>{const mesh=this.models[kind];if(!mesh){this.loadModel(kind);return;}g.uniformMatrix3fv(this.u.modelBasis,false,orientationBasis(up,forward,animation?.flight));g.uniform3fv(this.u.modelOrigin,add(mul(up,radius),forward?mul(norm(forward),animation?.kick||0):[0,0,0]));g.uniform1f(this.u.modelScale,scale);g.uniform1f(this.u.modelFlash,flash);g.uniform3fv(this.u.modelTint,palette[owner]||[.65,.27,.18]);mesh.draw(g.TRIANGLES,this.u,animation);};
+ drawModels(now){const g=this.gl;
+  const submit=command=>{const {mesh,basis,origin,scale,owner,flash,animation}=command;g.uniformMatrix3fv(this.u.modelBasis,false,basis);g.uniform3fv(this.u.modelOrigin,origin);g.uniform1f(this.u.modelScale,scale);g.uniform1f(this.u.modelFlash,flash);g.uniform3fv(this.u.modelTint,palette[owner]||[.65,.27,.18]);mesh.draw(g.TRIANGLES,this.u,animation);};
+  if(this.modelFrame===now){for(const command of this.modelCommands)submit(command);g.uniform1f(this.u.modelScale,0);return;}
+  this.modelFrame=now;this.modelCommands=[];
+  const elapsed=Math.min(2,(now-(this.receivedAt||now))/1000);
+  const draw=(kind,up,forward,radius,scale,owner,flash=0,animation)=>{const mesh=this.models[kind];if(!mesh){this.loadModel(kind);return;}const command={mesh,basis:orientationBasis(up,forward,animation?.flight),origin:add(mul(up,radius),forward?mul(norm(forward),animation?.kick||0):[0,0,0]),scale,owner,flash,animation};this.modelCommands.push(command);submit(command);};
   for(const s of this.state?.squads||[]){if(s.boarded_on!=null)continue;
    const {p,forward:stepForward,moving}=this.unitPosition(s,now);
    if(this.rotate(p)[2]<1/this.distance-.12)continue;
@@ -354,18 +367,18 @@ export class Globe {
   for(const projectile of this.projectileBodies||[]){const {kind,p,forward,scale,owner}=projectile;draw(kind,norm(p),forward,Math.hypot(...p),scale,owner,0,{name:'idle',seconds:now/1000,flight:true});}
   g.uniform1f(this.u.modelScale,0);
  }
- frame(now){this.clock=now/1000;const c=this.canvas,g=this.gl;const dpr=Math.min(devicePixelRatio||1,innerWidth<=760?1.4:1.8),w=Math.floor(c.clientWidth*dpr),h=Math.floor(c.clientHeight*dpr);if(c.width!==w||c.height!==h){c.width=w;c.height=h;g.viewport(0,0,w,h);this.targetOffset=this.preview&&innerWidth>760?.24:0;}
+ frame(now){this.clock=now/1000;const c=this.canvas,g=this.gl;this.viewWidth=c.clientWidth;this.viewHeight=c.clientHeight;const dpr=Math.min(devicePixelRatio||1,innerWidth<=760?1.4:1.8),w=Math.floor(this.viewWidth*dpr),h=Math.floor(this.viewHeight*dpr);if(c.width!==w||c.height!==h){c.width=w;c.height=h;g.viewport(0,0,w,h);this.targetOffset=this.preview&&innerWidth>760?.24:0;}
   this.controls.update(now);
   if(!this.pointer){this.distance+=(this.targetDistance-this.distance)*.09;this.offset+=(this.targetOffset-this.offset)*.06;}
   if(this.targetFocus){this.yaw+=(this.targetFocus[0]-this.yaw)*.085;this.pitch+=(this.targetFocus[1]-this.pitch)*.085;if(Math.abs(this.yaw-this.targetFocus[0])+Math.abs(this.pitch-this.targetFocus[1])<.001)this.targetFocus=null;}
   else if(this.preview&&!this.pointer&&!this.controls.moving)this.yaw+=.0007;
   this.outlines.begin(w,h);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.useProgram(this.program);g.uniform4f(this.u.camera,this.yaw,this.pitch,this.distance,0);g.uniform2f(this.u.viewport,w/h,1);g.uniform1f(this.u.offset,this.offset);g.uniform1f(this.u.time,this.clock);g.uniform1i(this.u.oceanNormal,0);g.uniform1i(this.u.oceanRough,1);g.uniform1i(this.u.fogTexture,2);g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.uniform1i(this.u.terrainTexture,4);g.uniform1f(this.u.preview,this.preview?1:0);g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.uniform4fv(this.u['weather[0]'],(this.state?.weather||[[.3,.2,.93,.89],[-.8,.3,.5,.89],[.4,-.3,-.85,.9]]).flat());this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});
   g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA);g.depthMask(false);g.uniform1f(this.u.mode,2);this.air.draw(g.TRIANGLES);g.depthMask(true);g.disable(g.BLEND);g.uniform1f(this.u.mode,0);this.land.draw(g.TRIANGLES);g.enable(g.BLEND);g.depthMask(false);g.uniform1f(this.u.mode,4);this.territories.draw(g.TRIANGLES);g.disable(g.DEPTH_TEST);this.territoryBorders.draw(g.TRIANGLES);g.enable(g.DEPTH_TEST);g.depthMask(true);g.disable(g.BLEND);g.uniform1f(this.u.mode,0);for(const [name,mesh]of this.staticMeshes){mesh.instances=mesh.sway?this.treeGroups.get(name)||[]:this.propInstances.get(name)||[];mesh.draw(this);}this.props.draw(g.TRIANGLES);g.uniform1f(this.u.mode,1);this.lines.draw(g.LINES);this.selection.draw(g.TRIANGLES);this.updateRoutes(now);this.routes.draw(g.LINES);
-  g.uniform1f(this.u.mode,0);this.updateUnits(now);this.units.draw(g.TRIANGLES);this.updateEffects(now);this.drawModels(now);g.uniform1f(this.u.mode,1);this.effectsMesh.draw(g.TRIANGLES);g.enable(g.BLEND);g.depthMask(false);g.uniform1f(this.u.mode,3);this.clouds.draw(g.TRIANGLES);g.depthMask(true);
+  g.uniform1f(this.u.mode,0);this.updateUnits(now);this.units.draw(g.TRIANGLES);this.unitRings.draw(this);this.updateEffects(now);this.drawModels(now);g.uniform1f(this.u.mode,1);this.effectsMesh.draw(g.TRIANGLES);g.enable(g.BLEND);g.depthMask(false);g.uniform1f(this.u.mode,3);this.clouds.draw(g.TRIANGLES);g.depthMask(true);
   // A depth-tested player mask uses exactly the same geometry and animation time.
   this.outlines.beginMask();g.useProgram(this.program);g.uniform1f(this.u.mode,0);g.uniform1f(this.u.outline,1);g.uniform1i(this.u.outlineSceneDepth,7);
   for(const mesh of this.staticMeshes.values())if(!mesh.sway)mesh.draw(this,true);
-  this.drawModels(now);g.uniform1f(this.u.outline,0);this.outlines.composite(w/c.clientWidth);
+  this.drawModels(now);g.uniform1f(this.u.outline,0);this.outlines.composite(w/this.viewWidth);
   this.onFrame?.(now);requestAnimationFrame(this.frame);
  }
 }
