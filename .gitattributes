@@ -4,3 +4,7 @@
 *.mesh binary
 *.png binary
 *.mp3 binary
+
+# Release integrity checks require identical bytes on every checkout.
+releases/** -text
+deploy.sh text eol=lf

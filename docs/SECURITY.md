@@ -32,7 +32,7 @@ The public map seed generates terrain, not production discovery locations. The W
 
 ## Upgrade compatibility
 
-New rooms use rules version 4. Active v1, v2 and v3 rooms remain pinned to their original WASM binaries. Unstarted lobbies upgrade while preserving human seat identities. A new browser opening an older active match is directed to the retained legacy frontend. Current tests check all four engine formats.
+Every room, including an unstarted lobby, is pinned to an immutable build ID in SQLite. That ID selects the complete server implementation, WASM, and browser assets for the lifetime of the room. Missing releases fail closed. Pre-existing rooms use the captured production baseline, with older v1–v3 engines and their legacy client retained. Deployment checks SHA-256 archive integrity and refuses to remove versions in the live catalog. See [deployment details](DEPLOYMENT.md).
 
 ## Presentation events and elimination
 
