@@ -1,3 +1,4 @@
+import {GlobeControls} from './globe-controls.js';
 import {attackTiming,drawAttack,unitScales,ballisticPose} from './combat-visuals.js';
 import {RiggedMesh,Woodland,modelNames,treeNames,loadTexture,orientationBasis} from './model-assets.js';
 import {coastalEdges,shoreDistance,beachWeight,smoothTerrainNormals} from './terrain.js';
@@ -72,7 +73,7 @@ vec3 groundTex(float tile,vec3 p,vec3 surfaceNormal){
 void main(){terrainDx=dFdx(vWorld)*24.;terrainDy=dFdy(vWorld)*24.;vec3 wn=normalize(vWorld),n=normalize(vNormal),eye=normalize(vec3(0,0,camera.z)-vPos),sun=normalize(vec3(-.6,.85,1.));
 if(mode>3.5){if(dot(n,eye)<=.015)discard;outColor=vec4(vColor,vMaterial.z);return;}
 if(mode>2.5){
- float facing=dot(n,eye);if(facing<.025||camera.z<1.26)discard;
+ float facing=dot(n,eye);if(facing<.025)discard;
  float storm=0.;for(int i=0;i<3;i++)storm=max(storm,smoothstep(weather[i].w-.035,weather[i].w+.075,dot(wn,weather[i].xyz)));
  vec3 drift=vec3(time*.009,0,time*.004),q=wn+drift*.006;
  // Weather systems occupy distinct regions, with clear air between them.
@@ -91,7 +92,9 @@ if(mode>2.5){
  vec3 cloud=mix(vec3(.17,.24,.30),vec3(.89,.93,.95),light)*(.7+.3*max(dot(n,sun),0.));
  cloud+=vec3(.18,.15,.10)*pow(1.-mass,3.)*max(dot(n,sun),0.);
  float cloudFog=preview>.5?1.:texture(fogTexture,vec2(atan(wn.z,wn.x)/6.2831853+.5,asin(clamp(wn.y,-1.,1.))/3.14159265+.5)).r;cloud=mix(vec3(.025,.045,.065),cloud,.3+.7*cloudFog);
- float alpha=(1.-exp(-density*2.6))*smoothstep(1.26,2.55,camera.z)*smoothstep(.025,.30,facing);
+ // Keep a faint close-up layer and reach the 50% opacity ceiling farther out.
+ float zoomOpacity=mix(.10,.50,smoothstep(1.26,3.60,camera.z));
+ float alpha=(1.-exp(-density*2.6))*zoomOpacity*smoothstep(.025,.30,facing);
  outColor=vec4(tone(cloud),alpha);return;
 }
 if(mode>1.5){float edge=pow(1.-abs(dot(n,eye)),3.);outColor=vec4(.22,.61,.77,edge*.26);return;}
@@ -168,16 +171,7 @@ export class Globe {
   this.bind();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
  }
  bind(){
-  const c=this.canvas,surfaces=[c,document.getElementById('markers')].filter(Boolean),pointers=new Map();let suppressClick=false;
-  const down=e=>{const point={x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,moved:false,target:e.target};pointers.set(e.pointerId,point);this.pointer=point;this.targetFocus=null;e.target.setPointerCapture(e.pointerId);if(pointers.size>1)for(const p of pointers.values())p.moved=true;};
-  const move=e=>{const p=pointers.get(e.pointerId);if(!p){if(e.pointerType!=='touch')this.hovered=this.pick(e.clientX,e.clientY);return;}
-   const values=[...pointers.values()],before=values.length===2?Math.hypot(values[0].x-values[1].x,values[0].y-values[1].y):0,dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
-   if(Math.hypot(p.x-p.sx,p.y-p.sy)>8)p.moved=true;
-   if(values.length===2){const after=Math.hypot(values[0].x-values[1].x,values[0].y-values[1].y);if(after>10&&before>10)this.targetDistance=Math.max(1.12,Math.min(4.8,1+(this.targetDistance-1)*before/after));}
-   else if(p.moved){const sensitivity=Math.min(.006,Math.max(.0006,(this.distance-1)*.003));this.yaw+=dx*sensitivity;this.pitch=Math.max(-1.48,Math.min(1.48,this.pitch+dy*sensitivity));}
-  };
-  const up=e=>{const p=pointers.get(e.pointerId);if(!p)return;suppressClick=p.moved;if(!p.moved&&p.target===c){const i=this.pick(e.clientX,e.clientY);if(i>=0)this.onSelect(i);}pointers.delete(e.pointerId);this.pointer=pointers.size?[...pointers.values()][0]:null;};
-  for(const surface of surfaces){surface.addEventListener('pointerdown',down);surface.addEventListener('pointermove',move);surface.addEventListener('pointerup',up);surface.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);this.pointer=null;suppressClick=true;});surface.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopImmediatePropagation();suppressClick=false;}},true);}
+  const c=this.canvas;this.controls=new GlobeControls(this,[c,document.getElementById('markers')].filter(Boolean));
   c.addEventListener('wheel',e=>{e.preventDefault();this.targetDistance=Math.max(1.12,Math.min(4.8,this.targetDistance+e.deltaY*.0015));},{passive:false});
  }
  setWorld(world){this.motion=new UnitMotion();this.headings=new Map();this.world=world;this.staticReady=false;this.borderCache=[];this.territorySurfaces=[];this.edgeNeighbors=world.map(t=>t.poly.map(()=>-1));const edges=new Map(),pointKey=p=>p.map(x=>x.toFixed(5)).join(',');world.forEach((t,i)=>t.poly.forEach((p,k)=>{const key=[pointKey(p),pointKey(t.poly[(k+1)%t.poly.length])].sort().join('|'),other=edges.get(key);if(other){this.edgeNeighbors[i][k]=other[0];this.edgeNeighbors[other[0]][other[1]]=i;}else edges.set(key,[i,k]);}));this.shoreEdges=coastalEdges(world,this.edgeNeighbors);this.fogLookup=new Uint16Array(8192);for(let y=0;y<64;y++)for(let x=0;x<128;x++){const lat=((y+.5)/64-.5)*Math.PI,lon=((x+.5)/128-.5)*Math.PI*2,p=[Math.cos(lat)*Math.cos(lon),Math.sin(lat),Math.cos(lat)*Math.sin(lon)];let best=-2,idx=0;for(let i=0;i<world.length;i++){const v=world[i].p,d=p[0]*v[0]+p[1]*v[1]+p[2]*v[2];if(d>best){best=d;idx=i;}}this.fogLookup[y*128+x]=idx;}this.rebuild();}
@@ -357,9 +351,10 @@ export class Globe {
   g.uniform1f(this.u.modelScale,0);
  }
  frame(now){this.clock=now/1000;const c=this.canvas,g=this.gl;const dpr=Math.min(devicePixelRatio||1,innerWidth<=760?1.4:1.8),w=Math.floor(c.clientWidth*dpr),h=Math.floor(c.clientHeight*dpr);if(c.width!==w||c.height!==h){c.width=w;c.height=h;g.viewport(0,0,w,h);this.targetOffset=this.preview&&innerWidth>760?.24:0;}
-  this.distance+=(this.targetDistance-this.distance)*.09;this.offset+=(this.targetOffset-this.offset)*.06;
+  this.controls.update(now);
+  if(!this.pointer){this.distance+=(this.targetDistance-this.distance)*.09;this.offset+=(this.targetOffset-this.offset)*.06;}
   if(this.targetFocus){this.yaw+=(this.targetFocus[0]-this.yaw)*.085;this.pitch+=(this.targetFocus[1]-this.pitch)*.085;if(Math.abs(this.yaw-this.targetFocus[0])+Math.abs(this.pitch-this.targetFocus[1])<.001)this.targetFocus=null;}
-  else if(this.preview&&!this.pointer)this.yaw+=.0007;
+  else if(this.preview&&!this.pointer&&!this.controls.moving)this.yaw+=.0007;
   g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.useProgram(this.program);g.uniform4f(this.u.camera,this.yaw,this.pitch,this.distance,0);g.uniform2f(this.u.viewport,w/h,1);g.uniform1f(this.u.offset,this.offset);g.uniform1f(this.u.time,this.clock);g.uniform1i(this.u.oceanNormal,0);g.uniform1i(this.u.oceanRough,1);g.uniform1i(this.u.fogTexture,2);g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.uniform1i(this.u.terrainTexture,4);g.uniform1f(this.u.preview,this.preview?1:0);g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.uniform4fv(this.u['weather[0]'],(this.state?.weather||[[.3,.2,.93,.89],[-.8,.3,.5,.89],[.4,-.3,-.85,.9]]).flat());this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});
   g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA);g.depthMask(false);g.uniform1f(this.u.mode,2);this.air.draw(g.TRIANGLES);g.depthMask(true);g.disable(g.BLEND);g.uniform1f(this.u.mode,0);this.land.draw(g.TRIANGLES);g.enable(g.BLEND);g.depthMask(false);g.uniform1f(this.u.mode,4);this.territories.draw(g.TRIANGLES);g.disable(g.DEPTH_TEST);this.territoryBorders.draw(g.TRIANGLES);g.enable(g.DEPTH_TEST);g.depthMask(true);g.disable(g.BLEND);g.uniform1f(this.u.mode,0);for(const [name,mesh]of this.staticMeshes){mesh.instances=mesh.sway?this.treeGroups.get(name)||[]:this.propInstances.get(name)||[];mesh.draw(this);}this.props.draw(g.TRIANGLES);g.uniform1f(this.u.mode,1);this.lines.draw(g.LINES);this.selection.draw(g.TRIANGLES);this.updateRoutes(now);this.routes.draw(g.LINES);
   g.uniform1f(this.u.mode,0);this.updateUnits(now);this.units.draw(g.TRIANGLES);this.updateEffects(now);this.drawModels(now);g.uniform1f(this.u.mode,1);this.effectsMesh.draw(g.TRIANGLES);g.enable(g.BLEND);g.depthMask(false);g.uniform1f(this.u.mode,3);this.clouds.draw(g.TRIANGLES);g.depthMask(true);
