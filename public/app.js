@@ -1,3 +1,4 @@
+import {Manufacture} from './manufacture.js';
 import {roster,units as unitRoster} from './roster.js';
 import {createShowcase, showcasePosition, showcaseFeedback} from './showcase.js';
 import {assetBytes,assetsReady,finishLoading,loadingFailed,loadingStage} from './loading.js';
@@ -90,8 +91,9 @@ function send(type,payload={}){
  const request=new Promise((resolve,reject)=>{inflight={message:{type,...payload,seq:++seq},resolve,reject};ws.send(JSON.stringify(inflight.message));renderControls();});inflight.promise=request;return request;
 }
 const command=(kind,data={})=>send('command',{kind,...data}).catch(()=>{});
+const manufacture=new Manufacture(()=>({world,state,slot,connected}),command);
 setInterval(()=>{if(connected&&ws?.readyState===1)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));},10000);
-function renderControls(updatePanels=true){if(!state)return;if($('ending').open)$('back-lobby').disabled=!connected||!!inflight;if(updatePanels&&state.phase==='running'){if(pointerHeld)pendingRender=true;else{renderProvince();renderResearch();}}const lobby=state.phase==='lobby'||state.phase==='preview';$('start').disabled=!!inflight||!!creating||lobby&&state.phase!=='preview'&&(!connected||!state.host||state.awaitingResults);$('invite').disabled=!!creating;if(lobby){const locked=!!inflight||!!creating||state.phase!=='preview'&&(!connected||!state.host);$('fewer-players').disabled=locked||count<=(state.minCount||2);$('more-players').disabled=locked||count>=8;$('difficulty').disabled=locked;}}
+function renderControls(updatePanels=true){if(!state)return;manufacture.render();if($('ending').open)$('back-lobby').disabled=!connected||!!inflight;if(updatePanels&&state.phase==='running'){if(pointerHeld)pendingRender=true;else{renderProvince();renderResearch();}}const lobby=state.phase==='lobby'||state.phase==='preview';$('start').disabled=!!inflight||!!creating||lobby&&state.phase!=='preview'&&(!connected||!state.host||state.awaitingResults);$('invite').disabled=!!creating;if(lobby){const locked=!!inflight||!!creating||state.phase!=='preview'&&(!connected||!state.host);$('fewer-players').disabled=locked||count<=(state.minCount||2);$('more-players').disabled=locked||count>=8;$('difficulty').disabled=locked;}}
 function render(){
  const title=state.phase==='preview',lobby=state.phase==='lobby'||title;show('title-screen',title);show('topbar',!title);document.body.classList.toggle('on-title',title);document.body.classList.toggle('in-lobby',lobby);show('lobby',lobby&&!title);show('show-scoreboard',!lobby);if(lobby&&$('scoreboard').open)$('scoreboard').close();show('dock',!lobby);$('resources').innerHTML=lobby?'':resources();
  renderClock(state.tick);
@@ -214,20 +216,18 @@ function renderProvince(){
   }
   if(abilityTarget){const id=abilityTarget.kind==='move'?'move-order':abilityTarget.kind==='face'?'face-order':abilityTarget.kind==='attack'?'attack-order':abilityTarget.kind==='disembark'?'disembark-order':`ability-${actions.findIndex(a=>a.value===abilityTarget.value)}`;const button=$(id);if(button){button.classList.add('armed');button.setAttribute('aria-pressed','true');}}
  }else if(city){
-  const recruitScroll=$('province').querySelector('.recruit-row')?.scrollTop||0;
-  const own=city.owner===slot&&!state.spectator,p=state.players[slot],unit=state.squads.find(u=>u.tile===city.tile),units=own?[...p.unlocked].sort((a,b)=>unitRoster[a].era-unitRoster[b].era||a-b):[];
+  const own=city.owner===slot&&!state.spectator,unit=state.squads.find(u=>u.tile===city.tile);
   const block=(kind,value)=>availability(kind,{from:city.tile,value});
   const capacityGain=1;
   const landBenefits=city.radius<3?`<span class="radius-change">${city.radius}${icon('arrow')}${city.radius+1}</span><span class="upgrade-benefit">${icon('shield')}+${capacityGain}</span>${incomeBenefit(icon,city.expansion_income??0)}${price([0,80,140][city.radius])}`:'';
   const productionBenefits=city.production<3?`<span class="upgrade-benefit">${icon('coin')}+0.8<span class="upgrade-per">/${icon('clock')}1</span></span><span class="upgrade-benefit">${icon('hourglass')}−${city.production===1?'20':'16.7'}%</span>${price([0,110,180][city.production])}`:'';
   $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[city.owner]}">${icon(city.capital>=0?'crown':'city')}</span><div><span class="owner-name">${html(state.players[city.owner].name)}</span><div class="unit-stats">${stat('territory',city.radius)}${stat('factory',city.production)}${own?stat('wheat',city.farms??0)+stat('coin',rate(city.income??(4+city.production*4)))+stat('clock',5):''}</div></div><span class="spacer"></span>${unit?btn('select-occupant',unitIcons[unit.kind],'Select occupying unit'):''}${btn('close-piece','close','Close selection')}</div>
    ${own?`<div class="city-upgrades">${actionButton('radius-upgrade','territory',city.radius<3?`Expand city control radius to ${city.radius+1}; +${rate((city.expansion_income??0)/5)} coins per second from new farmland; +${capacityGain} unit capacity${capacityGain?'':'; capacity limit reached'}`:'Expand city control radius',landBenefits,block('upgrade',0))}${actionButton('production-upgrade','factory',city.production<3?`Upgrade production: +0.8 coins per second (4 every 5 seconds); approximately ${city.production===1?'20':'16.7'}% shorter training time for new recruits`:'Upgrade production and income',productionBenefits,block('upgrade',1))}</div>
-   <div class="action-row recruit-row">${units.map(k=>actionButton(`train-${k}`,unitIcons[k],`Train ${unitNames[k]}, ${state.rules.specs[k].cost} coins`,price(state.rules.specs[k].cost),block('train',k))).join('')}</div>
+   <div class="manufacture-entry">${btn('manufacture-open','swords','Manufacture units',`${city.queue?.length?`<span>${city.queue.length}</span>`:''}`)}</div>
    ${city.training>=0?`<div class="training">${icon(unitIcons[city.training])}${stat('clock',city.left)}<div class="job-progress"><i style="width:${100*(1-city.left/city.total)}%"></i></div></div>`:''}`:''}
    ${city.capture?`<div class="training">${icon('swords')}${city.capture}/12</div>`:''}`;
-  const recruitList=$('province').querySelector('.recruit-row');if(recruitList)recruitList.scrollTop=recruitScroll;
   $('close-piece').onclick=closeSelection;if(unit)$('select-occupant').onclick=()=>selectUnit(unit.id);
-  if(own){$('radius-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:0});$('production-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:1});units.forEach(k=>$(`train-${k}`).onclick=()=>command('train',{from:city.tile,value:k}));}
+  if(own){$('radius-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:0});$('production-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:1});$('manufacture-open').onclick=()=>manufacture.open(city.tile);}
  }else{
   $('province').innerHTML=`<div class="tile-inspector-head">${icon('territory')}<span class="spacer"></span>${btn('close-piece','close','Close selection')}</div>`;
   $('close-piece').onclick=closeSelection;
@@ -318,7 +318,7 @@ function renderSound(){$('sound').innerHTML=icon(sound?'sound':'mute');$('sound'
 $('invite').onclick=async()=>{try{await createRoom();const url=`${location.origin}/?room=${room}`;try{await navigator.clipboard.writeText(url);toast('check');}catch{if(navigator.share)await navigator.share({url});else toast('link');}}catch(e){toast('warning',Number(e.message)||503,true);}};
 $('start').onclick=async()=>{try{$('lobby').classList.add('busy');if(state.phase==='preview')await createRoom();await flushProfile();await send('start');}catch(e){toast('warning',Number(e.message)||503,true);}finally{$('lobby').classList.remove('busy');}};
 window.addEventListener('resize',()=>{const u=state?.squads.find(u=>u.id===activeUnit);if(u)globe.focus(u.tile);});
-document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||manual.opened||$('scoreboard').open)return;if(e.key==='Escape'){closeSelection();techOpen=false;show('research',false);manual.close();}if(e.key.toLowerCase()==='h'&&state?.phase==='running')home();if(e.key.toLowerCase()==='t'&&state?.phase==='running')toggleResearch();});
+document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||manual.opened||$('scoreboard').open||manufacture.root.open)return;if(e.key==='Escape'){closeSelection();techOpen=false;show('research',false);manual.close();}if(e.key.toLowerCase()==='h'&&state?.phase==='running')home();if(e.key.toLowerCase()==='t'&&state?.phase==='running')toggleResearch();});
 document.addEventListener('visibilitychange',()=>{if(ws?.readyState===1){ws.send(JSON.stringify({type:'presence',active:!document.hidden}));if(!document.hidden)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));}});
 try{
  globe=new Globe($('globe'),select);globe.onFrame=updateMarkers;

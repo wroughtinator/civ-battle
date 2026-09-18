@@ -10,6 +10,27 @@ function client(room,token){
  ws.addEventListener('message',e=>{const m=JSON.parse(e.data);messages.push(m);for(const w of [...waiters])if(w.filter(m)){waiters.splice(waiters.indexOf(w),1);clearTimeout(w.timer);w.resolve(m);}});
  return {ws,messages,wait(filter,from=0){const found=messages.slice(from).find(filter);if(found)return Promise.resolve(found);return new Promise((resolve,reject)=>{const w={filter,resolve,timer:setTimeout(()=>{waiters.splice(waiters.indexOf(w),1);reject(Error('Timed out waiting for server message'));},15000)};waiters.push(w);});},send(m){const from=messages.length;ws.send(JSON.stringify(m));return this.wait(x=>x.type==='ack'&&x.seq===m.seq,from);}};
 }
+test('manufacture queues survive reconnect, reject rival orders, and clear without cancelling production',async t=>{
+ const made=await post('/api/rooms',{seed:42,count:2});
+ const host=client(made.room,made.token);t.after(()=>host.ws.close());
+ await host.wait(x=>x.type==='welcome');const initial=await host.wait(x=>x.type==='state');
+ const tile=initial.cities.find(c=>c.owner===0).tile;
+ const foreign=initial.cities.find(c=>c.owner===1).tile;
+ assert.equal((await host.send({type:'start',seq:1})).error,0);
+ assert.equal((await host.send({type:'command',kind:'enqueue',from:foreign,value:0,seq:2})).error,3);
+ assert.equal((await host.send({type:'command',kind:'enqueue',from:tile,value:0,seq:3})).error,0);
+ const add={type:'command',kind:'enqueue',from:tile,value:0,seq:4};
+ assert.equal((await host.send(add)).error,0);
+ assert.equal((await host.send(add)).error,0);
+ await host.wait(x=>x.type==='state'&&x.cities.find(c=>c.tile===tile)?.queue?.length===1);
+ const restored=client(made.room,made.token);t.after(()=>restored.ws.close());await restored.wait(x=>x.type==='welcome');
+ const state=await restored.wait(x=>x.type==='state');
+ assert.deepEqual(state.cities.find(c=>c.tile===tile).queue,[0]);
+ assert.equal((await restored.send({type:'command',kind:'clear_queue',from:tile,seq:5})).error,0);
+ const cleared=await restored.wait(x=>x.type==='state'&&x.cities.find(c=>c.tile===tile)?.queue?.length===0);
+ assert.equal(cleared.cities.find(c=>c.tile===tile).training,0);
+});
+
 test('authoritative eight-seat lobby, private views, replay safety, reconnect and tick delivery',async()=>{
  const created=await post('/api/rooms',{seed:12345,count:8,difficulty:1});assert.equal(created.status,201);assert.match(created.token,/^[a-f0-9]{64}$/);
  const host=client(created.room,created.token);await host.wait(x=>x.type==='welcome');const initial=await host.wait(x=>x.type==='state');assert.equal(initial.host,true);assert.equal(initial.tiles.length,642);

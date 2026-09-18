@@ -229,7 +229,7 @@ export class Room extends DurableObject {
         else this.identity(a.slot,{civ:msg.civ,name:msg.name??this.room.game.players[a.slot].name,tag:msg.tag??this.room.game.players[a.slot].tag});
       }else if(msg.type==='command') {
         if(this.room.phase!=='running')error=1;
-        else if(!(this.room.rulesVersion===4?['auto','plan','face','move','stop','ability','attack','disembark','disband','explore','refit','research','train','upgrade']:['march','build','research','train','maneuver','strike','satellite','doctrine']).includes(msg.kind)||!['from','to','value'].every(k=>msg[k]===undefined||Number.isInteger(msg[k])&&msg[k]>=0&&msg[k]<(k==='value'?256:10000)))error=6;
+        else if(!(this.room.rulesVersion===4?['enqueue','clear_queue','auto','plan','face','move','stop','ability','attack','disembark','disband','explore','refit','research','train','upgrade']:['march','build','research','train','maneuver','strike','satellite','doctrine']).includes(msg.kind)||!['from','to','value'].every(k=>msg[k]===undefined||Number.isInteger(msg[k])&&msg[k]>=0&&msg[k]<(k==='value'?256:10000)))error=6;
         else {const result=this.simulate({op:'command',state:this.room.game,player:a.slot,kind:msg.kind,from:msg.from||0,to:msg.to||0,value:msg.value||0});this.room.game=result.state;error=result.error;}
       }else error=6;
       const ack={type:'ack',seq:msg.seq,error};seat.seq=msg.seq;seat.acks.push(ack);seat.acks=seat.acks.slice(-32);

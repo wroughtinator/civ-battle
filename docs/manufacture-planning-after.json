@@ -1,0 +1,89 @@
+{
+  "schema": 3,
+  "name": "Meridian Planning Audit",
+  "scope": "Generated three-piece land and sea skirmishes across three eras, including directional defenses and support; peaceful single-city orbital-path launches. Not a full-game, multiplayer, meta-diversity or universal APM certificate.",
+  "config": {
+    "budgets": [
+      4,
+      32
+    ],
+    "combat_horizon": 32,
+    "combat_metric": "paired material advantage; army elimination reported separately",
+    "order_interval": 8,
+    "restraint_low_interval": 2,
+    "schema": 3,
+    "seconds": 120,
+    "seed": 51000,
+    "space_metric": "actual peaceful launch completion time",
+    "type": "config"
+  },
+  "elapsed_seconds": 120.0000993,
+  "ended_cleanly": true,
+  "combat": {
+    "breadth": {
+      "samples": 95,
+      "mean": 0.6710526315789473,
+      "interval95": [
+        0.5317143560705563,
+        0.8103909070873384
+      ],
+      "verdict": "PASS",
+      "army_elimination": {
+        "wins": 65,
+        "losses": 31,
+        "unresolved": 94,
+        "mutual_destruction": 0
+      }
+    },
+    "foresight": {
+      "samples": 95,
+      "mean": 0.6078947368421053,
+      "interval95": [
+        0.4685564613337142,
+        0.7472330123504963
+      ],
+      "verdict": "INCONCLUSIVE",
+      "army_elimination": {
+        "wins": 66,
+        "losses": 31,
+        "unresolved": 91,
+        "mutual_destruction": 2
+      }
+    },
+    "restraint": {
+      "samples": 95,
+      "mean": 0.5026315789473684,
+      "interval95": [
+        0.36329330343897737,
+        0.6419698544557595
+      ],
+      "verdict": "INCONCLUSIVE",
+      "army_elimination": {
+        "wins": 57,
+        "losses": 51,
+        "unresolved": 77,
+        "mutual_destruction": 5
+      }
+    }
+  },
+  "space": {
+    "samples": 651,
+    "mean": 0.8241167434715821,
+    "interval95": [
+      0.770888548422648,
+      0.8773449385205163
+    ],
+    "verdict": "PASS",
+    "mean_seconds_saved": 8.725038402457757,
+    "unfinished": 0
+  },
+  "gates": {
+    "combat_breadth": "PASS",
+    "combat_foresight": "INCONCLUSIVE",
+    "combat_restraint": "INCONCLUSIVE",
+    "peaceful_space": "PASS"
+  },
+  "verdict": "INCONCLUSIVE",
+  "build_seconds": 4.5116491,
+  "source_fingerprint": "9cb09b60c835d33497f5a4c5a7167ae3abcab3c01be0dff2fad0e6eb671c04a1"
+}
