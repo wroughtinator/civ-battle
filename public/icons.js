@@ -11,6 +11,8 @@ const paths = {
  settler:'<circle cx="14" cy="6" r="3"/><path d="M9 29l3-11-3-5 8-3 4 8M12 18l8 11M8 11H4v10h6M25 9v20M23 9h4"/>',
  settle:'<path d="m2 18 14-13 14 13M6 16v13h20V16M13 29v-9h6v9M25 2v9M21 6h8"/>',
  scout:'<path d="m4 29 6-13 6 13M21 2v27M21 3l9 5-9 4"/><circle cx="10" cy="9" r="4"/>',
+ board:'<path d="M3 20h26l-4 9H8ZM16 2v14m-6-6 6 6 6-6"/>',
+ disembark:'<path d="M2 22h16l-3 7H6ZM16 14h13m-5-5 5 5-5 5M20 29h10"/>',
  carrier:'<path d="m2 19 28-5-5 15H7ZM7 20l15-3M12 17V9h7v7M13 4h14M20 1v7"/>',
  submerge:'<path d="M2 9q4-5 8 0t8 0 8 0M5 21h21a4 4 0 0 1 0 8H5a4 4 0 0 1 0-8ZM12 21v-4h7v4M16 2v11M12 10l4 4 4-4"/>',
  route:'<path d="M4 27h9V14h14M22 9l5 5-5 5"/><circle cx="4" cy="27" r="3"/>',

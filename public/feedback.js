@@ -20,7 +20,7 @@ export class EventTimeline {
  }
 }
 
-export const actionSymbol=e=>e.action==='shot'?(e.value?abilities(e.kind)[0]?.icon:'swords'):e.action==='ability'?(abilities(e.kind).find(a=>a.value===e.value)?.icon||'bolt'):({move:'route',stop:'hand',refit:'refit',disband:'disband',explore:'telescope',heal:'heart'})[e.action]||unitIcons[e.kind];
+export const actionSymbol=e=>e.action==='shot'?(e.value?abilities(e.kind)[0]?.icon:'swords'):e.action==='ability'?(abilities(e.kind).find(a=>a.value===e.value)?.icon||'bolt'):({disembark:'disembark',move:'route',stop:'hand',refit:'refit',disband:'disband',explore:'telescope',heal:'heart'})[e.action]||unitIcons[e.kind];
 
 export class FeedbackLayer {
  constructor(audio){this.audio=audio;this.timeline=new EventTimeline();this.nodes=[];this.root=document.createElement('div');this.root.id='action-feedback';this.root.setAttribute('aria-hidden','true');document.body.append(this.root);}

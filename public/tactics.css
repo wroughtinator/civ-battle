@@ -68,3 +68,5 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 
 /* Seat count controls share the same 44px touch targets as game actions. */
 #config{display:grid;grid-template-columns:1fr auto;gap:6px 10px}.player-count{grid-column:1/-1;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:6px}.player-count .config-group{justify-content:center;gap:7px;font-size:17px}.player-count .icon{width:21px;height:21px}.bot-seats{display:flex;align-items:center;gap:5px;margin-left:8px;font-size:14px;color:var(--muted)}#config .player-count button{border:1px solid var(--line)}#difficulty{justify-self:start;padding:0 10px}
+
+.passenger-status{display:flex;align-items:center;gap:10px;padding:9px 14px;background:#153747;border-block:1px solid #396477;color:#e7f5ff}.passenger-status>svg{width:25px;height:25px}.passenger-status strong{font-size:19px;font-variant-numeric:tabular-nums}.passenger-manifest{display:flex;gap:8px;margin-left:8px}.passenger-manifest svg{width:26px;height:26px}

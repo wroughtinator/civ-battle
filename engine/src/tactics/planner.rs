@@ -42,7 +42,7 @@ impl Game {
         let own: Vec<_> = self
             .squads
             .iter()
-            .filter(|u| u.owner == p)
+            .filter(|u| u.owner == p && u.boarded_on.is_none())
             .cloned()
             .collect();
         let cities: Vec<_> = self

@@ -21,6 +21,7 @@ pub struct Spec {
     pub cost: u16,
     pub train: u16,
     pub sight: u16,
+    pub boarding_capacity: u8,
 }
 pub fn spec(k: u8) -> Spec {
     let (hp, damage, min, range, reload, speed, cost, train, sight) = match k {
@@ -49,6 +50,7 @@ pub fn spec(k: u8) -> Spec {
         cost,
         train,
         sight,
+        boarding_capacity: if k == 9 { 3 } else { 0 },
     }
 }
 
@@ -87,6 +89,8 @@ pub struct City {
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Unit {
+    #[serde(default)]
+    pub boarded_on: Option<usize>,
     pub id: usize,
     pub owner: usize,
     pub kind: u8,
@@ -262,6 +266,7 @@ impl Game {
     }
     fn spawn(&mut self, owner: usize, kind: u8, tile: usize) {
         self.squads.push(Unit {
+            boarded_on: None,
             id: self.next_unit,
             owner,
             kind,
@@ -290,7 +295,7 @@ impl Game {
         self.next_unit += 1;
     }
     pub fn occupant(&self, tile: usize) -> Option<&Unit> {
-        self.squads.iter().find(|u| u.tile == tile)
+        self.squads.iter().find(|u| u.tile == tile && u.boarded_on.is_none())
     }
     pub fn distances(&self, start: usize) -> Vec<u16> {
         let mut d = vec![u16::MAX; self.tiles.len()];
@@ -344,7 +349,7 @@ impl Game {
                 }
             }
         }
-        for u in self.squads.iter().filter(|u| u.owner == p) {
+        for u in self.squads.iter().filter(|u| u.owner == p && u.boarded_on.is_none()) {
             let r = if u.mode == 2 && u.effect_until > self.tick {
                 4
             } else {
@@ -373,7 +378,7 @@ impl Game {
         if u.owner == p {
             return true;
         }
-        if !vision[u.tile] {
+        if u.boarded_on.is_some() || !vision[u.tile] {
             return false;
         }
         if u.revealed > self.tick {
@@ -386,7 +391,7 @@ impl Game {
         }
         let d = self.distances(u.tile);
         self.squads.iter().any(|a| {
-            a.owner == p
+            a.owner == p && a.boarded_on.is_none()
                 && (d[a.tile] <= 1
                     || ((a.mode == 2 && a.effect_until > self.tick) || a.kind == 9)
                         && d[a.tile] <= 3)
@@ -439,7 +444,7 @@ impl Game {
         n
     }
     pub fn path(&self, u: &Unit, to: usize) -> Option<Vec<usize>> {
-        if !self.can_enter(u.kind, to) {
+        if u.boarded_on.is_some() || (!self.can_enter(u.kind, to) && self.boarding_target(u, to).is_none()) {
             return None;
         }
         let start = u.tile;
@@ -447,7 +452,7 @@ impl Game {
         let occupied: Vec<_> = self
             .squads
             .iter()
-            .filter(|s| s.id != u.id && self.detected(u.owner, s, &vision))
+            .filter(|s| s.id != u.id && s.boarded_on.is_none() && self.detected(u.owner, s, &vision))
             .collect();
         let mut dist = vec![u32::MAX; self.tiles.len()];
         let mut prev = vec![usize::MAX; self.tiles.len()];
@@ -462,11 +467,8 @@ impl Game {
                 break;
             }
             for &j in &self.tiles[i].near {
-                if !self.can_enter(u.kind, j) || occupied.iter().any(|s| s.tile == j) {
-                    continue;
-                }
-                // A known friendly piece is a real obstruction, even at the destination.
-                if occupied.iter().any(|s| s.tile == j && s.owner == u.owner) {
+                let boarding = j == to && self.boarding_target(u, j).is_some();
+                if !boarding && (!self.can_enter(u.kind, j) || occupied.iter().any(|s| s.tile == j)) {
                     continue;
                 }
                 let n = cost + self.move_cost(u, j) as u32;
@@ -634,7 +636,7 @@ impl Game {
                     }
                 }
             }
-            "move" | "stop" | "ability" | "explore" | "refit" | "attack" | "disband" => {
+            "move" | "stop" | "ability" | "explore" | "refit" | "attack" | "disband" | "disembark" => {
                 let index = self
                     .squads
                     .iter()
@@ -644,7 +646,7 @@ impl Game {
                 if u.locked_until > self.tick && !matches!(kind, "move" | "stop") {
                     return Err(2);
                 }
-                if u.refit >= 0 {
+                if u.refit >= 0 || u.boarded_on.is_some() {
                     return Err(6);
                 }
                 if kind == "move" || kind == "stop" {
@@ -668,15 +670,19 @@ impl Game {
                     if kind == "move" {
                         self.move_unit(index);
                     }
+                } else if kind == "disembark" {
+                    self.disembark(index, to)?;
                 } else if kind == "disband" {
                     if self.tiles[u.tile].owner == p as i8 {
                         self.players[p].gold += spec(u.kind).cost as f32 * 0.25;
                     }
                     self.squads.remove(index);
+                    self.sync_passengers();
                 } else if kind == "attack" {
                     self.order_attack(index, to, 0)?;
                 } else if kind == "refit" {
-                    if u.left > 0
+                    if self.passenger_count(u.id) > spec(value).boarding_capacity as usize
+                        || u.left > 0
                         || u.founding
                         || matches!(u.kind, 10 | 11 | 13)
                         || value > 13
@@ -713,13 +719,13 @@ impl Game {
         if let Some(u) = actor {
             if matches!(
                 kind,
-                "move" | "stop" | "disband" | "refit" | "explore" | "ability"
+                "move" | "stop" | "disband" | "refit" | "explore" | "ability" | "disembark"
             ) && !self
                 .squads
                 .iter()
                 .any(|a| a.id == u.id && a.fire_at > self.tick && kind == "ability")
             {
-                let target = if kind == "move"
+                let target = if kind == "move" || kind == "disembark"
                     || kind == "ability" && (u.kind == 11 || u.kind == 8 && value == 2)
                 {
                     to
@@ -910,13 +916,18 @@ impl Game {
     }
     fn move_unit(&mut self, i: usize) {
         let u = self.squads[i].clone();
-        if u.left > 0 || u.locked_until > self.tick || u.founding || u.refit >= 0 || u.path.len() < 2 {
+        if u.boarded_on.is_some() || u.left > 0 || u.locked_until > self.tick || u.founding || u.refit >= 0 || u.path.len() < 2 {
             return;
         }
         let to = u.path[1];
-        if !self.tiles[u.tile].near.contains(&to) || !self.can_enter(u.kind, to) {
+        let boarding = self.boarding_target(&u, to);
+        if !self.tiles[u.tile].near.contains(&to) || (!self.can_enter(u.kind, to) && boarding.is_none()) {
             self.squads[i].path = vec![u.tile];
             self.squads[i].to = u.tile;
+            return;
+        }
+        if let Some(ship) = boarding {
+            self.board(i, ship, to);
             return;
         }
         if let Some(other) = self.occupant(to).cloned() {
@@ -940,6 +951,7 @@ impl Game {
         s.path.remove(0);
         s.left = cooldown;
         s.total = cooldown;
+        self.sync_passengers();
     }
     fn line_of_sight(&self, from: usize, to: usize) -> bool {
         let d = self.distances(to);
@@ -1014,7 +1026,7 @@ impl Game {
         // to an enemy, moving into it, or scouting never implicitly starts an attack.
         for i in 0..self.squads.len() {
             let u = self.squads[i].clone();
-            if u.refit >= 0
+            if u.boarded_on.is_some() || u.refit >= 0
                 || u.founding
                 || u.left > 0
                 || u.locked_until > self.tick
@@ -1027,7 +1039,7 @@ impl Game {
                 if let Some(t) = self
                     .squads
                     .iter()
-                    .filter(|b| b.owner != 8 && d[b.tile] <= 1)
+                    .filter(|b| b.boarded_on.is_none() && b.owner != 8 && d[b.tile] <= 1)
                     .min_by_key(|b| b.hp as u16)
                     .map(|b| b.tile)
                 {
@@ -1037,7 +1049,7 @@ impl Game {
         }
         let mut pushes = vec![];
         for (i, a) in self.squads.iter().enumerate() {
-            if a.fire_at == 0 || a.fire_at > self.tick {
+            if a.boarded_on.is_some() || a.fire_at == 0 || a.fire_at > self.tick {
                 continue;
             }
             let target = a.aim;
@@ -1051,7 +1063,7 @@ impl Game {
                 }
             } else {
                 for (j, b) in self.squads.iter().enumerate() {
-                    if b.tile == target && b.owner != a.owner || splash && d[b.tile] == 1 {
+                    if b.boarded_on.is_none() && (b.tile == target && b.owner != a.owner || splash && d[b.tile] == 1) {
                         let mut damage = self.damage(a, b);
                         if a.salvo > 0 {
                             damage *= 1.35;
@@ -1109,7 +1121,7 @@ impl Game {
         for s in impacts {
             let d = self.distances(s.to);
             for (i, u) in self.squads.iter().enumerate() {
-                if d[u.tile] <= if s.kind == 2 { 1 } else { 0 } {
+                if u.boarded_on.is_none() && d[u.tile] <= if s.kind == 2 { 1 } else { 0 } {
                     hits[i] += if s.kind == 2 { 140. } else { 75. };
                 }
             }
@@ -1128,7 +1140,7 @@ impl Game {
                 u.hurt = self.tick;
             }
         }
-        self.squads.retain(|u| u.hp > 0.);
+        self.sync_passengers();
     }
     fn development(&mut self) {
         let mut changed = false;
@@ -1202,6 +1214,7 @@ impl Game {
         let mut founded = vec![];
         for i in 0..self.squads.len() {
             let u = self.squads[i].clone();
+            if u.boarded_on.is_some() { continue; }
             if u.refit >= 0 {
                 self.squads[i].work = self.squads[i].work.saturating_sub(1);
                 if self.squads[i].work == 0 {
@@ -1480,6 +1493,7 @@ pub fn execute(input: &[u8]) -> Vec<u8> {
     serde_json::to_vec(&result.unwrap_or_else(|e| json!({"error":99,"detail":e}))).unwrap()
 }
 
+mod transport;
 mod actions;
 mod discoveries;
 mod feedback;
