@@ -1,0 +1,254 @@
+{
+  "name": "canoe",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "hull",
+      "position": [
+        0,
+        0.08,
+        0
+      ],
+      "size": [
+        0.28,
+        0.19,
+        0.96
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "taper": 0.65
+    },
+    {
+      "name": "bow",
+      "position": [
+        0,
+        0.09,
+        0.48
+      ],
+      "size": [
+        0.28,
+        0.2,
+        0.28
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "rotation": [
+        90,
+        0,
+        0
+      ],
+      "taper": 0.05
+    },
+    {
+      "name": "seat",
+      "position": [
+        0,
+        0.18,
+        0
+      ],
+      "size": [
+        0.24,
+        0.05,
+        0.17
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ]
+    },
+    {
+      "name": "oar-0.23",
+      "position": [
+        -0.23,
+        0.14,
+        -0.05
+      ],
+      "size": [
+        0.025,
+        0.025,
+        0.66
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "rotation": [
+        0,
+        -32.2,
+        0
+      ]
+    },
+    {
+      "name": "oar0.23",
+      "position": [
+        0.23,
+        0.14,
+        -0.05
+      ],
+      "size": [
+        0.025,
+        0.025,
+        0.66
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "rotation": [
+        0,
+        32.2,
+        0
+      ]
+    }
+  ],
+  "animations": [
+    {
+      "name": "walk",
+      "duration": 1,
+      "tracks": [
+        {
+          "part": 3,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                -20,
+                10
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                0,
+                20,
+                -10
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                -20,
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "part": 4,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                -20,
+                10
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                0,
+                20,
+                -10
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                -20,
+                10
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "attack",
+      "duration": 0.5,
+      "tracks": [
+        {
+          "part": 2,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -9,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "rotation": [
+                9,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                -9,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "idle",
+      "duration": 2,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -2
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                0,
+                2
+              ]
+            },
+            {
+              "time": 2,
+              "rotation": [
+                0,
+                0,
+                -2
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

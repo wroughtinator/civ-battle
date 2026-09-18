@@ -1,5 +1,9 @@
 # Rules v4 balance evidence — 2026-09-17
 
+**Historical report:** these measurements precede conquest/full-tree-space victory,
+persistent automatic attacks and guard zones. They do not describe the current
+rules. See [the current three-era report](THREE_ERAS.md).
+
 These measurements apply to the discrete-piece redesign, explicit one-shot attacks, committed abilities, settlers, one treasury and presence takeover. Earlier population-transfer reports describe different games and cannot substantiate this release. This audit is evidence of specific behavior, not proof of chess-level complexity, equal strategy strength, or universal superiority of a deeper planner.
 
 ## Final complete-match sample

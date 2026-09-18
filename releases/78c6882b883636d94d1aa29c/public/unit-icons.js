@@ -1,0 +1,26 @@
+// Unit silhouettes remain legible at 24px; each echoes its model's defining feature.
+export const unitPaths={
+ face:'<path d="M5 28V8h22v20M16 24V2m-5 5 5-5 5 5"/>',
+ slinger:'<circle cx="8" cy="24" r="4"/><path d="M8 20 21 4l7 8L12 25M21 4l-2 9 9-1"/>',
+ pike:'<path d="M7 30 24 2l2 10-8-5M3 16l10 6M17 29l10-17"/>',
+ palisade:'<path d="M3 29V9l4-7 4 7v20M11 29V9l5-7 5 7v20M21 29V9l4-7 4 7v20M3 17h26M3 24h26"/>',
+ herbalist:'<path d="M16 29V12M16 22C0 23 1 5 15 16M17 17C31 16 30 1 18 8M5 28h22"/>',
+ ram:'<path d="M3 16h22l5 5-5 3H3ZM8 16V8h16v8M7 8l9-6 9 6"/><circle cx="8" cy="28" r="3"/><circle cx="24" cy="28" r="3"/>',
+ canoe:'<path d="M2 17q14 7 28 0l-6 10H8ZM7 3l18 26M4 2l6 1-3 6-5-5"/>',
+ outrigger:'<path d="M8 4v22M9 5l14 10H9M3 22h25l-5 7H8ZM3 14v15M3 18h7M3 26h7"/>',
+ fireboat:'<path d="M2 22h28l-6 7H8ZM11 20C1 12 16 10 12 2c14 8 16 15 8 18M16 20q-5-5 2-10"/>',
+ supply:'<path d="M4 12h24v12H4ZM16 12V4M11 8h10M9 16h14"/><circle cx="8" cy="28" r="3"/><circle cx="24" cy="28" r="3"/>',
+ musket:'<path d="m3 27 7-8 6-2L27 3l3 3-14 15-5 1-5 8ZM13 19l4 5M16 24h4"/>',
+ lancer:'<path d="M5 29 12 17 9 10l6-6 8 7-4 4-4-3-1 6 10 11M23 28V2l5 6h-5"/>',
+ mortar:'<path d="m10 22 9-19 8 4-9 18ZM5 29h24M14 23l-4 6M20 24l5 5M4 9l4 2M6 3l4 4"/>',
+ bulwark:'<path d="M3 29V5h6v5h5V5h5v5h5V5h5v24M3 18h26M12 29v-6h8v6"/>',
+ medic:'<path d="M3 10h26v19H3ZM10 10V4h12v6M16 14v11M11 19h10"/>',
+ balloon:'<path d="M6 13C-3-3 35-3 26 13l-6 11h-8ZM12 24v6h8v-6M16 2v22"/>',
+ ironclad:'<path d="M2 20h28l-5 9H7ZM7 20l4-9h12l4 9M15 11V3h5v8M20 14h10M8 25h16"/>',
+ chainboom:'<path d="M2 24h28M5 19v10M27 19v10M8 8h7a4 4 0 0 1 0 8H8a4 4 0 0 1 0-8ZM17 8h7a4 4 0 0 1 0 8h-7M13 12h7"/>',
+ transport:'<path d="M2 20h28l-5 9H7ZM6 20V8h20v12M11 9v10M16 9v10M21 9v10M16 2v4"/>',
+ flak:'<path d="M3 24h26v5H3ZM10 23V13h12v10M13 13 8 4M20 13l4-9M1 3l4 1M29 3l-3 1M14 4h5M16 1v7"/>',
+ radartruck:'<path d="M3 21h26v7H3ZM10 21V11M5 5l14 10q10-14-4-13M10 8l11-7"/><circle cx="8" cy="29" r="2"/><circle cx="24" cy="29" r="2"/>',
+ shieldtruck:'<path d="M3 23h26v6H3ZM9 23V10h14v13M16 2 3 7q0 13 13 17Q29 20 29 7ZM16 6v11"/>',
+ rockets:'<path d="M3 25h26v5H3ZM7 23 3 7l5-5 5 17M15 23 11 7l5-5 5 17M23 23 19 7l5-5 5 17M7 7h-4M15 7h-4M23 7h-4"/>'
+};

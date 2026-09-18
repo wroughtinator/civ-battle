@@ -1,8 +1,9 @@
+import {roster,units as unitRoster} from './roster.js';
 import { Globe } from './globe.js';
 import { icon, colors, civs, civNames, buildings, techs } from './icons.js';
 import { Soundscape } from './audio.js';
 import {passengers,boardingCapacity,boardingTarget,branches,unitIcons,unitNames,counters,researchCost,distances,route,abilities,canEnter} from './planning.js';
-import {orderBlock,targetTiles,refitChoices,abilityCost} from './controls.js';
+import {orderBlock,targetTiles,abilityCost} from './controls.js';
 import {Manual} from './manual.js';
 import {FeedbackLayer} from './feedback.js';
 import {terrainIcons,terrainSummary,inForestCover,rate,incomeBenefit} from './terrain.js';
@@ -30,7 +31,7 @@ rememberIdentity();
 async function syncProfile(){while(profileDirty&&connected&&state?.phase==='lobby'){if(inflight)await inflight.promise.catch(()=>{});const profile={civ,name:username,tag:callsign};await send('civ',profile);if(profile.name===username&&profile.civ===civ)profileDirty=false;}}
 function queueProfile(){profileDirty=true;clearTimeout(profileTimer);profileTimer=setTimeout(()=>{profilePromise=profilePromise.catch(()=>{}).then(syncProfile).catch(()=>{});},350);}
 async function flushProfile(){clearTimeout(profileTimer);await profilePromise;profileDirty=true;await syncProfile();}
-let selectedTech=1,abilityTarget=null,refitOpen=false;
+let selectedTech=1,abilityTarget=null;
 let globe;
 const soundscape=new Soundscape();sound=soundscape.enabled;
 document.addEventListener('pointerdown',()=>soundscape.unlock(),{passive:true});
@@ -101,7 +102,7 @@ function renderLobby(){
  $('seats').innerHTML=state.players.map((p,i)=>`<span class="seat ${!p.bot?'human':''}" style="--seat:${colors[i]}" aria-label="${html(p.name)}, ${civNames[p.civ]}">${icon(p.bot?'bot':civs[p.civ])}<small>${html(p.name)}</small></span>`).join('');
  const host=state.phase==='preview'||state.host,humans=state.humans||1;
  $('config').innerHTML=`<div class="player-count">${btn('fewer-players','minus','Remove a player slot','',!host||count<=(state.minCount||2)?'disabled':'')}<div class="config-group" aria-label="${humans} human players, ${count-humans} bot seats, ${count} total">${icon('person')}<span>${humans}/${count}</span><span class="bot-seats">${icon('bot')}${count-humans}</span></div>${btn('more-players','plus','Add a player slot','',!host||count>=8?'disabled':'')}</div><button id="difficulty" class="difficulty" aria-label="${['Easy','Medium','Hard'][difficulty]} bots" ${!host?'disabled':''}>${Array.from({length:difficulty+1},()=>icon('bot')).join('')}</button>${btn('regenerate','refresh','Generate a new world','',!host?'disabled':'')}`;
- $('victory-hint').innerHTML=`<em>${icon('crown')}<span>${state.rules.capital_goal??4}</span></em><span></span><em>${icon('rocket')}</em><span></span><em>${icon('clock')}20–25</em>`;
+ $('victory-hint').innerHTML=`<em aria-label="Conquest: eliminate every other civilization">${icon('crown')}</em><span></span><em aria-label="Space: complete every technology and launch">${icon('rocket')}</em>`;
  $('seed').innerHTML=icon('globe')+`<span>${seed.toString().padStart(10,'0')}</span>`;
  $('start').innerHTML=icon(state.phase==='lobby'&&(!state.host||state.awaitingResults)?'hourglass':'play');$('start').setAttribute('aria-label',state.awaitingResults?'Waiting for players to return from the victory screen':'Start match');$('invite').innerHTML=icon('link');
  civs.forEach((_,i)=>$(`civ-${i}`).onclick=()=>{civ=i;rememberIdentity();if(state.phase==='preview'){previewState.players[0].civ=i;state.players[0].civ=i;globe.setState(state,slot);renderLobby();}else queueProfile();});
@@ -111,16 +112,27 @@ function renderLobby(){
 async function configure(changes){if(state.phase==='preview'){count=changes.count??count;seed=changes.seed??seed;difficulty=changes.difficulty??difficulty;makePreview();}else await send('configure',{count,seed,difficulty,...changes}).catch(()=>{});}
 function makePreview(){previewState=previewEngine({op:'new',seed,count,difficulty}).state;previewState.players[0].civ=civ;previewState.players[0].tag=callsign;previewState.players[0].name=username;world=previewState.tiles.map(t=>({p:t.p,poly:t.poly,near:t.near,terrain:t.terrain,capital:t.capital,site:t.site}));state={...previewState,...previewEngine({op:'view',state:previewState,player:0}).state,tiles:previewState.tiles.map(t=>({...t,visible:true})),phase:'preview',host:true,humans:1,revision:0};globe.setWorld(world);globe.setState(state,0);render();rebuildMarkers();}
 function renderRoster(){
- $('roster').innerHTML=state.players.map((p,i)=>`<button class="roster-item ${i===slot?'me':''} ${!p.alive?'dead':''}" style="--faction:${colors[i]}" aria-label="${html(p.name)}, ${!p.alive?'Spectating':p.bot?'AI control':'Human online'}, influence ${p.mandate} of ${state.rules.mandate_goal}" data-player="${i}">${!p.alive?icon('spectate'):p.bot?icon('bot','control-bot'):'<i class="control-human" data-help="person" aria-label="Human online"></i>'}<span class="roster-name">${html(p.name)}</span><span class="victory-count">${icon('crown')}${p.mandate}</span><i class="launch-track" style="width:${Math.min(100,100*Math.max(p.mandate/state.rules.mandate_goal,p.launch/state.rules.space_goal))}%"></i></button>`).join('');
+ $('roster').innerHTML=state.players.map((p,i)=>`<button class="roster-item ${i===slot?'me':''} ${!p.alive?'dead':''}" style="--faction:${colors[i]}" aria-label="${html(p.name)}, ${!p.alive?'Spectating':p.bot?'AI control':'Human online'}, ${p.score} cities, launch ${p.launch} of ${state.rules.space_goal}" data-player="${i}">${!p.alive?icon('spectate'):p.bot?icon('bot','control-bot'):'<i class="control-human" data-help="person" aria-label="Human online"></i>'}<span class="roster-name">${html(p.name)}</span><span class="victory-count">${icon('city')}${p.score}</span><i class="launch-track" style="width:${Math.min(100,100*p.launch/state.rules.space_goal)}%"></i></button>`).join('');
  $('roster').querySelectorAll('button').forEach(b=>b.onclick=()=>{const c=state.cities.find(c=>c.capital===Number(b.dataset.player));if(c){globe.focus(c.tile);selectCity(c.tile);}});
 }
 const price=n=>`<span class="price">${icon('coin')}${n}</span>`;
 const stat=(symbol,n)=>`<span class="stat">${icon(symbol)}${n}</span>`;
 function unitStats(k){const s=state.rules.specs[k];return `<div class="unit-stats">${stat('heart',s.hp)}${s.damage?stat('swords',s.damage)+stat('eye',s.min===s.range?s.range:`${s.min}–${s.range}`):''}${stat('route',s.speed)}${s.damage?stat('clock',s.reload):''}</div>`;}
 function unitCounters(k){return counters[k].length?`<div class="counter-strip">${icon(unitIcons[k])}${icon('swords')}${counters[k].map(i=>icon(unitIcons[i])).join('')}</div>`:'';}
+function unitRules(k){
+ const u=unitRoster[k],parts=[];
+ if(u.directional)parts.push(`${icon('face')}${icon('shield')}−${k===34?'40':'75'}%`);
+ if([17,22,27].includes(k))parts.push(`${icon(k===22?'gear':'heart')}${icon('territory')}1 +${k===27?6:4}${icon('clock')}5`);
+ if([28,33].includes(k))parts.push(`${icon('eye')}${u.spec.sight}${icon('radar')}`);
+ if(u.spec.boarding_capacity)parts.push(`${icon('board')}${u.spec.boarding_capacity}`);
+ if(u.splash)parts.push(`${icon('swords')}${icon('territory')}+1${icon('warning')}`);
+ if(u.setup)parts.push(`${icon('hand')}${icon('clock')}${u.setup}${icon('arrow')}${icon('swords')}`);
+ if(k===21)parts.push(`${icon('fireboat')}${icon('arrow')}${icon('bomb')}${icon('disband')}`);
+ return parts.length?`<div class="unit-rules" aria-label="${html(u.role)}">${parts.map(p=>`<span>${p}</span>`).join('')}</div>`:'';
+}
 function clearRoute(){abilityTarget=null;document.body.classList.remove('targeting');globe.previewPath=[];globe.setTargets(new Set());globe.setBlockedTargets(new Set());}
 function selectCity(tile){clearRoute();activeUnit=-1;globe.routeUnit=-1;selected=tile;techOpen=false;show('research',false);globe.choose(tile,true);globe.frameCity(tile);renderProvince();}
-function selectUnit(id){refitOpen=false;const u=state.squads.find(u=>u.id===id);if(!u)return;if(u.boarded_on!=null){selectUnit(u.boarded_on);return;}clearRoute();activeUnit=id;selected=u.tile;techOpen=false;show('research',false);globe.choose(u.tile);globe.routeUnit=id;globe.focus(u.tile);renderProvince();}
+function selectUnit(id){const u=state.squads.find(u=>u.id===id);if(!u)return;if(u.boarded_on!=null){selectUnit(u.boarded_on);return;}clearRoute();activeUnit=id;selected=u.tile;techOpen=false;show('research',false);globe.choose(u.tile);globe.routeUnit=id;globe.focus(u.tile);renderProvince();}
 function availability(kind,data={}){
  if(!connected)return {reason:'Reconnect to issue orders',icon:'network',count:0};
  if(inflight)return {reason:'Waiting for the current order',icon:'hourglass',count:0};
@@ -132,7 +144,7 @@ function actionButton(id,symbol,label,body='',block=null,primary=false){
 }
 function aim(u,kind,value,iconName){
  const same=abilityTarget?.kind===kind&&abilityTarget?.value===value;
- clearRoute();refitOpen=false;
+ clearRoute();
  if(!same){abilityTarget={icon:iconName,kind,value};document.body.classList.add('targeting');
   if(kind==='move'){const d=distances(world,u.tile);globe.setBlockedTargets(new Set(world.flatMap((t,i)=>state.tiles[i]?.visible&&d[i]<=3&&!canEnter(world,u.kind,i)&&!boardingTarget(world,state,u,i)?[i]:[])));}
   if(kind!=='move')globe.setTargets(new Set(targetTiles(world,state,u,kind,value)));
@@ -164,48 +176,48 @@ function renderProvince(){
  if(u&&selected!==u.tile){selected=u.tile;globe.choose(u.tile);}
  if(u){
   const own=u.owner===slot&&!state.spectator,sp=state.rules.specs[u.kind];
-  const options=own?refitChoices(state,u):[],actions=abilities(u.kind),block=(kind,value=0,to=null)=>availability(kind,{from:u.id,value,to});
+  const actions=abilities(u.kind),block=(kind,value=0,to=null)=>availability(kind,{from:u.id,value,to});
   const cargo=passengers(state,u),capacity=boardingCapacity(state,u);
-  const refitBlock=options.length?block('refit',options[0]):null;
-  const canRefit=options.some(k=>!block('refit',k));
   const actionMarkup=actions.map((a,i)=>actionButton(`ability-${i}`,a.icon,a.label,abilityCost(state,u,a.value)?price(abilityCost(state,u,a.value)):'',block('ability',a.value),u.kind===13||u.kind===10)).join('');
   $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[u.owner]}">${icon(unitIcons[u.kind])}</span><div><span class="owner-name">${html(state.players[u.owner]?.name||'')}</span><div class="health"><i style="width:${100*u.hp/sp.hp}%"></i></div>${stat('heart',num(u.hp))}<span class="terrain-status">${icon(terrainIcons[world[u.tile].terrain])}${inForestCover(world,u)?`<span aria-label="Forest cover: 25% less incoming damage">${icon('shield')}−25%</span>`:''}</span></div><span class="spacer"></span>${city?btn('select-city','city','Select city here'):''}${btn('close-piece','close','Close selection')}</div>
+   ${[0,3].includes(u.kind)?`<div class="passive-rule ${u.mode===3&&u.effect_until>state.tick?'active':''}" role="img" aria-label="Hold position for eight seconds to dig in: 45 percent less incoming damage; moving or cavalry displacement removes it">${icon('hand')}${stat('clock',8)}${icon('arrow')}${icon('fort')}−45%</div>`:''}
+   ${unitCounters(u.kind)}${unitRules(u.kind)}
    ${capacity&&(own||state.spectator)?`<div class="passenger-status" aria-label="${cargo.length} of ${capacity} passengers aboard">${icon('board')}<strong>${cargo.length}/${capacity}</strong><span class="passenger-manifest">${cargo.map(s=>`<span title="${unitNames[s.kind]}: ${num(s.hp)} health" aria-label="${unitNames[s.kind]}, ${num(s.hp)} health">${icon(unitIcons[s.kind])}</span>`).join('')}</span></div>`:''}
-   ${own&&!state.spectator?`<div class="action-row unit-actions">${actionButton('move-order','route','Move: choose a destination hex','',block('move'))}${sp.damage?actionButton('attack-order','swords','Attack: choose a hex in range; committed until recovery','',block('attack')):''}${actionMarkup}${capacity?actionButton('disembark-order','disembark','Disembark one passenger: choose adjacent empty land; first passenger able to enter it','',block('disembark')):''}${actionButton('stop-order','hand',u.founding?'Cancel city construction':'Clear remaining path; keep current tile and cooldown','',block('stop'),u.path.length>1)}${options.length?actionButton('refit-toggle','refit','Choose a different military unit', '',canRefit?null:refitBlock):''}${actionButton('disband-unit','disband','Disband this unit',state.tiles[u.tile].owner===slot?price(Math.floor(sp.cost*.25)):'',block('disband'))}</div>`:''}
+   ${own&&!state.spectator?`<div class="action-row unit-actions">${actionButton('move-order','route','Move: choose a destination hex','',block('move'))}${unitRoster[u.kind].directional?actionButton('face-order','face','Face the protected side toward a neighboring hex','',block('face')):''}${sp.damage?actionButton('attack-order','swords','Attack: choose a hex in range; committed until recovery','',block('attack')):''}${actionMarkup}${capacity?actionButton('disembark-order','disembark','Disembark one passenger: choose adjacent empty land; first passenger able to enter it','',block('disembark')):''}${actionButton('stop-order','hand',u.founding?'Cancel city construction':'Clear remaining path; keep current tile and cooldown','',block('stop'),u.path.length>1)}${actionButton('disband-unit','disband','Disband this unit',state.tiles[u.tile].owner===slot?price(Math.floor(sp.cost*.25)):'',block('disband'))}</div>`:''}
    ${abilityTarget?`<div class="aim-hint" aria-label="Choose a map target">${icon(abilityTarget.icon)}${icon('arrow')}${icon('territory')}</div>`:''}
-   ${refitOpen&&own&&options.length?`<div class="action-row recruit-row">${options.map(k=>actionButton(`refit-${k}`,unitIcons[k],`Refit as ${unitNames[k]}`,price(Math.max(30,state.rules.specs[k].cost-sp.cost*.5)),block('refit',k))).join('')}</div>`:''}
    ${u.path.length>1||u.left>0?`<div class="movement-status" aria-label="Remaining steps and movement cooldown">${stat('route',u.path.length-1)}${stat('clock',u.left)}</div>`:''}
    ${u.locked_until>state.tick?`<div class="commitment">${icon('hourglass')}${u.locked_until-state.tick}${u.focus!=null?icon('swords'):''}</div>`:''}
    ${u.refit>=0?`<div class="training">${icon(unitIcons[u.refit])}${stat('clock',u.work)}</div>`:''}
-   ${u.founding?`<div class="job-progress"><i style="width:${100*(1-u.work/45)}%"></i></div>`:''}`;
+   ${u.founding?`<div class="job-progress"><i style="width:${100*(1-u.work/25)}%"></i></div>`:''}`;
   $('close-piece').onclick=closeSelection;
   if(city)$('select-city').onclick=()=>selectCity(city.tile);
   if(own&&!state.spectator){
    if(capacity)$('disembark-order').onclick=()=>aim(u,'disembark',0,'disembark');
    $('move-order').onclick=()=>aim(u,'move',0,'route');
    $('disband-unit').onclick=()=>{clearRoute();command('disband',{from:u.id});};
+   if(unitRoster[u.kind].directional)$('face-order').onclick=()=>aim(u,'face',0,'face');
    if(sp.damage)$('attack-order').onclick=()=>aim(u,'attack',0,'swords');
-   if(options.length)$('refit-toggle').onclick=()=>{clearRoute();refitOpen=!refitOpen;renderProvince();};
-   if(refitOpen)options.forEach(k=>{const b=$(`refit-${k}`);if(b)b.onclick=()=>{refitOpen=false;command('refit',{from:u.id,value:k});};});
    $('stop-order').onclick=()=>{clearRoute();command('stop',{from:u.id});};
    actions.forEach((a,i)=>$(`ability-${i}`).onclick=()=>{if(a.target)aim(u,'ability',a.value,a.icon);else{clearRoute();command('ability',{from:u.id,value:a.value});}});
   }
-  if(abilityTarget){const id=abilityTarget.kind==='move'?'move-order':abilityTarget.kind==='attack'?'attack-order':abilityTarget.kind==='disembark'?'disembark-order':`ability-${actions.findIndex(a=>a.value===abilityTarget.value)}`;const button=$(id);if(button){button.classList.add('armed');button.setAttribute('aria-pressed','true');}}
+  if(abilityTarget){const id=abilityTarget.kind==='move'?'move-order':abilityTarget.kind==='face'?'face-order':abilityTarget.kind==='attack'?'attack-order':abilityTarget.kind==='disembark'?'disembark-order':`ability-${actions.findIndex(a=>a.value===abilityTarget.value)}`;const button=$(id);if(button){button.classList.add('armed');button.setAttribute('aria-pressed','true');}}
  }else if(city){
-  const own=city.owner===slot&&!state.spectator,p=state.players[slot],unit=state.squads.find(u=>u.tile===city.tile),units=own?p.unlocked:[];
+  const recruitScroll=$('province').querySelector('.recruit-row')?.scrollTop||0;
+  const own=city.owner===slot&&!state.spectator,p=state.players[slot],unit=state.squads.find(u=>u.tile===city.tile),units=own?[...p.unlocked].sort((a,b)=>unitRoster[a].era-unitRoster[b].era||a-b):[];
   const block=(kind,value)=>availability(kind,{from:city.tile,value});
   const capacityGain=state.rules.unit_cap<16?1:0;
   const landBenefits=city.radius<3?`<span class="radius-change">${city.radius}${icon('arrow')}${city.radius+1}</span><span class="upgrade-benefit">${icon('shield')}+${capacityGain}</span>${incomeBenefit(icon,city.expansion_income??0)}${price([0,80,140][city.radius])}`:'';
-  const productionBenefits=city.production<3?`<span class="upgrade-benefit">${icon('coin')}+0.4<span class="upgrade-per">/${icon('clock')}1</span></span><span class="upgrade-benefit">${icon('hourglass')}−${city.production===1?'20':'16.7'}%</span>${price([0,110,180][city.production])}`:'';
-  $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[city.owner]}">${icon(city.capital>=0?'crown':'city')}</span><div><span class="owner-name">${html(state.players[city.owner].name)}</span><div class="unit-stats">${stat('territory',city.radius)}${stat('factory',city.production)}${own?stat('wheat',city.farms??0)+stat('coin',rate(city.income??(3+city.production*2)))+stat('clock',5):''}</div></div><span class="spacer"></span>${unit?btn('select-occupant',unitIcons[unit.kind],'Select occupying unit'):''}${btn('close-piece','close','Close selection')}</div>
-   ${own?`<div class="city-upgrades">${actionButton('radius-upgrade','territory',city.radius<3?`Expand city control radius to ${city.radius+1}; +${rate((city.expansion_income??0)/5)} coins per second from new farmland; +${capacityGain} unit capacity${capacityGain?'':'; capacity limit reached'}`:'Expand city control radius',landBenefits,block('upgrade',0))}${actionButton('production-upgrade','factory',city.production<3?`Upgrade production: +0.4 coins per second (2 every 5 seconds); approximately ${city.production===1?'20':'16.7'}% shorter training time for new recruits`:'Upgrade production and income',productionBenefits,block('upgrade',1))}</div>
+  const productionBenefits=city.production<3?`<span class="upgrade-benefit">${icon('coin')}+0.8<span class="upgrade-per">/${icon('clock')}1</span></span><span class="upgrade-benefit">${icon('hourglass')}−${city.production===1?'20':'16.7'}%</span>${price([0,110,180][city.production])}`:'';
+  $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[city.owner]}">${icon(city.capital>=0?'crown':'city')}</span><div><span class="owner-name">${html(state.players[city.owner].name)}</span><div class="unit-stats">${stat('territory',city.radius)}${stat('factory',city.production)}${own?stat('wheat',city.farms??0)+stat('coin',rate(city.income??(4+city.production*4)))+stat('clock',5):''}</div></div><span class="spacer"></span>${unit?btn('select-occupant',unitIcons[unit.kind],'Select occupying unit'):''}${btn('close-piece','close','Close selection')}</div>
+   ${own?`<div class="city-upgrades">${actionButton('radius-upgrade','territory',city.radius<3?`Expand city control radius to ${city.radius+1}; +${rate((city.expansion_income??0)/5)} coins per second from new farmland; +${capacityGain} unit capacity${capacityGain?'':'; capacity limit reached'}`:'Expand city control radius',landBenefits,block('upgrade',0))}${actionButton('production-upgrade','factory',city.production<3?`Upgrade production: +0.8 coins per second (4 every 5 seconds); approximately ${city.production===1?'20':'16.7'}% shorter training time for new recruits`:'Upgrade production and income',productionBenefits,block('upgrade',1))}</div>
    <div class="action-row recruit-row">${units.map(k=>actionButton(`train-${k}`,unitIcons[k],`Train ${unitNames[k]}, ${state.rules.specs[k].cost} coins`,price(state.rules.specs[k].cost),block('train',k))).join('')}</div>
    ${city.training>=0?`<div class="training">${icon(unitIcons[city.training])}${stat('clock',city.left)}<div class="job-progress"><i style="width:${100*(1-city.left/city.total)}%"></i></div></div>`:''}`:''}
    ${city.capture?`<div class="training">${icon('swords')}${city.capture}/12</div>`:''}`;
+  const recruitList=$('province').querySelector('.recruit-row');if(recruitList)recruitList.scrollTop=recruitScroll;
   $('close-piece').onclick=closeSelection;if(unit)$('select-occupant').onclick=()=>selectUnit(unit.id);
   if(own){$('radius-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:0});$('production-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:1});units.forEach(k=>$(`train-${k}`).onclick=()=>command('train',{from:city.tile,value:k}));}
  }else{
-  $('province').innerHTML=`<div class="tile-inspector-head">${icon('territory')}<span>Tile terrain</span><span class="spacer"></span>${btn('close-piece','close','Close selection')}</div>`;
+  $('province').innerHTML=`<div class="tile-inspector-head">${icon('territory')}<span class="spacer"></span>${btn('close-piece','close','Close selection')}</div>`;
   $('close-piece').onclick=closeSelection;
  }
  $('province').insertAdjacentHTML('beforeend',terrainSummary(icon,world[u?u.tile:selected].terrain));
@@ -215,10 +227,21 @@ function closeSelection(){activeUnit=-1;selected=-1;clearRoute();globe.choose(-1
 function toggleResearch(){if(state?.spectator)return;techOpen=!techOpen;clearRoute();renderResearch();renderProvince();}
 function renderResearch(){
  show('research',techOpen);if(!techOpen)return;const p=state.players[slot];
- const node=k=>{const done=p.unlocked.includes(k),busy=p.research===k,blocked=availability('research',{value:k});return `<button data-tech="${k}" aria-label="Research ${unitNames[k]}, ${researchCost(k)} coins${blocked?`. Unavailable: ${blocked.reason}`:''}" ${blocked?'disabled aria-disabled="true"':'aria-disabled="false"'} class="tree-node ${selectedTech===k?'selected':''} ${done?'done':''} ${busy?'studying':''} ${!done&&blocked?'locked':''}">${icon(unitIcons[k])}<span>${done?icon('check'):busy?stat('clock',p.research_left):price(researchCost(k))}</span></button>`;};
- $('research').innerHTML=`<div class="panel-head">${icon('flask')}${btn('close-tech','close','Close research tree')}</div><div class="tree-scroll"><div class="connected-tree"><svg class="tree-links" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true"><path d="M50 45V245M150 45V245M250 45V245M50 145L90 350M150 145L90 350M150 245L210 350M150 145L210 350"/></svg>${[0,1,2].map(row=>`<div class="tree-row">${branches.map(b=>node(b[row])).join('')}</div>`).join('')}<div class="tree-row final-nodes">${node(10)}${node(11)}</div></div></div>`;
- $('close-tech').onclick=toggleResearch;$('research').querySelectorAll('[data-tech]').forEach(b=>b.onclick=()=>{selectedTech=Number(b.dataset.tech);command('research',{value:selectedTech});renderResearch();});
+ const scroll=$('research').querySelector('.tree-scroll')?.scrollTop||0;
+ if(!unitRoster[selectedTech]?.researchable)selectedTech=1;
+ const queued=p.research_queue||[],node=k=>{const done=p.unlocked.includes(k),busy=p.research===k;return `<button data-tech="${k}" aria-label="Inspect ${unitNames[k]}" class="tree-node ${selectedTech===k?'selected':''} ${done?'done':''} ${busy?'studying':''} ${queued.includes(k)?'queued':''}">${icon(unitIcons[k])}<span>${done?icon('check'):busy?stat('clock',p.research_left):queued.includes(k)?icon('hourglass'):price(researchCost(k))}</span></button>`;};
+ const def=unitRoster[selectedTech],parents=def.prerequisites,needed=new Set();
+ const visit=k=>{if(p.unlocked.includes(k)||p.research===k||needed.has(k))return;for(const parent of unitRoster[k].prerequisites)visit(parent);needed.add(k);};visit(selectedTech);
+ const goalCost=[...needed].reduce((sum,k)=>sum+unitRoster[k].research_cost,0);
+ $('research').innerHTML=`<div class="panel-head">${icon('flask')}<span>${p.unlocked.filter(k=>unitRoster[k].researchable).length}/33</span>${btn('close-tech','close','Close research tree')}</div><div class="tree-scroll era-tree">${roster.eras.map((era,e)=>`<section class="tech-era" style="--era:${era.color}" aria-label="${era.name}"><div class="era-heading">${icon(era.icon)}<b>${e+1}</b></div><div class="era-nodes">${branches.map(b=>node(b[e])).join('')}</div></section>`).join('')}</div><div class="tech-inspector"><div class="tech-preview">${icon(def.icon)}${unitStats(selectedTech)}${unitCounters(selectedTech)}${unitRules(selectedTech)}</div><div class="tech-parents" aria-label="Required technologies">${parents.map(k=>`<span class="${p.unlocked.includes(k)?'done':''}">${icon(unitIcons[k])}</span>`).join('')}${parents.length?icon('arrow'):''}${icon(def.icon)}</div><div class="action-row">${actionButton('plan-tech','flask',`Research toward ${def.name}; prerequisites queue automatically as funds become available`,`${icon('arrow')}${icon(def.icon)}${price(goalCost)}`,p.unlocked.includes(selectedTech)?{icon:'check',reason:'Already researched'}:availability('plan',{value:selectedTech}))}${queued.length?actionButton('pause-tech','hand','Stop the pending research plan; current paid research continues',queued.length,availability('plan',{value:255})):''}${btn('tech-help','book','Explain this unit')}</div></div>`;
+ $('close-tech').onclick=toggleResearch;
+ $('research').querySelector('.tree-scroll').scrollTop=scroll;
+ $('research').querySelectorAll('[data-tech]').forEach(b=>b.onclick=()=>{selectedTech=Number(b.dataset.tech);renderResearch();});
+ $('plan-tech').onclick=()=>command('plan',{value:selectedTech});
+ if($('pause-tech'))$('pause-tech').onclick=()=>command('plan',{value:255});
+ $('tech-help').onclick=()=>manual.open(def.icon);
 }
+
 function openGuide(){manual.open();}
 function home(){clearRoute();activeUnit=-1;const c=state.cities.find(c=>c.owner===slot&&c.capital===slot)||state.cities.find(c=>c.owner===slot);if(c){globe.targetDistance=1.65;globe.focus(c.tile);selectCity(c.tile);}}
 async function leaveRoom(newLobby=false){
@@ -239,7 +262,7 @@ function renderEnding(){
  const dialog=$('ending');
  if(!dialog.open){
   manual.close();clearRoute();techOpen=false;show('research',false);show('province',false);
-  dialog.innerHTML=`<div class="winner-icon">${icon(result.victory===2?'rocket':'crown')}</div><h1 id="victory-title">${result.winner===slot?'Victory!':'Match complete'}</h1><div class="end-emblem" style="color:${colors[result.winner]}">${icon(civs[p.civ])}<span>${html(p.name)} wins!</span></div><p>${result.victory===2?'Space victory':'Capital victory'} · ${time(result.tick)}</p><div class="result-actions">${btn('back-lobby','home','Back to lobby','Back to lobby')}${btn('leave-result','close','Leave game','Leave')}</div>`;
+  dialog.innerHTML=`<div class="winner-icon">${icon(result.victory===2?'rocket':'crown')}</div><h1 id="victory-title">${result.winner===slot?'Victory!':'Match complete'}</h1><div class="end-emblem" style="color:${colors[result.winner]}">${icon(civs[p.civ])}<span>${html(p.name)} wins!</span></div><p>${result.victory===2?'Space victory':'Conquest victory'} · ${time(result.tick)}</p><div class="result-actions">${btn('back-lobby','home','Back to lobby','Back to lobby')}${btn('leave-result','close','Leave game','Leave')}</div>`;
   $('back-lobby').onclick=async()=>{try{await send('lobby');}catch{}};
   $('leave-result').onclick=()=>leaveRoom();
   dialog.showModal();
@@ -254,7 +277,7 @@ function rebuildMarkers(){
 function updateMarkers(now){if(!globe)return;for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y+(u?22:-34)}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
  if(state?.phase==='running')$('clock').innerHTML=icon('clock')+`<span>${time(lastTick+Math.min(2,Math.floor((now-lastStateAt)/1000)))}</span>`;feedbackLayer.update(now,globe);soundscape.mix(globe,state,now);
 }
-$('tools').innerHTML=btn('home','home','Focus your capital')+btn('zoom-in','plus','Zoom in')+btn('zoom-out','minus','Zoom out')+btn('sound','mute','Toggle sound')+btn('help','book','Open icon manual')+btn('new-lobby','plus','Create new lobby','<span>New lobby</span>')+btn('leave-room','close','Leave game or lobby','<span>Leave</span>');
+$('tools').innerHTML=btn('home','home','Focus your capital')+btn('zoom-in','plus','Zoom in')+btn('zoom-out','minus','Zoom out')+btn('sound','mute','Toggle sound')+btn('help','book','Open icon manual')+btn('new-lobby','plus','Create new lobby')+btn('leave-room','close','Leave game or lobby');
 $('new-lobby').onclick=()=>leaveRoom(true);$('leave-room').onclick=()=>leaveRoom();$('ending').addEventListener('cancel',e=>e.preventDefault());
 const manual=new Manual($('guide'),()=>({state,slot}));
 const feedbackLayer=new FeedbackLayer(soundscape);

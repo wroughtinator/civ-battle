@@ -16,7 +16,7 @@ test('every ocean-facing edge gets sand, including mountain and snow coasts',()=
  assert.ok(checked>50);assert.equal(beachWeight(Infinity),0);assert.equal(beachWeight(.03),0);
 });
 
-for(const name of modelNames.slice(0,14))test(`${name}: bounded mesh, normalized skin weights and distinct animated poses`,()=>{
+for(const name of modelNames.slice(0,36))test(`${name}: bounded mesh, normalized skin weights and distinct animated poses`,()=>{
  const bytes=readFileSync(`public/assets/forge/${name}.rig`),rig=parseRig(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));
  assert.equal(rig.meta.version,2);assert.equal(rig.meta.stride,28);
  assert.ok(rig.meta.vertices/3<3200);assert.ok(rig.meta.bones.length<=32);
@@ -29,7 +29,7 @@ for(const name of modelNames.slice(0,14))test(`${name}: bounded mesh, normalized
 
 test('complete forge catalog has every runtime model and bounded textured geometry',()=>{
  const catalog=JSON.parse(readFileSync('public/assets/forge/catalog.json'));
- assert.equal(new Set(catalog.models.map(m=>m.name)).size,55);
+ assert.equal(new Set(catalog.models.map(m=>m.name)).size,77);
  for(const name of [...modelNames,...treeNames,...Array.from({length:10},(_,i)=>'discovery-'+i),...Array.from({length:8},(_,i)=>'capital-'+i),...Array.from({length:7},(_,i)=>'building-'+(i+1)),'farm','site'])assert.ok(catalog.models.some(m=>m.name===name),name);
  for(const m of catalog.models){
   const texture=readFileSync(`public/assets/forge/${m.name}.png`);assert.equal(texture.readUInt32BE(16),256);assert.equal(texture.readUInt32BE(20),256);
@@ -63,7 +63,7 @@ test('each ranged weapon dispatches a real textured model with a finite pose',()
 
 test('all attack cues are distinct, under 650ms, and finish at the authoritative windup',()=>{
  assert.equal(new Set(attackStyles.map(s=>s.type)).size,14);
- for(let kind=0;kind<14;kind++){
+ for(let kind=0;kind<36;kind++){
   const e={kind,start:1000,flight:5000},end=6000;
   assert.equal(attackTiming(e,end-700).active,false);
   assert.equal(attackTiming(e,end-100).active,true);
@@ -75,7 +75,7 @@ test('all attack cues are distinct, under 650ms, and finish at the authoritative
 test('attack geometry remains finite for every weapon and point-blank target',()=>{
  const norm=p=>{const l=Math.hypot(...p);return p.map(x=>x/l);},add=(a,b)=>a.map((x,i)=>x+b[i]),mul=(a,s)=>a.map(x=>x*s),mix=(a,b,s)=>a.map((x,i)=>x*(1-s)+b[i]*s),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
  let count=0;const check=(...args)=>{assert.ok(args.flat().every(Number.isFinite));count++;};
- for(let kind=0;kind<14;kind++)for(const b of [[0,0,1],norm([.1,0,1])])for(const f of [.05,.4,.9]){
+ for(let kind=0;kind<36;kind++)for(const b of [[0,0,1],norm([.1,0,1])])for(const f of [.05,.4,.9]){
   const e={kind,start:0,flight:1000,from:0,to:1,value:0};
   drawAttack(e,1000-attackStyles[kind].seconds*1000*(1-f),{a:[0,0,1],b,base:()=>1.02,ring:check,ribbon:check,triangle:check,norm,add,mul,mix,cross});
  }

@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "name": "Meridian Planning Audit",
+  "scope": "Generated three-piece skirmishes and peaceful single-city full-tree launches. Not a full-game, multiplayer, meta-diversity or APM certificate.",
+  "config": {
+    "budgets": [
+      4,
+      32
+    ],
+    "combat_horizon": 32,
+    "combat_metric": "paired material advantage; army elimination reported separately",
+    "order_interval": 8,
+    "schema": 1,
+    "seconds": 40,
+    "seed": 51000,
+    "space_metric": "actual peaceful launch completion time",
+    "type": "config"
+  },
+  "elapsed_seconds": 40.0001174,
+  "ended_cleanly": true,
+  "combat": {
+    "breadth": {
+      "samples": 135,
+      "mean": 0.6111111111111112,
+      "interval95": [
+        0.4942243432683896,
+        0.7279978789538327
+      ],
+      "verdict": "INCONCLUSIVE"
+    },
+    "foresight": {
+      "samples": 135,
+      "mean": 0.6703703703703704,
+      "interval95": [
+        0.5534836025276488,
+        0.787257138213092
+      ],
+      "verdict": "PASS"
+    }
+  },
+  "space": {
+    "samples": 137,
+    "mean": 0.9562043795620438,
+    "interval95": [
+      0.84017393656907,
+      1
+    ],
+    "verdict": "PASS",
+    "mean_seconds_saved": 70.30656934306569,
+    "unfinished": 0
+  },
+  "gates": {
+    "combat_breadth": "INCONCLUSIVE",
+    "combat_foresight": "PASS",
+    "peaceful_space": "PASS"
+  },
+  "verdict": "INCONCLUSIVE",
+  "build_seconds": 2.2995256,
+  "source_fingerprint": "7a9db6a2faf3057318d3fd4efb61ef4dc9bf810ac593ae63564df737938e5054"
+}

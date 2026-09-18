@@ -7,6 +7,7 @@ impl Game {
     }
     // Policies 1..6 are deliberately narrow audit opponents, with the same economy.
     pub fn bot_policy(&mut self, p: usize, policy: u8) {
+        if !self.players[p].alive || self.players[p].cooldown > self.tick {return;}
         let visible = self.vision(p);
         let mut observed = self.clone();
         observed.squads.retain(|u| self.detected(p, u, &visible));
@@ -54,6 +55,7 @@ impl Game {
         let city_dist: Vec<_> = self.cities.iter().map(|c| self.distances(c.tile)).collect();
         let enemy_dist: Vec<_> = enemies.iter().map(|u| self.distances(u.tile)).collect();
         let a = self.players[p].clone();
+        if self.bot_transport(p,&own) {return;}
         for u in &own {
             if u.left == 0
                 && self.discoveries.iter().any(|d| d.tile == u.tile && !d.used)
@@ -67,7 +69,7 @@ impl Game {
         let threat = enemies
             .iter()
             .any(|u| cities.iter().any(|c| self.distances(c.tile)[u.tile] <= 4));
-        let preferred = match policy {
+        let mut preferred = match policy {
             1 => 0,
             2 => 1,
             3 => 2,
@@ -76,11 +78,11 @@ impl Game {
             6 => 10,
             _ => {
                 if enemies.is_empty() {
-                    BRANCHES[(p + self.seed as usize) % 3][0]
+                    BRANCHES[(p + self.seed as usize) % BRANCHES.len()][0]
                 } else {
                     *a.unlocked
                         .iter()
-                        .filter(|&&k| k < 10)
+                        .filter(|&&k| spec(k).damage>0.)
                         .max_by(|&&k, &&l| {
                             let score = |kind| {
                                 let s = spec(kind);
@@ -97,7 +99,7 @@ impl Game {
                                 let coverage = enemies
                                     .iter()
                                     .map(|e| {
-                                        let reachable = if (7..=9).contains(&kind)
+                                        let reachable = if naval(kind)
                                             && self.tiles[e.tile].terrain > 0
                                             && !self.tiles[e.tile]
                                                 .near
@@ -111,7 +113,7 @@ impl Game {
                                         Self::multiplier(kind, e.kind) * reachable
                                     })
                                     .sum::<f32>();
-                                let splash = if matches!(kind, 2 | 4 | 6 | 7) {
+                                let splash = if definition(kind).splash || matches!(kind, 2 | 6 | 7) {
                                     1. + clusters * if kind == 4 { 1.4 } else { 0.65 }
                                 } else {
                                     1.
@@ -129,6 +131,54 @@ impl Game {
                 }
             }
         };
+        if (1..=5).contains(&policy) {
+            let family:&[u8]=match policy {1=>&[0,15,16,26],2=>&[1,24,3],3=>&[2,14,23,32],4=>&[18,4,25,35],_=>&[0,1,2,5,19,20,7,29,8,9]};
+            let value=|k:u8|{
+                let sp=spec(k);
+                let coverage=if enemies.is_empty(){if k==32{0.2}else{1.}}else{enemies.iter().map(|e|{
+                    let access=if naval(k)&&self.tiles[e.tile].terrain>0 {if k==8{0.}else if self.tiles[e.tile].near.iter().any(|&t|self.tiles[t].terrain==0){0.65}else{0.1}}else{1.};
+                    Self::multiplier(k,e.kind)*access
+                }).sum::<f32>()/enemies.len() as f32};
+                coverage*sp.damage/sp.reload as f32*sp.hp.sqrt()/sp.cost as f32*(1.+sp.range as f32*0.3)/(1.+own.iter().filter(|u|u.kind==k).count() as f32*0.3)
+            };
+            preferred=family.iter().copied().filter(|k|a.unlocked.contains(k)).max_by(|&k,&l|value(k).total_cmp(&value(l))).unwrap_or(0);
+        }
+        // Utility units maintain their jobs without repetitive ability commands.
+        for u in &own {
+            if u.left>0||u.locked_until>self.tick {continue;}
+            if u.kind==11 && a.gold>=150. {
+                let d=self.distances(u.tile);
+                if let Some(e)=enemies.iter().filter(|e|d[e.tile]<=9
+                    && !own.iter().any(|f|f.tile==e.tile||self.tiles[e.tile].near.contains(&f.tile)))
+                    .max_by_key(|e|enemies.iter().filter(|b|b.tile==e.tile||self.tiles[e.tile].near.contains(&b.tile)).count()) {
+                    if (enemies.iter().filter(|b|b.tile==e.tile||self.tiles[e.tile].near.contains(&b.tile)).count()>=2
+                        || self.players.get(e.owner).is_some_and(|a|a.launch>0)) && self.command(p,"ability",u.id,e.tile,0).is_ok(){return;}
+                }
+            }
+            if definition(u.kind).directional {
+                if let Some(e)=enemies.iter().min_by_key(|e|self.distances(u.tile)[e.tile]) {
+                    if self.distances(u.tile)[e.tile]<=4 && !self.in_front(u,e.tile) {
+                        let d=self.distances(e.tile);
+                        if let Some(t)=self.tiles[u.tile].near.iter().copied().min_by_key(|&t|d[t]) {
+                            if self.command(p,"face",u.id,t,0).is_ok(){return;}
+                        }
+                    }
+                }
+            }
+            if matches!(u.kind,17|22|27|28|33|34) && u.path.len()==1 {
+                let mut choices:Vec<_>=self.tiles[u.tile].near.iter().copied().chain(std::iter::once(u.tile)).filter(|&t|self.can_enter(u.kind,t)&&self.occupant(t).is_none_or(|s|s.id==u.id)).collect();
+                let value=|t:usize|{let d=self.distances(t);own.iter().filter(|f|f.id!=u.id&&spec(f.kind).damage>0.).map(|f|if d[f.tile]==1{4.}else{-(d[f.tile] as f32)*0.2}).sum::<f32>()-enemies.iter().map(|e|if d[e.tile]<=spec(e.kind).range{10.}else{0.}).sum::<f32>()};
+                choices.sort_by(|&x,&y|value(y).total_cmp(&value(x)));
+                if let Some(&t)=choices.first(){if t!=u.tile && value(t)>value(u.tile)+0.2 && self.command(p,"move",u.id,t,0).is_ok(){return;}}
+            }
+        }
+        // Military policies save for replacements during an actual city attack.
+        // A switch of policy must be able to change a standing research goal;
+        // otherwise every late-game portfolio choice silently funds the same plan.
+        let pressure=policy!=6&&enemies.iter().any(|u|u.owner<self.players.len()&&cities.iter().any(|c|self.distances(c.tile)[u.tile]<=3));
+        if pressure&&a.gold<250.&&!a.research_queue.is_empty()&&own.iter().filter(|u|spec(u.kind).damage>0.&&u.hp>spec(u.kind).hp*0.5).count()<4 {
+            if self.command(p,"plan",0,0,255).is_ok(){return;}
+        }
         // Reserve an occasional order for investment so repeated combat cannot starve it.
         if (self.tick + p as u32) % 12 < 2
             && self.bot_economy(p, policy, preferred, &own, &cities, &enemies)
@@ -137,8 +187,8 @@ impl Game {
         }
 
         let depth = if policy == 0 { self.difficulty + 1 } else { 1 };
-        // Attack is a deliberate order, never a side effect of movement. The next attack
-        // is chosen afresh after recovery, using the latest visible position.
+        // Standing units already repeat their attacks. Spend an order only to
+        // improve focus or commit an ability, not to keep ordinary weapons firing.
         for u in &own {
             if u.left > 0 || u.locked_until > self.tick || spec(u.kind).damage == 0. || u.refit >= 0
             {
@@ -216,11 +266,13 @@ impl Game {
                 {
                     return;
                 }
-                if u.path.len() > 1 {
+                // Arriving occupies the site before the movement cooldown expires.
+                // Wait there; choosing a new site now would endlessly reroute settlers.
+                if u.left>0 || u.path.len()>1 || self.foundable(u.tile) {
                     continue;
                 }
                 let d = self.distances(u.tile);
-                let dest = (0..self.tiles.len())
+                let mut sites: Vec<_> = (0..self.tiles.len())
                     .filter(|&i| {
                         matches!(self.tiles[i].terrain, 1 | 2 | 3)
                             && city_dist.iter().all(|ds| ds[i] >= 4)
@@ -230,7 +282,8 @@ impl Game {
                                 .iter()
                                 .any(|s| s.founding && self.distances(s.tile)[i] < 4)
                     })
-                    .min_by_key(|&i| {
+                    .collect();
+                sites.sort_by_key(|&i| {
                         let danger = enemy_dist.iter().filter(|ds| ds[i] < 5).count() as u16 * 6;
                         d[i] + danger
                             + if self.tiles[i]
@@ -243,6 +296,7 @@ impl Game {
                                 2
                             }
                     });
+                let dest = sites.into_iter().take(12).find(|&t| self.path(u,t).is_some());
                 if let Some(t) = dest {
                     if self.command(p, "move", u.id, t, 0).is_ok() {
                         return;
@@ -252,18 +306,28 @@ impl Game {
         }
         // Inexpensive defensive formations come before expensive exposed development.
         let combat_count = own.iter().filter(|u| spec(u.kind).damage > 0.).count();
-        let desired = (3 + cities.len()).min(self.cap(p) - 1);
+        let desired = (if policy==6 {2+cities.len()}else{3+cities.len()+usize::from(pressure)*2}).min(self.cap(p) - 1);
+        // Keep an emergency defence, but do not spend every research saving on
+        // another replacement. Completing the tree is now a real win route.
+        let research_reserve = if a.research < 0 && combat_count >= 3 {
+            technologies().filter(|k| !a.unlocked.contains(k))
+                .filter_map(|k| self.research_info(k))
+                .filter(|info| self.tick >= info.3 && info.2.iter().all(|k|a.unlocked.contains(k)))
+                .map(|info|info.0).min().unwrap_or(0) as f32
+        } else { 0. };
+        let founding_reserve=if own.iter().any(|u|u.kind==SETTLER&&!u.founding&&self.foundable(u.tile)){35.+cities.len() as f32*25.}else{0.};
+        let reserve=research_reserve.max(founding_reserve);
         if combat_count < desired && (threat || a.gold > 115.) {
-            let k = if a.unlocked.contains(&preferred) && preferred < 10 {
+            let k = if a.unlocked.contains(&preferred) && spec(preferred).damage>0. {
                 preferred
             } else {
                 0
             };
-            if let Some(c) = cities
+            if a.gold >= spec(k).cost as f32 + reserve { if let Some(c) = cities
                 .iter()
                 .filter(|c| {
                     c.training < 0
-                        && (!(7..=9).contains(&k)
+                        && (!naval(k)
                             || self.tiles[c.tile]
                                 .near
                                 .iter()
@@ -274,21 +338,7 @@ impl Game {
                 if self.command(p, "train", c.tile, 0, k).is_ok() {
                     return;
                 }
-            }
-        }
-        if policy == 0 {
-            for u in &own {
-                if u.left == 0
-                    && u.refit < 0
-                    && self.tiles[u.tile].owner == p as i8
-                    && u.kind < 10
-                    && u.kind != preferred
-                    && spec(preferred).cost > spec(u.kind).cost
-                    && self.command(p, "refit", u.id, 0, preferred).is_ok()
-                {
-                    return;
-                }
-            }
+            } }
         }
         // Positional search evaluates an objective route and nearby alternatives, including
         // enemy best replies at deeper settings. It does not inspect concealed pieces.
@@ -326,7 +376,7 @@ impl Game {
                     .filter(|c| enemies.iter().any(|e| self.distances(c.tile)[e.tile] <= 4))
                     .map(|c| c.tile),
             );
-            if (7..=9).contains(&u.kind) {
+            if naval(u.kind) {
                 targets = targets
                     .into_iter()
                     .flat_map(|t| {
@@ -343,38 +393,53 @@ impl Game {
                     })
                     .collect();
             }
-            targets.sort_by_key(|&t| d[t]);
+            // Public launch progress makes that civilization urgent to pressure.
+            targets.sort_by_key(|&t| {
+                let launch = self.cities.iter().find(|c|c.tile==t)
+                    .map(|c|self.players[c.owner].launch>0).unwrap_or(false);
+                (if launch {0}else{1},d[t])
+            });
             targets.truncate(3);
             let Some(&goal) = targets.first() else {
                 continue;
             };
+            // An occupied city is not a legal path destination. Advance to a
+            // firing position, then occupy the city after its defender falls.
+            let approach = if self.occupant(goal).is_some_and(|b|b.id!=u.id) {
+                let goal_dist=self.distances(goal);
+                let mut positions:Vec<_>=(0..self.tiles.len()).filter(|&t|
+                    goal_dist[t]>=spec(u.kind).min.max(1) && goal_dist[t]<=spec(u.kind).range.max(1)
+                    && self.can_enter(u.kind,t) && self.occupant(t).is_none()).collect();
+                positions.sort_by_key(|&t|d[t]);
+                positions.into_iter().find(|&t|self.path(u,t).is_some()).unwrap_or(goal)
+            }else{goal};
             let dg = self.distances(goal);
             let mut candidates = vec![u.tile];
             candidates.extend(self.tiles[u.tile].near.iter().copied());
-            if let Some(route) = self.path(u, goal) {
+            if let Some(route) = self.path(u, approach) {
                 candidates.push(*route.get(1).unwrap_or(&u.tile));
             }
             for tile in candidates {
                 if !self.can_enter(u.kind, tile)
                     || self.occupant(tile).is_some_and(|b| b.id != u.id)
+                    || self.guard_blocks(u,u.tile,tile,Some(&vision))
                 {
                     continue;
                 }
                 let positional = self.position_value(u, tile, goal, depth, &enemies, &enemy_dist);
                 let current = self.position_value(u, u.tile, goal, depth, &enemies, &enemy_dist);
                 let progress = (dg[u.tile] as f32 - dg[tile] as f32) * 2.;
-                let urgency = if u.hp < spec(u.kind).hp * 0.4 { 8. } else { 0. };
                 if tile != u.tile && !(u.left > 0 && u.to == tile) {
-                    orders.push((positional - current + progress + urgency, u.id, tile));
+                    orders.push((positional - current + progress, u.id, tile));
                 }
             }
             // Long routes are a single command. Tactical replanning starts on contact.
             if !enemies.iter().any(|e| d[e.tile] <= 5) && u.path.len() <= 1 {
-                if self.path(u, goal).is_some() {
+                if approach != u.tile && self.path(u, approach).is_some() {
                     orders.push((
                         5. + (hash(self.tick / 12 + u.id as u32) % 7) as f32 * 0.1,
                         u.id,
-                        goal,
+                        approach,
                     ));
                 }
             }
@@ -440,6 +505,11 @@ impl Game {
         enemies: &[Unit],
     ) -> bool {
         let a = self.players[p].clone();
+        if own.iter().any(|u|u.kind==SETTLER&&!u.founding&&self.foundable(u.tile)) {
+            // Save for the city already reached instead of feeding every coin into a queue.
+            if !a.research_queue.is_empty() {return self.command(p,"plan",0,0,255).is_ok();}
+            return false;
+        }
         let threat = enemies
             .iter()
             .any(|u| cities.iter().any(|c| self.distances(c.tile)[u.tile] <= 3));
@@ -453,7 +523,17 @@ impl Game {
                 }
             }
         }
+        if policy==5 && !threat && !own.iter().any(|u|spec(u.kind).boarding_capacity>0)
+            && !cities.iter().any(|c|c.training>=0&&spec(c.training as u8).boarding_capacity>0) && a.gold>120. {
+            let aircraft=enemies.iter().any(|u|air(u.kind));
+            if let Some(k)=(if aircraft{[9,31,19]}else{[31,19,9]}).into_iter().find(|k|a.unlocked.contains(k)) {
+                if let Some(c)=cities.iter().find(|c|c.training<0&&self.bot_sea_route(p,c.tile,k,own)) {
+                    if self.command(p,"train",c.tile,0,k).is_ok(){return true;}
+                }
+            }
+        }
         if !threat
+            && cities.len() < if policy==7{4}else{2}
             && !own.iter().any(|u| u.kind == SETTLER)
             && !cities.iter().any(|c| c.training == SETTLER as i8)
             && a.gold > 185. + 25. * cities.len() as f32
@@ -464,48 +544,54 @@ impl Game {
                 }
             }
         }
-        if a.research < 0 && a.gold > 95. {
-            let mut tech: Vec<_> = (0..12)
-                .filter(|&k| {
-                    !a.unlocked.contains(&k)
-                        && (policy == 0
-                            || match policy {
-                                1 => false,
-                                2 => k == 1,
-                                3 => k == 2,
-                                4 => k == 2 || k == 4,
-                                5 => (7..=9).contains(&k),
-                                6 => [1, 2, 3, 4, 10].contains(&k),
-                                _ => true,
-                            })
-                })
-                .filter_map(|k| self.research_info(k).map(|info| (k, info)))
-                .filter(|(_, info)| {
-                    info.2.iter().all(|k| a.unlocked.contains(k)) && self.tick >= info.3
-                })
-                .collect();
-            tech.sort_by(|(k, _), (l, _)| {
-                let score = |k: u8| {
-                    let mut s = if k == preferred { 9. } else { 1. };
-                    if k == 10 {
-                        s += if self.tick >= 900 { 8. } else { 0. };
-                    }
-                    if policy == 0 {
-                        s += enemies
-                            .iter()
-                            .map(|e| Self::multiplier(k, e.kind))
-                            .sum::<f32>();
-                    }
-                    if policy == 6 && matches!(k, 2 | 3 | 4 | 10) {
-                        s += 8.;
-                    }
-                    s
-                };
-                score(*l).total_cmp(&score(*k))
-            });
-            for (k, _) in tech {
-                if self.command(p, "research", 0, 0, k).is_ok() {
-                    return true;
+        // Invest in income early, then choose a persistent research goal. Queue
+        // execution uses exactly the same automatic rules available to humans.
+        if a.gold>=110. && (self.tick<180 || policy==6) {
+            if let Some(c)=cities.iter().filter(|c|c.production<3).max_by_key(|c|c.production){
+                if self.command(p,"upgrade",c.tile,0,1).is_ok(){return true;}
+            }
+        }
+        let emergency=policy!=6&&a.gold<250.&&enemies.iter().any(|u|u.owner<self.players.len()&&cities.iter().any(|c|self.distances(c.tile)[u.tile]<=3))
+            && own.iter().filter(|u|spec(u.kind).damage>0.&&u.hp>spec(u.kind).hp*0.5).count()<4;
+        if !emergency && a.research_queue.is_empty() && !self.space_ready(p) {
+            if policy==5&&!a.unlocked.contains(&2)&&a.research!=2 {
+                // A navy still needs an inexpensive land escort to hold its ports.
+                if self.command(p,"plan",0,0,2).is_ok(){return true;}
+            }
+            if policy==6 || self.tick>=360 {
+                if self.command(p,"plan",0,0,10).is_ok(){return true;}
+            }else{
+                let family:&[u8]=match policy {1=>&[15,16,17,26,34],2=>&[1,24,3,22],3=>&[2,14,23,32],4=>&[18,4,25,35,22],5=>&[19,20,31,7,29,8,30,9],_=>&[]};
+                let mut tech:Vec<_>=technologies().filter(|k|!a.unlocked.contains(k)&&a.research!=*k as i8).collect();
+                tech.sort_by_key(|&k|(if family.contains(&k)||k==preferred{0}else{1},definition(k).era,hash(self.seed ^ k as u32)));
+                if let Some(&k)=tech.first(){if self.command(p,"plan",0,0,k).is_ok(){return true;}}
+            }
+        }
+        // Buy one situational response when an observed threat warrants it.
+        // These are the same public recruit orders a human can issue.
+        let clustered=enemies.iter().any(|e|enemies.iter().filter(|b|b.tile==e.tile||self.tiles[e.tile].near.contains(&b.tile)).count()>=3);
+        let launch_threat=enemies.iter().any(|e|self.players.get(e.owner).is_some_and(|a|a.launch>0));
+        let response=if launch_threat&&clustered&&a.gold>spec(11).cost as f32+150.{Some(11)}
+            else if threat&&enemies.iter().any(|e|air(e.kind)){Some(if policy==5&&a.unlocked.contains(&9)&&cities.iter().any(|c|self.tiles[c.tile].near.iter().any(|&t|self.tiles[t].terrain==0)){9}else{32})}
+            else if threat&&enemies.iter().any(|e|naval(e.kind))&&policy==5{Some(30)}
+            else if policy==1&&threat{Some(if a.unlocked.contains(&26){26}else{16})}
+            else if policy==0&&enemies.iter().any(|e|matches!(e.kind,4|25|35|26)){Some(6)}else{None};
+        if let Some(k)=response.filter(|k|a.unlocked.contains(k)&&!own.iter().any(|u|u.kind==*k)&&!cities.iter().any(|c|c.training==*k as i8)){
+            if a.gold>spec(k).cost as f32+80. {
+                if let Some(c)=cities.iter().find(|c|c.training<0&&(!naval(k)||self.tiles[c.tile].near.iter().any(|&t|self.tiles[t].terrain==0))){
+                    if self.command(p,"train",c.tile,0,k).is_ok(){return true;}
+                }
+            }
+        }
+        // At most two distinct support jobs, and only when an army can use them.
+        if own.iter().filter(|u|spec(u.kind).damage>0.).count()>=3 && !threat && a.gold>180. {
+            let mechanical=own.iter().filter(|u|definition(u.kind).mechanical&&spec(u.kind).damage>0.).count();
+            let support=if policy==1{[34,27,17,22,33,28]}else if enemies.iter().any(|e|e.kind==8||e.kind==5){[33,28,22,27,17,34]}
+                else if mechanical>=2{[22,34,27,17,33,28]}else if enemies.is_empty(){[28,33,17,27,22,34]}else{[27,17,34,22,33,28]};
+            if let Some(k)=support.into_iter().find(|k|a.unlocked.contains(k)&&!own.iter().any(|u|u.kind==*k)) {
+                let count=own.iter().filter(|u|matches!(u.kind,17|22|27|28|33|34)).count()+cities.iter().filter(|c|matches!(c.training,17|22|27|28|33|34)).count();
+                if count<if a.gold>300.{2}else{1} {
+                    if let Some(c)=cities.iter().find(|c|c.training<0){if self.command(p,"train",c.tile,0,k).is_ok(){return true;}}
                 }
             }
         }
@@ -565,7 +651,8 @@ impl Game {
                 // An opponent may close one hex or escape a minimum-range weapon.
                 let mut best = 0f32;
                 for &reply in &self.tiles[e.tile].near {
-                    if self.can_enter(e.kind, reply) && self.occupant(reply).is_none() {
+                    if self.can_enter(e.kind, reply) && self.occupant(reply).is_none()
+                        && !self.guard_blocks(e,e.tile,reply,None) {
                         let dr = d[reply];
                         if dr >= their.min && dr <= their.range {
                             let mut b = e.clone();
@@ -626,7 +713,7 @@ impl Game {
                 .cities
                 .iter()
                 .any(|c| c.tile == tile && c.owner != u.owner)
-            && !matches!(u.kind, 6..=9)
+            && ground(u.kind)
         {
             score += 24.;
         }
@@ -638,7 +725,7 @@ impl Game {
         {
             score += 18.;
         }
-        if u.kind == 4 && tile == u.tile && self.tick - u.moved >= 10 {
+        if definition(u.kind).setup>0 && tile == u.tile && self.tick - u.moved >= definition(u.kind).setup {
             score += 6.;
         }
         score

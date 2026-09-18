@@ -2,6 +2,7 @@
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {join,dirname} from 'node:path';
+import {authorEraModels} from './era-models.mjs';
 const root=dirname(fileURLToPath(import.meta.url)),out=join(root,'models');mkdirSync(out,{recursive:true});
 const colors=[[123,91,55],[80,60,40],[71,96,39],[42,67,40],[88,95,70],[52,56,58],[160,164,158],[168,151,114],[75,48,31],[179,132,98],[136,133,116],[135,81,53],[29,49,76],[159,129,55],[158,133,62],[33,58,72]];
 const catalog=[];
@@ -30,14 +31,15 @@ function human(m,mat=4){
  m.clip('attack',.6,[['right-arm',[[0,[0,0,0]],[.25,[-90,0,-15]],[.36,[30,0,10]],[.6,[0,0,0]]]],['body',[[0,[0,0,0]],[.25,[0,-12,0]],[.6,[0,0,0]]]]]);
 }
 for(const name of['guard','archer','scout','engineer','recon']){
- const m=new Model(name);human(m,name==='scout'?8:name==='engineer'?7:4);
- if(name==='guard'){m.add('shield',[-.07,-.19,.11],[.28,.37,.055],0,{parent:'left-arm'});m.add('blade',[0,-.17,.27],[.045,.035,.44],6,{parent:'right-arm'});m.add('guard',[0,-.17,.08],[.16,.05,.04],13,{parent:'right-arm'});}
+ const m=new Model(name),early=['guard','archer','scout'].includes(name);human(m,early?8:name==='engineer'?7:4);
+ if(early){const hair=m.parts.find(p=>p.name==='helmet');hair.size=[.22,.07,.21];hair.material=8;hair.color=colors[8];for(const arm of m.parts.filter(p=>p.name.endsWith('-arm'))){arm.material=9;arm.color=colors[9];}}
+ if(name==='guard'){m.add('shield',[-.07,-.19,.11],[.28,.37,.055],0,{parent:'left-arm'});m.cyl('club',[0,-.17,.27],[.06,.44,.06],0,{parent:'right-arm',rotation:[90,0,0],segments:5});m.add('stone-head',[0,-.17,.48],[.15,.16,.20],10,{parent:'right-arm',taper:.65});}
  if(name==='archer'){
   for(const [i,y,z,r]of[[0,-.02,.18,-25],[1,-.14,.23,0],[2,-.26,.18,25]])m.add('bow'+i,[0,y,z],[.025,.17,.027],0,{parent:'left-arm',rotation:[r,0,0]});
   m.add('bowstring',[0,-.14,.12],[.008,.4,.008],7,{parent:'left-arm'});m.add('quiver',[.1,-.03,-.17],[.13,.28,.12],8,{parent:'body'});m.add('drawn-arrow',[0,-.17,.21],[.015,.015,.35],0,{parent:'right-arm'});
   m.animations=m.animations.filter(c=>c.name!=='attack');m.clip('attack',.6,[['left-arm',[[0,[-70,0,0]],[.4,[-85,0,0]],[.6,[-70,0,0]]]],['right-arm',[[0,[-65,0,0]],[.3,[-80,-45,0]],[.42,[-80,0,0]],[.6,[-65,0,0]]]]]);
  }
- if(name==='scout'){m.add('pack',[0,0,-.15],[.26,.3,.14],7,{parent:'body'});m.add('knife',[0,-.2,.14],[.035,.03,.22],6,{parent:'right-arm'});}
+ if(name==='scout'){m.add('pack',[0,0,-.15],[.26,.3,.14],7,{parent:'body'});m.add('knife',[0,-.2,.14],[.035,.03,.22],10,{parent:'right-arm'});}
  if(name==='engineer'){m.add('battery',[0,-.03,-.17],[.27,.36,.16],6,{parent:'body'});m.cyl('antenna',[.12,.38,-.19],[.012,.55,.012],6,{parent:'body',segments:4});m.cyl('dish',[.12,.57,-.19],[.28,.055,.28],6,{parent:'body',taper:.25});m.add('tool',[0,-.17,.14],[.07,.07,.24],13,{parent:'right-arm'});}
  if(name==='recon'){m.add('vest',[0,.02,.105],[.28,.24,.035],8,{parent:'body'});m.add('rifle',[0,-.18,.24],[.05,.08,.42],5,{parent:'right-arm'});m.add('stock',[0,-.17,.015],[.045,.10,.12],0,{parent:'right-arm'});}
  m.finish();
@@ -65,8 +67,13 @@ for(const name of['fleet','carrier','submarine']){
  if(name==='submarine'){m.cyl('round-hull',[0,.015,-.02],[.29,.95,.29],5,{rotation:[90,0,0]});m.add('sail',[0,.18,-.05],[.12,.24,.24],5,{taper:.8});m.cyl('periscope',[0,.37,-.04],[.015,.18,.015],6,{segments:4});m.add('planes',[0,.06,-.36],[.5,.035,.11],5);}
  else{m.add('deck',[0,.12,0],[name==='carrier'?.44:.25,.03,.99],5);m.add('bridge',[name==='carrier'?.13:0,.23,-.06],[.16,.2,.22],6);m.add('windows',[name==='carrier'?.13:0,.27,.055],[.14,.055,.012],15);m.cyl('mast',[.05,.48,-.11],[.022,.4,.022],6,{segments:4});m.add('radar',[0,.17,0],[.23,.04,.07],5,{parent:'mast'});
  if(name==='carrier'){m.add('runway',[0,.138,0],[.022,.008,.88],7);for(const z of[-.27,.23]){m.add('plane'+z,[-.09,.17,z],[.035,.035,.2],6);m.add('wing'+z,[-.09,.18,z],[.22,.015,.05],6);}}
- else{m.cyl('gun',[0,.19,.29],[.15,.11,.15],6);m.cyl('gun-barrel',[0,.025,.15],[.025,.25,.025],5,{parent:'gun',rotation:[90,0,0],segments:6});for(const z of[-.35,-.23])m.add('vls'+z,[0,.15,z],[.17,.03,.08],4);}}
- m.cycle('idle','hull',2,1.5,2);m.cycle('walk',name==='submarine'?'planes':'radar',1,12,1);m.cycle('attack',name==='fleet'?'gun':name==='carrier'?'radar':'planes',0,10,.5);m.finish();
+ else{m.cyl('gun',[0,.19,.29],[.15,.11,.15],6);m.cyl('gun-barrel',[0,.025,.15],[.025,.25,.025],5,{parent:'gun',rotation:[90,0,0],segments:6});m.add('mainmast',[0,.59,-.13],[.025,.86,.025],0);for(const z of[-.13,.17])m.add('sail'+z,[0,.57,z],[.51,.43,.025],7,{taper:.72});}}
+ if(name==='fleet'){
+  for(const part of m.parts.filter(p=>['hull','bow','bridge','mast'].includes(p.name))){part.material=0;part.color=colors[0];}
+  const deck=m.parts.find(p=>p.name==='deck');deck.material=1;deck.color=colors[1];
+  const nest=m.parts.find(p=>p.name==='radar');nest.size=[.17,.09,.17];nest.material=0;nest.color=colors[0];
+ }
+ m.cycle('idle','hull',2,1.5,2);m.cycle('walk',name==='submarine'?'planes':name==='fleet'?'mainmast':'radar',1,name==='fleet'?3:12,1);m.cycle('attack',name==='fleet'?'gun':name==='carrier'?'radar':'planes',0,10,.5);m.finish();
 }
 function aircraft(name,category){const m=new Model(name,category);m.cyl('hull',[0,.1,0],[.10,.85,.10],6,{rotation:[90,0,0],taper:.45});m.add('wing',[0,.1,0],[.96,.035,.15],4,{taper:.75});m.add('tail-wing',[0,.13,-.33],[.35,.025,.08],4);m.add('tail',[0,.19,-.32],[.025,.19,.13],4);m.add('canopy',[0,.15,.22],[.07,.055,.19],15);m.add('propeller',[0,-.43,0],[.29,.02,.022],5,{parent:'hull'});m.cycle('idle','propeller',1,80,.4);m.cycle('walk','wing',2,3,.8);m.cycle('attack','hull',0,7,.5);return m;}
 aircraft('drone','unit').finish();aircraft('aircraft','projectile').finish();
@@ -118,4 +125,5 @@ for(let k=0;k<10;k++){
  }
  m.add('lock',[0,.30,.28],[.10,.14,.035],13);m.finish();
 }
-writeFileSync(join(root,'catalog.json'),JSON.stringify({version:1,materials:'sources/materials.png',terrain:'sources/terrain.png',models:catalog},null,2)+'\n');console.log(`Authored ${catalog.length} models`);
+authorEraModels(Model,human,wheels,vehicleClips);
+writeFileSync(join(root,'catalog.json'),JSON.stringify({version:2,materials:'sources/materials.png',terrain:'sources/terrain.png',models:catalog},null,2)+'\n');console.log(`Authored ${catalog.length} models`);

@@ -1,0 +1,962 @@
+{
+  "note": "Preserved iteration results, including failures. Controllers and coverage evolved; these are not isolated causal estimates. Raw local evidence remains under artifacts. eras-coverage crashed on a barbarian owner index; subsequent runs include the fix.",
+  "runs": [
+    {
+      "tool": "design",
+      "run": "eras-before",
+      "seed": 42000,
+      "verdict": "FAIL",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "FAIL",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "FAIL"
+      },
+      "source_fingerprint": "d4b648b71b73a91583e468756cf1e8058e0f4bae075e49275a8e913a52a59867",
+      "elapsed_seconds": 120.0059493,
+      "completion": {
+        "games": 1306,
+        "tick_capped_games": 316,
+        "verdict": "FAIL"
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 5,
+          "games": 10,
+          "high_win_rate": 0.6,
+          "interval95": [
+            0,
+            1
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-coverage",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "INCONCLUSIVE",
+        "decision_consequences": "INCONCLUSIVE",
+        "multiplayer": "INCONCLUSIVE",
+        "active_beats_idle": "INCONCLUSIVE",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "INCONCLUSIVE"
+      },
+      "source_fingerprint": "e4c8a4aa936f04182851dc91e64dfc45f36590731d7d69309ad5892ac3efb2fc",
+      "elapsed_seconds": null,
+      "completion": {
+        "games": 0,
+        "tick_capped_games": 0,
+        "verdict": "INCONCLUSIVE"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 0,
+          "mean_seconds": null,
+          "median_seconds": null,
+          "p80_seconds": null,
+          "completed_by_15_minutes": null,
+          "space_wins": 0
+        },
+        "eight_player": {
+          "completed_games": 0,
+          "mean_seconds": null,
+          "median_seconds": null,
+          "p80_seconds": null,
+          "completed_by_15_minutes": null,
+          "space_wins": 0
+        }
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 0,
+          "games": 0,
+          "high_win_rate": null,
+          "interval95": [
+            0,
+            1
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-coverage-fixed",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "PASS",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "ec219a914d3e65f9658e7fc3288413f4755b7e321067290dd29d62e624501e7b",
+      "elapsed_seconds": 120.0023355,
+      "completion": {
+        "games": 2406,
+        "tick_capped_games": 125,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 564,
+          "mean_seconds": 796.7021276595744,
+          "median_seconds": 806,
+          "p80_seconds": 937,
+          "completed_by_15_minutes": 0.7464539007092199,
+          "space_wins": 479
+        },
+        "eight_player": {
+          "completed_games": 235,
+          "mean_seconds": 750.3191489361702,
+          "median_seconds": 743,
+          "p80_seconds": 789,
+          "completed_by_15_minutes": 0.9872340425531915,
+          "space_wins": 235
+        }
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 36,
+          "games": 72,
+          "high_win_rate": 0.5972222222222222,
+          "interval95": [
+            0.37087196959878566,
+            0.8235724748456588
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-final",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "PASS",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "d32d3f63f8e1a9ecd86cf0ad601780ea78ffbe3e054eca2799f29ffa57c6012d",
+      "elapsed_seconds": 120.0042752,
+      "completion": {
+        "games": 2713,
+        "tick_capped_games": 136,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 734,
+          "mean_seconds": 780.6607629427793,
+          "median_seconds": 801,
+          "p80_seconds": 923,
+          "completed_by_15_minutes": 0.773841961852861,
+          "space_wins": 606
+        },
+        "eight_player": {
+          "completed_games": 241,
+          "mean_seconds": 755.0248962655602,
+          "median_seconds": 745,
+          "p80_seconds": 795,
+          "completed_by_15_minutes": 0.970954356846473,
+          "space_wins": 241
+        }
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 30,
+          "games": 60,
+          "high_win_rate": 0.5833333333333334,
+          "interval95": [
+            0.3353790548156351,
+            0.8312876118510316
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-first",
+      "seed": 42000,
+      "verdict": "FAIL",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "FAIL",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "b35a055d690628416554903e7e47fa99fc10e202a34c53bd49fcf3f94b744295",
+      "elapsed_seconds": 120.004123,
+      "completion": {
+        "games": 1994,
+        "tick_capped_games": 147,
+        "verdict": "PASS"
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 15,
+          "games": 30,
+          "high_win_rate": 0.5333333333333333,
+          "interval95": [
+            0.1826730298051687,
+            0.883993636861498
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-holdout",
+      "seed": 43000,
+      "verdict": "FAIL",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "FAIL",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "d32d3f63f8e1a9ecd86cf0ad601780ea78ffbe3e054eca2799f29ffa57c6012d",
+      "elapsed_seconds": 120.003159,
+      "completion": {
+        "games": 2548,
+        "tick_capped_games": 192,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 510,
+          "mean_seconds": 703.3725490196078,
+          "median_seconds": 759,
+          "p80_seconds": 830,
+          "completed_by_15_minutes": 0.8803921568627451,
+          "space_wins": 376
+        },
+        "eight_player": {
+          "completed_games": 256,
+          "mean_seconds": 748.22265625,
+          "median_seconds": 743,
+          "p80_seconds": 789,
+          "completed_by_15_minutes": 0.9921875,
+          "space_wins": 256
+        }
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 31,
+          "games": 62,
+          "high_win_rate": 0.46774193548387094,
+          "interval95": [
+            0.2238197025662562,
+            0.7116641684014857
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-pressure",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "PASS",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "d257470a3299b976fc107dadbf9d9719b3bc79eefb32f0c2e0d73849a0eeb239",
+      "elapsed_seconds": 120.0051172,
+      "completion": {
+        "games": 2484,
+        "tick_capped_games": 134,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 640,
+          "mean_seconds": 878.0734375,
+          "median_seconds": 850,
+          "p80_seconds": 993,
+          "completed_by_15_minutes": 0.653125,
+          "space_wins": 607
+        },
+        "eight_player": {
+          "completed_games": 212,
+          "mean_seconds": 791.0283018867924,
+          "median_seconds": 786,
+          "p80_seconds": 841,
+          "completed_by_15_minutes": 0.9292452830188679,
+          "space_wins": 212
+        }
+      },
+      "space_victory_share": 0.9217352415026834,
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 20,
+          "games": 40,
+          "high_win_rate": 0.65,
+          "interval95": [
+            0.3463192690458474,
+            0.9536807309541526
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-restraint",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "PASS",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "61b2eb37c3fa9837338cb12fb8ad3b5cca924a4ae9e7d751310fd46842dd8909",
+      "elapsed_seconds": 120.0042958,
+      "completion": {
+        "games": 2709,
+        "tick_capped_games": 110,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 736,
+          "mean_seconds": 789.4864130434783,
+          "median_seconds": 805,
+          "p80_seconds": 909,
+          "completed_by_15_minutes": 0.7880434782608695,
+          "space_wins": 633
+        },
+        "eight_player": {
+          "completed_games": 224,
+          "mean_seconds": 752.5892857142857,
+          "median_seconds": 751,
+          "p80_seconds": 787,
+          "completed_by_15_minutes": 0.9866071428571429,
+          "space_wins": 224
+        }
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 36,
+          "games": 72,
+          "high_win_rate": 0.5277777777777778,
+          "interval95": [
+            0.30142752515434124,
+            0.7541280304012143
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-second",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "PASS",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "c3a86e29daa228afbf945152d44535544d97cc49b75dc42c71165b18d37d4747",
+      "elapsed_seconds": 120.0040588,
+      "completion": {
+        "games": 2072,
+        "tick_capped_games": 159,
+        "verdict": "PASS"
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 15,
+          "games": 30,
+          "high_win_rate": 0.5666666666666667,
+          "interval95": [
+            0.21600636313850202,
+            0.9173269701948312
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-third",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "PASS",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "99dfe692191cce9bfcb816e48fe3ebabe3d8d2c4990cb4200ee894bb363402e6",
+      "elapsed_seconds": 120.0050996,
+      "completion": {
+        "games": 2010,
+        "tick_capped_games": 97,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 524,
+          "mean_seconds": 753.9885496183206,
+          "median_seconds": 764,
+          "p80_seconds": 875,
+          "completed_by_15_minutes": 0.8473282442748091,
+          "space_wins": 476
+        },
+        "eight_player": {
+          "completed_games": 160,
+          "mean_seconds": 685.7625,
+          "median_seconds": 675,
+          "p80_seconds": 738,
+          "completed_by_15_minutes": 1,
+          "space_wins": 160
+        }
+      },
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 20,
+          "games": 40,
+          "high_win_rate": 0.6,
+          "interval95": [
+            0.2963192690458474,
+            0.9036807309541526
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-verified",
+      "seed": 42000,
+      "verdict": "INCONCLUSIVE",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "PASS",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "d5835449063250f502f9927c5cc2a1f6254e6d9aa37d5670255dcba125915e24",
+      "elapsed_seconds": 120.0035402,
+      "completion": {
+        "games": 2368,
+        "tick_capped_games": 135,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 556,
+          "mean_seconds": 875.9784172661871,
+          "median_seconds": 847,
+          "p80_seconds": 995,
+          "completed_by_15_minutes": 0.6600719424460432,
+          "space_wins": 523
+        },
+        "eight_player": {
+          "completed_games": 208,
+          "mean_seconds": 789.9326923076923,
+          "median_seconds": 786,
+          "p80_seconds": 841,
+          "completed_by_15_minutes": 0.9375,
+          "space_wins": 208
+        }
+      },
+      "space_victory_share": 0.9215500945179584,
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 24,
+          "games": 48,
+          "high_win_rate": 0.6458333333333334,
+          "interval95": [
+            0.36861202229458884,
+            0.923054644372078
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "design",
+      "run": "eras-verified-holdout",
+      "seed": 43000,
+      "verdict": "FAIL",
+      "gates": {
+        "thinking": "INCONCLUSIVE",
+        "policy_diversity": "PASS",
+        "decision_consequences": "FAIL",
+        "multiplayer": "PASS",
+        "active_beats_idle": "PASS",
+        "input_restraint": "INCONCLUSIVE",
+        "completion": "PASS"
+      },
+      "source_fingerprint": "d5835449063250f502f9927c5cc2a1f6254e6d9aa37d5670255dcba125915e24",
+      "elapsed_seconds": 120.0035295,
+      "completion": {
+        "games": 2215,
+        "tick_capped_games": 180,
+        "verdict": "PASS"
+      },
+      "pacing": {
+        "two_player": {
+          "completed_games": 470,
+          "mean_seconds": 833.5276595744681,
+          "median_seconds": 829,
+          "p80_seconds": 931,
+          "completed_by_15_minutes": 0.7127659574468085,
+          "space_wins": 439
+        },
+        "eight_player": {
+          "completed_games": 208,
+          "mean_seconds": 792.8173076923077,
+          "median_seconds": 785,
+          "p80_seconds": 845,
+          "completed_by_15_minutes": 0.9230769230769231,
+          "space_wins": 208
+        }
+      },
+      "space_victory_share": 0.9289473684210526,
+      "compute": [
+        {
+          "high": "mcts-32",
+          "low": "mcts-8",
+          "pairs": 32,
+          "games": 64,
+          "high_win_rate": 0.4375,
+          "interval95": [
+            0.19741930217001982,
+            0.6775806978299802
+          ],
+          "verdict": "INCONCLUSIVE"
+        }
+      ]
+    },
+    {
+      "tool": "planning",
+      "run": "eras-before",
+      "seed": 51000,
+      "verdict": "PASS",
+      "gates": {
+        "combat_breadth": "PASS",
+        "combat_foresight": "PASS",
+        "combat_restraint": "PASS",
+        "peaceful_space": "PASS"
+      },
+      "source_fingerprint": "bc44bfd50628a6e7ecc3e9cb24e62bd435cda303ac4df930246e1b655314c561",
+      "elapsed_seconds": 120.000056,
+      "combat": {
+        "breadth": {
+          "samples": 241,
+          "mean": 0.6524896265560166,
+          "interval95": [
+            0.5650066174870834,
+            0.7399726356249499
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 149,
+            "losses": 78,
+            "unresolved": 253,
+            "mutual_destruction": 2
+          }
+        },
+        "foresight": {
+          "samples": 241,
+          "mean": 0.6856846473029046,
+          "interval95": [
+            0.5982016382339713,
+            0.7731676563718378
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 151,
+            "losses": 66,
+            "unresolved": 261,
+            "mutual_destruction": 4
+          }
+        },
+        "restraint": {
+          "samples": 240,
+          "mean": 0.6895833333333333,
+          "interval95": [
+            0.6019182574512921,
+            0.7772484092153745
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 129,
+            "losses": 58,
+            "unresolved": 292,
+            "mutual_destruction": 1
+          }
+        }
+      },
+      "space": {
+        "samples": 416,
+        "mean": 0.9375,
+        "interval95": [
+          0.87091359490191,
+          1
+        ],
+        "verdict": "PASS",
+        "mean_seconds_saved": 64.9423076923077,
+        "unfinished": 0
+      }
+    },
+    {
+      "tool": "planning",
+      "run": "eras-first",
+      "seed": 51000,
+      "verdict": "PASS",
+      "gates": {
+        "combat_breadth": "PASS",
+        "combat_foresight": "PASS",
+        "combat_restraint": "PASS",
+        "peaceful_space": "PASS"
+      },
+      "source_fingerprint": "ad8100a26fd6acdf32d7b3d29ed17cd71ced2ab659c9fe40465511f721f1eb97",
+      "elapsed_seconds": 120.0000603,
+      "combat": {
+        "breadth": {
+          "samples": 231,
+          "mean": 0.6612554112554112,
+          "interval95": [
+            0.571898891834514,
+            0.7506119306763084
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 110,
+            "losses": 44,
+            "unresolved": 306,
+            "mutual_destruction": 2
+          }
+        },
+        "foresight": {
+          "samples": 231,
+          "mean": 0.6461038961038961,
+          "interval95": [
+            0.5567473766829989,
+            0.7354604155247932
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 88,
+            "losses": 49,
+            "unresolved": 314,
+            "mutual_destruction": 11
+          }
+        },
+        "restraint": {
+          "samples": 231,
+          "mean": 0.7034632034632035,
+          "interval95": [
+            0.6141066840423063,
+            0.7928197228841006
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 106,
+            "losses": 42,
+            "unresolved": 310,
+            "mutual_destruction": 4
+          }
+        }
+      },
+      "space": {
+        "samples": 730,
+        "mean": 0.8698630136986302,
+        "interval95": [
+          0.8195974214600845,
+          0.9201286059371758
+        ],
+        "verdict": "PASS",
+        "mean_seconds_saved": 11.682191780821919,
+        "unfinished": 0
+      }
+    },
+    {
+      "tool": "planning",
+      "run": "eras-restraint",
+      "seed": 51000,
+      "verdict": "PASS",
+      "gates": {
+        "combat_breadth": "PASS",
+        "combat_foresight": "PASS",
+        "combat_restraint": "PASS",
+        "peaceful_space": "PASS"
+      },
+      "source_fingerprint": "d7f014aa62a2cb86c5302d5582130fd2bd9b73651e39aedf4a9e2822bb8d6aa8",
+      "elapsed_seconds": 120.0000989,
+      "combat": {
+        "breadth": {
+          "samples": 228,
+          "mean": 0.6633771929824561,
+          "interval95": [
+            0.5734347228935796,
+            0.7533196630713327
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 110,
+            "losses": 44,
+            "unresolved": 300,
+            "mutual_destruction": 2
+          }
+        },
+        "foresight": {
+          "samples": 227,
+          "mean": 0.6486784140969163,
+          "interval95": [
+            0.5585380505452857,
+            0.7388187776485469
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 87,
+            "losses": 47,
+            "unresolved": 309,
+            "mutual_destruction": 11
+          }
+        },
+        "restraint": {
+          "samples": 227,
+          "mean": 0.75,
+          "interval95": [
+            0.6598596364483694,
+            0.8401403635516306
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 111,
+            "losses": 39,
+            "unresolved": 300,
+            "mutual_destruction": 4
+          }
+        }
+      },
+      "space": {
+        "samples": 779,
+        "mean": 0.8844672657252889,
+        "interval95": [
+          0.8358082292376147,
+          0.9331263022129631
+        ],
+        "verdict": "PASS",
+        "mean_seconds_saved": 13.41206675224647,
+        "unfinished": 0
+      }
+    },
+    {
+      "tool": "planning",
+      "run": "eras-verified",
+      "seed": 51000,
+      "verdict": "PASS",
+      "gates": {
+        "combat_breadth": "PASS",
+        "combat_foresight": "PASS",
+        "combat_restraint": "PASS",
+        "peaceful_space": "PASS"
+      },
+      "source_fingerprint": "cdfdfbfdc2aae7d73994679e5c48b55f2102660853e22c972923c8797e43ac31",
+      "elapsed_seconds": 120.0000472,
+      "combat": {
+        "breadth": {
+          "samples": 228,
+          "mean": 0.6633771929824561,
+          "interval95": [
+            0.5734347228935796,
+            0.7533196630713327
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 110,
+            "losses": 44,
+            "unresolved": 300,
+            "mutual_destruction": 2
+          }
+        },
+        "foresight": {
+          "samples": 228,
+          "mean": 0.6458333333333334,
+          "interval95": [
+            0.5558908632444568,
+            0.7357758034222099
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 87,
+            "losses": 49,
+            "unresolved": 309,
+            "mutual_destruction": 11
+          }
+        },
+        "restraint": {
+          "samples": 228,
+          "mean": 0.7467105263157895,
+          "interval95": [
+            0.6567680562269129,
+            0.8366529964046661
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 111,
+            "losses": 39,
+            "unresolved": 302,
+            "mutual_destruction": 4
+          }
+        }
+      },
+      "space": {
+        "samples": 782,
+        "mean": 0.8842710997442456,
+        "interval95": [
+          0.8357054886928114,
+          0.9328367107956798
+        ],
+        "verdict": "PASS",
+        "mean_seconds_saved": 13.381074168797953,
+        "unfinished": 0
+      }
+    },
+    {
+      "tool": "planning",
+      "run": "eras-verified-holdout",
+      "seed": 61000,
+      "verdict": "PASS",
+      "gates": {
+        "combat_breadth": "PASS",
+        "combat_foresight": "PASS",
+        "combat_restraint": "PASS",
+        "peaceful_space": "PASS"
+      },
+      "source_fingerprint": "cdfdfbfdc2aae7d73994679e5c48b55f2102660853e22c972923c8797e43ac31",
+      "elapsed_seconds": 120.0037314,
+      "combat": {
+        "breadth": {
+          "samples": 227,
+          "mean": 0.6519823788546255,
+          "interval95": [
+            0.5618420153029949,
+            0.7421227424062561
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 87,
+            "losses": 48,
+            "unresolved": 316,
+            "mutual_destruction": 3
+          }
+        },
+        "foresight": {
+          "samples": 227,
+          "mean": 0.6442731277533039,
+          "interval95": [
+            0.5541327642016733,
+            0.7344134913049345
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 80,
+            "losses": 55,
+            "unresolved": 311,
+            "mutual_destruction": 8
+          }
+        },
+        "restraint": {
+          "samples": 227,
+          "mean": 0.723568281938326,
+          "interval95": [
+            0.6334279183866954,
+            0.8137086454899566
+          ],
+          "verdict": "PASS",
+          "army_elimination": {
+            "wins": 111,
+            "losses": 35,
+            "unresolved": 304,
+            "mutual_destruction": 4
+          }
+        }
+      },
+      "space": {
+        "samples": 775,
+        "mean": 0.8774193548387097,
+        "interval95": [
+          0.8286349082551867,
+          0.9262038014222327
+        ],
+        "verdict": "PASS",
+        "mean_seconds_saved": 12.88258064516129,
+        "unfinished": 0
+      }
+    }
+  ]
+}

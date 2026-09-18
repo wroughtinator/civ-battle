@@ -10,21 +10,21 @@ impl Game {
         if to >= self.tiles.len()
             || s.damage == 0.
             || !self.vision(u.owner)[to]
-            || self.tiles[u.tile].terrain == 0 && !matches!(u.kind, 6..=9)
+            || self.tiles[u.tile].terrain == 0 && ground(u.kind)
         {
             return Err(4);
         }
         let d = self.distances(u.tile)[to];
-        if d < s.min || d > range || !matches!(u.kind, 4 | 6) && !self.line_of_sight(u.tile, to) {
+        if d < s.min || d > range || !definition(u.kind).indirect && !self.line_of_sight(u.tile, to) {
             return Err(4);
         }
         if u.kind == 8 && self.tiles[to].terrain > 0 {
             return Err(4);
         }
-        if u.kind == 4 && self.tick.saturating_sub(u.moved) < 10 {
+        if self.tick.saturating_sub(u.moved) < definition(u.kind).setup {
             return Err(6);
         }
-        let windup = if u.kind == 4 {
+        let windup = if definition(u.kind).setup>0 {
             5
         } else if salvo > 0 {
             4

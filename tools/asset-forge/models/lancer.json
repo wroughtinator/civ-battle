@@ -1,0 +1,540 @@
+{
+  "name": "lancer",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "horse",
+      "position": [
+        0,
+        0.45,
+        0
+      ],
+      "size": [
+        0.3,
+        0.32,
+        0.64
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ]
+    },
+    {
+      "name": "leg-0.1-0.23",
+      "position": [
+        -0.1,
+        -0.14,
+        -0.23
+      ],
+      "size": [
+        0.08,
+        0.4,
+        0.09
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.15,
+        0
+      ]
+    },
+    {
+      "name": "leg-0.10.23",
+      "position": [
+        -0.1,
+        -0.14,
+        0.23
+      ],
+      "size": [
+        0.08,
+        0.4,
+        0.09
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.15,
+        0
+      ]
+    },
+    {
+      "name": "leg0.1-0.23",
+      "position": [
+        0.1,
+        -0.14,
+        -0.23
+      ],
+      "size": [
+        0.08,
+        0.4,
+        0.09
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.15,
+        0
+      ]
+    },
+    {
+      "name": "leg0.10.23",
+      "position": [
+        0.1,
+        -0.14,
+        0.23
+      ],
+      "size": [
+        0.08,
+        0.4,
+        0.09
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "parent": 0,
+      "pivot": [
+        0,
+        0.15,
+        0
+      ]
+    },
+    {
+      "name": "neck",
+      "position": [
+        0,
+        0.23,
+        0.27
+      ],
+      "size": [
+        0.19,
+        0.35,
+        0.18
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "parent": 0,
+      "rotation": [
+        -20,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "head",
+      "position": [
+        0,
+        0.41,
+        0.36
+      ],
+      "size": [
+        0.19,
+        0.17,
+        0.3
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ],
+      "parent": 0
+    },
+    {
+      "name": "barding",
+      "position": [
+        0,
+        0.12,
+        0.13
+      ],
+      "size": [
+        0.33,
+        0.12,
+        0.43
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "parent": 0
+    },
+    {
+      "name": "rider",
+      "position": [
+        0,
+        0.35,
+        -0.05
+      ],
+      "size": [
+        0.23,
+        0.29,
+        0.18
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "parent": 0
+    },
+    {
+      "name": "helmet",
+      "position": [
+        0,
+        0.24,
+        0
+      ],
+      "size": [
+        0.2,
+        0.23,
+        0.2
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "parent": 8
+    },
+    {
+      "name": "plume",
+      "position": [
+        0,
+        0.42,
+        0
+      ],
+      "size": [
+        0.06,
+        0.22,
+        0.12
+      ],
+      "material": 11,
+      "color": [
+        135,
+        81,
+        53
+      ],
+      "parent": 8
+    },
+    {
+      "name": "arm",
+      "position": [
+        0.16,
+        0.1,
+        0
+      ],
+      "size": [
+        0.085,
+        0.3,
+        0.1
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "parent": 8,
+      "pivot": [
+        0,
+        0.12,
+        0
+      ]
+    },
+    {
+      "name": "lance",
+      "position": [
+        0,
+        0,
+        0.39
+      ],
+      "size": [
+        0.024,
+        1.4,
+        0.024
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "parent": 11,
+      "rotation": [
+        75,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "tip",
+      "position": [
+        0,
+        0.78,
+        0
+      ],
+      "size": [
+        0.08,
+        0.18,
+        0.08
+      ],
+      "material": 6,
+      "color": [
+        160,
+        164,
+        158
+      ],
+      "shape": "cylinder",
+      "segments": 4,
+      "parent": 12,
+      "taper": 0.02
+    },
+    {
+      "name": "pennant",
+      "position": [
+        0.1,
+        0.5,
+        0
+      ],
+      "size": [
+        0.2,
+        0.17,
+        0.018
+      ],
+      "material": 11,
+      "color": [
+        135,
+        81,
+        53
+      ],
+      "parent": 12,
+      "taper": 0.1
+    }
+  ],
+  "animations": [
+    {
+      "name": "walk",
+      "duration": 0.65,
+      "tracks": [
+        {
+          "part": 1,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.325,
+              "rotation": [
+                30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.65,
+              "rotation": [
+                -30,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 2,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.325,
+              "rotation": [
+                -30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.65,
+              "rotation": [
+                30,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 3,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.325,
+              "rotation": [
+                30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.65,
+              "rotation": [
+                -30,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 4,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.325,
+              "rotation": [
+                -30,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.65,
+              "rotation": [
+                30,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "attack",
+      "duration": 0.6,
+      "tracks": [
+        {
+          "part": 11,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.3,
+              "rotation": [
+                25,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.6,
+              "rotation": [
+                -25,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "idle",
+      "duration": 2,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -1
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "time": 2,
+              "rotation": [
+                0,
+                0,
+                -1
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

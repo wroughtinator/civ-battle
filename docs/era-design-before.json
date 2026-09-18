@@ -1,0 +1,992 @@
+{
+  "schema_version": 3,
+  "name": "Meridian Strategy Audit",
+  "verdict": "FAIL",
+  "certificate_scope": "Operational tests of this policy portfolio, sampled maps, horizons and input rates; not a proof of strategic depth or distinct human metas.",
+  "config": {
+    "budgets": [
+      8,
+      32
+    ],
+    "horizon": 120,
+    "name": "Meridian Strategy Audit",
+    "parallel_pairs": 8,
+    "phase_fractions": {
+      "compute_and_input_thinking": 0.5,
+      "input_frequency": 0.1,
+      "meta": 0.2,
+      "multiplayer": 0.1,
+      "probes": 0.1
+    },
+    "policies": [
+      "adaptive",
+      "guards",
+      "cavalry",
+      "archers",
+      "artillery",
+      "naval",
+      "space",
+      "expansion",
+      "idle"
+    ],
+    "policy_interval_seconds": 40,
+    "replan_seconds": 120,
+    "ruleset": "conquest-space-persistent-combat",
+    "schema_version": 3,
+    "search": "open-loop portfolio UCT; independent hidden-state priors; no learned network",
+    "seconds": 120,
+    "seed": 42000,
+    "type": "config"
+  },
+  "gates": {
+    "thinking": "INCONCLUSIVE",
+    "policy_diversity": "PASS",
+    "decision_consequences": "FAIL",
+    "multiplayer": "PASS",
+    "active_beats_idle": "PASS",
+    "input_restraint": "INCONCLUSIVE",
+    "completion": "FAIL"
+  },
+  "compute": [
+    {
+      "high": "mcts-32",
+      "low": "mcts-8",
+      "pairs": 5,
+      "games": 10,
+      "high_win_rate": 0.6,
+      "interval95": [
+        0,
+        1
+      ],
+      "verdict": "INCONCLUSIVE"
+    }
+  ],
+  "completion": {
+    "games": 1306,
+    "tick_capped_games": 316,
+    "verdict": "FAIL"
+  },
+  "input_restraint": {
+    "verdict": "INCONCLUSIVE",
+    "tests": [
+      {
+        "phase": "apm_frequency",
+        "label": "Same policy: 2s vs 8s",
+        "pairs": 87,
+        "fast_win_rate": 0.5287356321839081,
+        "interval95": [
+          0.38313186632313534,
+          0.6743393980446808
+        ],
+        "verdict": "INCONCLUSIVE",
+        "excess_fast_win_percentage_points": 2.8735632183908066,
+        "fast_actual_apm": 9.784979687856719,
+        "slow_actual_apm": 4.8115072491817,
+        "repeat_attempts": 0,
+        "policies": 8,
+        "breakdown": {
+          "adaptive@2s": {
+            "pairs": 12,
+            "fast_win_rate": 0.4166666666666667
+          },
+          "artillery@2s": {
+            "pairs": 11,
+            "fast_win_rate": 0.4090909090909091
+          },
+          "expansion@2s": {
+            "pairs": 10,
+            "fast_win_rate": 0.75
+          },
+          "guards@2s": {
+            "pairs": 16,
+            "fast_win_rate": 0.40625
+          },
+          "cavalry@2s": {
+            "pairs": 9,
+            "fast_win_rate": 0.6666666666666666
+          },
+          "archers@2s": {
+            "pairs": 11,
+            "fast_win_rate": 0.5909090909090909
+          },
+          "naval@2s": {
+            "pairs": 13,
+            "fast_win_rate": 0.5769230769230769
+          },
+          "space@2s": {
+            "pairs": 5,
+            "fast_win_rate": 0.5
+          }
+        }
+      },
+      {
+        "phase": "apm_repeat",
+        "label": "Same 8s thinking + repeated commands vs no repeats",
+        "pairs": 104,
+        "fast_win_rate": 0.5240384615384616,
+        "interval95": [
+          0.39086565134228163,
+          0.6572112717346414
+        ],
+        "verdict": "INCONCLUSIVE",
+        "excess_fast_win_percentage_points": 2.4038461538461564,
+        "fast_actual_apm": 16.698786452840796,
+        "slow_actual_apm": 4.8343904740505135,
+        "repeat_attempts": 133208,
+        "policies": 8,
+        "breakdown": {
+          "adaptive@8s+repeat": {
+            "pairs": 14,
+            "fast_win_rate": 0.4642857142857143
+          },
+          "cavalry@8s+repeat": {
+            "pairs": 16,
+            "fast_win_rate": 0.5
+          },
+          "archers@8s+repeat": {
+            "pairs": 14,
+            "fast_win_rate": 0.39285714285714285
+          },
+          "naval@8s+repeat": {
+            "pairs": 17,
+            "fast_win_rate": 0.6176470588235294
+          },
+          "expansion@8s+repeat": {
+            "pairs": 16,
+            "fast_win_rate": 0.5625
+          },
+          "guards@8s+repeat": {
+            "pairs": 10,
+            "fast_win_rate": 0.45
+          },
+          "artillery@8s+repeat": {
+            "pairs": 9,
+            "fast_win_rate": 0.6111111111111112
+          },
+          "space@8s+repeat": {
+            "pairs": 8,
+            "fast_win_rate": 0.625
+          }
+        }
+      },
+      {
+        "phase": "apm_thinking",
+        "label": "Fast/shallow 8@2s vs slow/deeper 32@8s",
+        "pairs": 7,
+        "fast_win_rate": 0.42857142857142855,
+        "interval95": [
+          0,
+          0.9418855522613645
+        ],
+        "verdict": "INCONCLUSIVE",
+        "excess_fast_win_percentage_points": 0,
+        "fast_actual_apm": 10.812981310152944,
+        "slow_actual_apm": 5.096402814491898,
+        "repeat_attempts": 0,
+        "policies": 1,
+        "breakdown": {
+          "mcts-8@2s": {
+            "pairs": 7,
+            "fast_win_rate": 0.42857142857142855
+          }
+        }
+      }
+    ]
+  },
+  "diversity": {
+    "verdict": "PASS",
+    "tested_matchups": 28,
+    "required_matchups": 28,
+    "viable_tested_policies": [
+      "archers",
+      "adaptive",
+      "expansion",
+      "guards",
+      "cavalry",
+      "artillery",
+      "space"
+    ],
+    "dominant_tested_policy": null,
+    "strategies": [
+      {
+        "name": "archers",
+        "opponents": 7,
+        "pairs": 38,
+        "winning_routes": {
+          "elimination": 30,
+          "space": 23
+        },
+        "mean_win_rate": 0.6806122448979591,
+        "worst_matchup": 0.375,
+        "matchups": {
+          "space": {
+            "pairs": 5,
+            "win_rate": 0.8
+          },
+          "artillery": {
+            "pairs": 6,
+            "win_rate": 0.6666666666666666
+          },
+          "cavalry": {
+            "pairs": 4,
+            "win_rate": 0.375
+          },
+          "expansion": {
+            "pairs": 7,
+            "win_rate": 0.7142857142857143
+          },
+          "naval": {
+            "pairs": 6,
+            "win_rate": 0.8333333333333334
+          },
+          "guards": {
+            "pairs": 6,
+            "win_rate": 0.75
+          },
+          "adaptive": {
+            "pairs": 4,
+            "win_rate": 0.625
+          }
+        }
+      },
+      {
+        "name": "adaptive",
+        "opponents": 7,
+        "pairs": 28,
+        "winning_routes": {
+          "space": 22,
+          "elimination": 17
+        },
+        "mean_win_rate": 0.6749999999999999,
+        "worst_matchup": 0.375,
+        "matchups": {
+          "expansion": {
+            "pairs": 6,
+            "win_rate": 0.75
+          },
+          "naval": {
+            "pairs": 5,
+            "win_rate": 0.8
+          },
+          "guards": {
+            "pairs": 5,
+            "win_rate": 0.8
+          },
+          "artillery": {
+            "pairs": 4,
+            "win_rate": 0.75
+          },
+          "archers": {
+            "pairs": 4,
+            "win_rate": 0.375
+          },
+          "cavalry": {
+            "pairs": 2,
+            "win_rate": 0.5
+          },
+          "space": {
+            "pairs": 2,
+            "win_rate": 0.75
+          }
+        }
+      },
+      {
+        "name": "expansion",
+        "opponents": 7,
+        "pairs": 43,
+        "winning_routes": {
+          "space": 37,
+          "elimination": 10
+        },
+        "mean_win_rate": 0.5672619047619049,
+        "worst_matchup": 0.25,
+        "matchups": {
+          "cavalry": {
+            "pairs": 8,
+            "win_rate": 0.6875
+          },
+          "adaptive": {
+            "pairs": 6,
+            "win_rate": 0.25
+          },
+          "naval": {
+            "pairs": 5,
+            "win_rate": 0.7
+          },
+          "archers": {
+            "pairs": 7,
+            "win_rate": 0.2857142857142857
+          },
+          "guards": {
+            "pairs": 7,
+            "win_rate": 0.5
+          },
+          "space": {
+            "pairs": 3,
+            "win_rate": 0.8333333333333334
+          },
+          "artillery": {
+            "pairs": 7,
+            "win_rate": 0.7142857142857143
+          }
+        }
+      },
+      {
+        "name": "guards",
+        "opponents": 7,
+        "pairs": 39,
+        "winning_routes": {
+          "space": 35,
+          "elimination": 6
+        },
+        "mean_win_rate": 0.5297619047619048,
+        "worst_matchup": 0.2,
+        "matchups": {
+          "space": {
+            "pairs": 5,
+            "win_rate": 0.8
+          },
+          "artillery": {
+            "pairs": 6,
+            "win_rate": 0.6666666666666666
+          },
+          "cavalry": {
+            "pairs": 6,
+            "win_rate": 0.6666666666666666
+          },
+          "expansion": {
+            "pairs": 7,
+            "win_rate": 0.5
+          },
+          "naval": {
+            "pairs": 4,
+            "win_rate": 0.625
+          },
+          "archers": {
+            "pairs": 6,
+            "win_rate": 0.25
+          },
+          "adaptive": {
+            "pairs": 5,
+            "win_rate": 0.2
+          }
+        }
+      },
+      {
+        "name": "cavalry",
+        "opponents": 7,
+        "pairs": 32,
+        "winning_routes": {
+          "space": 27,
+          "elimination": 1
+        },
+        "mean_win_rate": 0.45535714285714285,
+        "worst_matchup": 0.25,
+        "matchups": {
+          "expansion": {
+            "pairs": 8,
+            "win_rate": 0.3125
+          },
+          "naval": {
+            "pairs": 6,
+            "win_rate": 0.6666666666666666
+          },
+          "archers": {
+            "pairs": 4,
+            "win_rate": 0.625
+          },
+          "guards": {
+            "pairs": 6,
+            "win_rate": 0.3333333333333333
+          },
+          "space": {
+            "pairs": 4,
+            "win_rate": 0.25
+          },
+          "adaptive": {
+            "pairs": 2,
+            "win_rate": 0.5
+          },
+          "artillery": {
+            "pairs": 2,
+            "win_rate": 0.5
+          }
+        }
+      },
+      {
+        "name": "artillery",
+        "opponents": 7,
+        "pairs": 36,
+        "winning_routes": {
+          "elimination": 11,
+          "space": 19
+        },
+        "mean_win_rate": 0.42414965986394554,
+        "worst_matchup": 0.25,
+        "matchups": {
+          "naval": {
+            "pairs": 6,
+            "win_rate": 0.6666666666666666
+          },
+          "archers": {
+            "pairs": 6,
+            "win_rate": 0.3333333333333333
+          },
+          "guards": {
+            "pairs": 6,
+            "win_rate": 0.3333333333333333
+          },
+          "space": {
+            "pairs": 5,
+            "win_rate": 0.6
+          },
+          "expansion": {
+            "pairs": 7,
+            "win_rate": 0.2857142857142857
+          },
+          "adaptive": {
+            "pairs": 4,
+            "win_rate": 0.25
+          },
+          "cavalry": {
+            "pairs": 2,
+            "win_rate": 0.5
+          }
+        }
+      },
+      {
+        "name": "space",
+        "opponents": 7,
+        "pairs": 28,
+        "winning_routes": {
+          "elimination": 5,
+          "space": 18
+        },
+        "mean_win_rate": 0.40595238095238095,
+        "worst_matchup": 0.16666666666666666,
+        "matchups": {
+          "archers": {
+            "pairs": 5,
+            "win_rate": 0.2
+          },
+          "guards": {
+            "pairs": 5,
+            "win_rate": 0.2
+          },
+          "artillery": {
+            "pairs": 5,
+            "win_rate": 0.4
+          },
+          "expansion": {
+            "pairs": 3,
+            "win_rate": 0.16666666666666666
+          },
+          "naval": {
+            "pairs": 4,
+            "win_rate": 0.875
+          },
+          "cavalry": {
+            "pairs": 4,
+            "win_rate": 0.75
+          },
+          "adaptive": {
+            "pairs": 2,
+            "win_rate": 0.25
+          }
+        }
+      },
+      {
+        "name": "naval",
+        "opponents": 7,
+        "pairs": 36,
+        "winning_routes": {
+          "space": 19
+        },
+        "mean_win_rate": 0.2619047619047619,
+        "worst_matchup": 0.125,
+        "matchups": {
+          "artillery": {
+            "pairs": 6,
+            "win_rate": 0.3333333333333333
+          },
+          "cavalry": {
+            "pairs": 6,
+            "win_rate": 0.3333333333333333
+          },
+          "expansion": {
+            "pairs": 5,
+            "win_rate": 0.3
+          },
+          "adaptive": {
+            "pairs": 5,
+            "win_rate": 0.2
+          },
+          "archers": {
+            "pairs": 6,
+            "win_rate": 0.16666666666666666
+          },
+          "guards": {
+            "pairs": 4,
+            "win_rate": 0.375
+          },
+          "space": {
+            "pairs": 4,
+            "win_rate": 0.125
+          }
+        }
+      }
+    ]
+  },
+  "decisions": {
+    "verdict": "FAIL",
+    "complete_positions": 6,
+    "consequential_positions": 1,
+    "delayed_reversals": 1,
+    "probes": [
+      {
+        "seed": 42000,
+        "tick": 700,
+        "snapshot": "position-0.json",
+        "source_controllers": [
+          "cavalry",
+          "expansion"
+        ],
+        "spread": 0.009797767253880596,
+        "delayed_gain": 0.009797767253880596,
+        "immediate_best": "adaptive",
+        "later_best": "cavalry",
+        "tangible_consequence": false,
+        "low_choice": "expansion",
+        "high_choice": "expansion",
+        "longer_choice": "naval",
+        "high_minus_low_replay_value": 0,
+        "longer_minus_shorter_replay_value": 0,
+        "policy_values": [
+          {
+            "policy": "adaptive",
+            "immediate": 0.44800767561733035,
+            "later": 0.43958176100963314
+          },
+          {
+            "policy": "guards",
+            "immediate": 0.44800767561733035,
+            "later": 0.43958176100963314
+          },
+          {
+            "policy": "cavalry",
+            "immediate": 0.4408262853855908,
+            "later": 0.44937952826351374
+          },
+          {
+            "policy": "archers",
+            "immediate": 0.44800767561733035,
+            "later": 0.43958176100963314
+          },
+          {
+            "policy": "artillery",
+            "immediate": 0.44800767561733035,
+            "later": 0.43958176100963314
+          },
+          {
+            "policy": "naval",
+            "immediate": 0.44800767561733035,
+            "later": 0.43958176100963314
+          },
+          {
+            "policy": "space",
+            "immediate": 0.44800767561733035,
+            "later": 0.43958176100963314
+          },
+          {
+            "policy": "expansion",
+            "immediate": 0.44800767561733035,
+            "later": 0.43958176100963314
+          }
+        ]
+      },
+      {
+        "seed": 42000,
+        "tick": 700,
+        "snapshot": "position-1.json",
+        "source_controllers": [
+          "expansion",
+          "cavalry"
+        ],
+        "spread": 0.03963369324167598,
+        "delayed_gain": 0.006299756732935591,
+        "immediate_best": "adaptive",
+        "later_best": "artillery",
+        "tangible_consequence": false,
+        "low_choice": "expansion",
+        "high_choice": "artillery",
+        "longer_choice": "artillery",
+        "high_minus_low_replay_value": 0.03963369324167598,
+        "longer_minus_shorter_replay_value": 0,
+        "policy_values": [
+          {
+            "policy": "adaptive",
+            "immediate": 0.5282321855602076,
+            "later": 0.5350080873820398
+          },
+          {
+            "policy": "guards",
+            "immediate": 0.5177029867413762,
+            "later": 0.5016741508732994
+          },
+          {
+            "policy": "cavalry",
+            "immediate": 0.5223077067527963,
+            "later": 0.5181943561390391
+          },
+          {
+            "policy": "archers",
+            "immediate": 0.5223077067527963,
+            "later": 0.5181943561390391
+          },
+          {
+            "policy": "artillery",
+            "immediate": 0.5223077067527963,
+            "later": 0.5413078441149753
+          },
+          {
+            "policy": "naval",
+            "immediate": 0.5223077067527963,
+            "later": 0.5229345013847485
+          },
+          {
+            "policy": "space",
+            "immediate": 0.5223077067527963,
+            "later": 0.5413078441149753
+          },
+          {
+            "policy": "expansion",
+            "immediate": 0.5177029867413762,
+            "later": 0.5016741508732994
+          }
+        ]
+      },
+      {
+        "seed": 42000,
+        "tick": 700,
+        "snapshot": "position-2.json",
+        "source_controllers": [
+          "archers",
+          "space"
+        ],
+        "spread": 0,
+        "delayed_gain": 0,
+        "immediate_best": "cavalry",
+        "later_best": "adaptive",
+        "tangible_consequence": false,
+        "low_choice": "expansion",
+        "high_choice": "expansion",
+        "longer_choice": "archers",
+        "high_minus_low_replay_value": 0,
+        "longer_minus_shorter_replay_value": 0,
+        "policy_values": [
+          {
+            "policy": "adaptive",
+            "immediate": 0.6144882405698685,
+            "later": 1
+          },
+          {
+            "policy": "guards",
+            "immediate": 0.6207206999698197,
+            "later": 1
+          },
+          {
+            "policy": "cavalry",
+            "immediate": 0.6226422137817266,
+            "later": 1
+          },
+          {
+            "policy": "archers",
+            "immediate": 0.6207206999698197,
+            "later": 1
+          },
+          {
+            "policy": "artillery",
+            "immediate": 0.6143921543597893,
+            "later": 1
+          },
+          {
+            "policy": "naval",
+            "immediate": 0.6144882405698685,
+            "later": 1
+          },
+          {
+            "policy": "space",
+            "immediate": 0.6143921543597893,
+            "later": 1
+          },
+          {
+            "policy": "expansion",
+            "immediate": 0.6207206999698197,
+            "later": 1
+          }
+        ]
+      },
+      {
+        "seed": 42000,
+        "tick": 700,
+        "snapshot": "position-3.json",
+        "source_controllers": [
+          "space",
+          "archers"
+        ],
+        "spread": 0.013527759638035985,
+        "delayed_gain": 0,
+        "immediate_best": "adaptive",
+        "later_best": "adaptive",
+        "tangible_consequence": false,
+        "low_choice": "expansion",
+        "high_choice": "expansion",
+        "longer_choice": "space",
+        "high_minus_low_replay_value": 0,
+        "longer_minus_shorter_replay_value": 0,
+        "policy_values": [
+          {
+            "policy": "adaptive",
+            "immediate": 0.4023342327438386,
+            "later": 0.4287044182114251
+          },
+          {
+            "policy": "guards",
+            "immediate": 0.3958745174001466,
+            "later": 0.4151766585733891
+          },
+          {
+            "policy": "cavalry",
+            "immediate": 0.3958745174001466,
+            "later": 0.4151766585733891
+          },
+          {
+            "policy": "archers",
+            "immediate": 0.3958745174001466,
+            "later": 0.4151766585733891
+          },
+          {
+            "policy": "artillery",
+            "immediate": 0.3958745174001466,
+            "later": 0.4151766585733891
+          },
+          {
+            "policy": "naval",
+            "immediate": 0.3958745174001466,
+            "later": 0.4151766585733891
+          },
+          {
+            "policy": "space",
+            "immediate": 0.3958745174001466,
+            "later": 0.4151766585733891
+          },
+          {
+            "policy": "expansion",
+            "immediate": 0.3958745174001466,
+            "later": 0.4151766585733891
+          }
+        ]
+      },
+      {
+        "seed": 42000,
+        "tick": 700,
+        "snapshot": "position-4.json",
+        "source_controllers": [
+          "naval",
+          "artillery"
+        ],
+        "spread": 0.01889422440537114,
+        "delayed_gain": 0,
+        "immediate_best": "expansion",
+        "later_best": "expansion",
+        "tangible_consequence": false,
+        "low_choice": "expansion",
+        "high_choice": "archers",
+        "longer_choice": "artillery",
+        "high_minus_low_replay_value": -0.011421403452480383,
+        "longer_minus_shorter_replay_value": 0.0009247265747359679,
+        "policy_values": [
+          {
+            "policy": "adaptive",
+            "immediate": 0.4728665370223825,
+            "later": 0.47803467027753427
+          },
+          {
+            "policy": "guards",
+            "immediate": 0.47524085436171565,
+            "later": 0.48036389418350295
+          },
+          {
+            "policy": "cavalry",
+            "immediate": 0.47852547192938144,
+            "later": 0.48734733583719686
+          },
+          {
+            "policy": "archers",
+            "immediate": 0.47747466988734466,
+            "later": 0.47817020725081677
+          },
+          {
+            "policy": "artillery",
+            "immediate": 0.46485995555138215,
+            "later": 0.47909493382555274
+          },
+          {
+            "policy": "naval",
+            "immediate": 0.4566541435695588,
+            "later": 0.470697386297926
+          },
+          {
+            "policy": "space",
+            "immediate": 0.46485995555138215,
+            "later": 0.47909493382555274
+          },
+          {
+            "policy": "expansion",
+            "immediate": 0.48953663747366444,
+            "later": 0.48959161070329715
+          }
+        ]
+      },
+      {
+        "seed": 42000,
+        "tick": 700,
+        "snapshot": "position-5.json",
+        "source_controllers": [
+          "guards",
+          "space"
+        ],
+        "spread": 0.04155185511356008,
+        "delayed_gain": 0.035119332567906114,
+        "immediate_best": "cavalry",
+        "later_best": "naval",
+        "tangible_consequence": true,
+        "low_choice": "expansion",
+        "high_choice": "archers",
+        "longer_choice": "adaptive",
+        "high_minus_low_replay_value": 0.0064325225456539625,
+        "longer_minus_shorter_replay_value": 0.001141315955012323,
+        "policy_values": [
+          {
+            "policy": "adaptive",
+            "immediate": 0.5622222115196042,
+            "later": 0.567395440932925
+          },
+          {
+            "policy": "guards",
+            "immediate": 0.5676004328419434,
+            "later": 0.5598216024322588
+          },
+          {
+            "policy": "cavalry",
+            "immediate": 0.5719264144425481,
+            "later": 0.5662541249779127
+          },
+          {
+            "policy": "archers",
+            "immediate": 0.5719264144425481,
+            "later": 0.5662541249779127
+          },
+          {
+            "policy": "artillery",
+            "immediate": 0.5719264144425481,
+            "later": 0.5623895154009032
+          },
+          {
+            "policy": "naval",
+            "immediate": 0.5719264144425481,
+            "later": 0.6013734575458188
+          },
+          {
+            "policy": "space",
+            "immediate": 0.5719264144425481,
+            "later": 0.5623895154009032
+          },
+          {
+            "policy": "expansion",
+            "immediate": 0.5676004328419434,
+            "later": 0.5598216024322588
+          }
+        ]
+      }
+    ]
+  },
+  "multiplayer": {
+    "verdict": "PASS",
+    "complete_games": 55,
+    "full_rotations": 2,
+    "wins": {
+      "adaptive": 3,
+      "guards": 8,
+      "cavalry": 3,
+      "archers": 25,
+      "artillery": 3,
+      "naval": 6,
+      "space": 2,
+      "expansion": 5
+    },
+    "balanced_wins": {
+      "adaptive": 1,
+      "guards": 4,
+      "cavalry": 1,
+      "archers": 4,
+      "artillery": 3,
+      "naval": 2,
+      "space": 0,
+      "expansion": 1
+    }
+  },
+  "negative_control": {
+    "pairs": 32,
+    "idle_win_rate": 0
+  },
+  "observations": {
+    "completed_matches": 805,
+    "excluded_incomplete_pairs": 257,
+    "victory_counts": {
+      "space": 607,
+      "elimination": 198
+    },
+    "average_captures": 0.6658385093167701,
+    "average_founded_cities": 1.0745341614906831,
+    "orders": {
+      "ability": 60312,
+      "move": 387417,
+      "research": 17503,
+      "train": 22557,
+      "upgrade": 9931,
+      "attack": 3668,
+      "explore": 204
+    },
+    "train_orders": {
+      "0": 9937,
+      "1": 2226,
+      "2": 3425,
+      "3": 12,
+      "4": 1087,
+      "5": 5,
+      "7": 914,
+      "8": 5,
+      "10": 1452,
+      "13": 3494
+    },
+    "invalid_orders": 65156
+  },
+  "warnings": [
+    "316/1306 resolved experiments reached the 2,200-second diagnostic cap without a legal victory. They are stalls, not draws or wins; inspect blocked routes, passive policies and delayed space development.",
+    "Same policy: 2s vs 8s: fast/repeated-input side wins 52.9%; input penalty 2.9 percentage points above 50%. Evidence is not yet decisive; see the interval.",
+    "Same 8s thinking + repeated commands vs no repeats: fast/repeated-input side wins 52.4%; input penalty 2.4 percentage points above 50%. Evidence is not yet decisive; see the interval.",
+    "Fewer than one city capture per completed match on average: conquest is uncommon in this portfolio.",
+    "A reliable advantage from additional thinking has not been established at every tested budget step. Inspect sample size, search horizon, evaluator and action coverage before blaming the rules."
+  ],
+  "ended_cleanly": true,
+  "elapsed_seconds": 120.0059493,
+  "source_fingerprint": "d4b648b71b73a91583e468756cf1e8058e0f4bae075e49275a8e913a52a59867",
+  "build_seconds": 6.594445599999999,
+  "build_skipped": false,
+  "process": {
+    "code": 0,
+    "signal": null,
+    "watchdog_fired": false
+  }
+}

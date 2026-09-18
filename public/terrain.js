@@ -1,3 +1,4 @@
+import {naval,air} from './roster.js';
 const dot=(a,b)=>a.reduce((sum,v,i)=>sum+v*b[i],0);
 // Include adjacent coastal segments so beaches join without cracks at land corners.
 export function coastalEdges(world,neighbors){
@@ -48,9 +49,9 @@ export const terrainEffects=[
 ];
 export function terrainSummary(icon,terrain){
  const effects=terrainEffects[terrain];if(!effects)return '';
- return `<section class="tile-terrain" aria-label="${terrainNames[terrain]} terrain effects"><div class="tile-terrain-heading">${icon(terrainIcons[terrain])}<strong>${terrainNames[terrain]}</strong><small>Tap effects for details</small></div><div class="tile-effects">${effects.map(([tone,symbol,value,label])=>`<button class="tile-effect ${tone}" data-terrain-help="${terrainIcons[terrain]}" aria-label="${label}" title="${label}">${icon(symbol)}<span>${value}</span></button>`).join('')}</div></section>`;
+ return `<section class="tile-terrain" aria-label="${terrainNames[terrain]} terrain effects"><div class="tile-terrain-heading">${icon(terrainIcons[terrain])}<button class="terrain-help" data-terrain-help="${terrainIcons[terrain]}" aria-label="Explain ${terrainNames[terrain]} terrain">${icon('book')}</button></div><div class="tile-effects">${effects.map(([tone,symbol,value,label])=>`<button class="tile-effect ${tone}" data-terrain-help="${terrainIcons[terrain]}" aria-label="${label}" title="${label}">${icon(symbol)}<span>${value}</span></button>`).join('')}</div></section>`;
 }
-export const inForestCover=(world,u)=>world[u.tile]?.terrain===2&&!(u.kind>=6&&u.kind<=9);
-export const terrainSlows=(terrain,kind)=>!(kind>=6&&kind<=9)&&(terrain===4||terrain===2&&kind!==5);
+export const inForestCover=(world,u)=>world[u.tile]?.terrain===2&&!naval(u.kind)&&!air(u.kind);
+export const terrainSlows=(terrain,kind)=>!naval(kind)&&!air(kind)&&(terrain===4||terrain===2&&kind!==5);
 export const rate=value=>Number(value.toFixed(2)).toString();
 export const incomeBenefit=(icon,amount)=>`<span class="upgrade-benefit">${icon('coin')}+${rate(amount/5)}<span class="upgrade-per">/${icon('clock')}1</span></span>`;

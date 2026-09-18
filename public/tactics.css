@@ -87,3 +87,22 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 #province .tile-effect{min-width:52px;min-height:44px;padding:7px 10px;border:1px solid #8ca79e55;border-radius:7px;font:12px ui-monospace,monospace;background:#14292d}
 #province .tile-effect .icon{width:19px;height:19px}#province .tile-effect.good{color:#a9f3c6}#province .tile-effect.bad{color:#ffc08a}#province .tile-effect.neutral{color:#b9dce8}
 #province .tile-effect:hover,#province .tile-effect:focus-visible{background:#30494d;border-color:currentColor}
+#research .connected-tree{height:470px;min-height:470px}
+
+.passive-rule{display:flex;align-items:center;gap:8px;padding:8px 0;color:#9ab0b8;font:12px ui-monospace,monospace}.passive-rule .icon{width:22px;height:22px}.passive-rule.active{color:#8fcfff}
+
+.terrain-help{margin-left:auto;min-width:44px;min-height:44px;border:1px solid #8ca79e55;border-radius:7px;background:#14292d;color:#cbb577}.terrain-help .icon{width:20px;height:20px}
+.era-tree{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:46vh;overflow:auto;padding:8px;align-items:start}
+.tech-era{border:1px solid var(--era);background:color-mix(in srgb,var(--era) 27%,#111d25);border-radius:14px;padding:10px}
+.era-heading{display:flex;align-items:center;gap:8px;color:#fff;margin-bottom:8px}.era-heading .icon{width:30px;height:30px}
+.era-nodes{display:grid;grid-template-columns:1fr;gap:8px}.era-nodes .tree-node{width:100%;min-height:62px;margin:0;position:relative}.era-heading{position:sticky;top:-8px;z-index:2;background:var(--era);border-radius:6px;padding:5px}
+.tree-node.queued{outline:2px dashed #e8c979}.tree-node.selected{box-shadow:0 0 0 3px #fff}.tech-inspector{padding:10px;border-top:1px solid #53616c}
+.tech-preview{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.tech-preview>.icon{width:40px;height:40px}
+.tech-parents{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:8px 0}.tech-parents .icon{width:20px;height:20px}.tech-parents span{opacity:.4}.tech-parents .done{opacity:1;color:#94d5ab}
+.recruit-row{max-height:180px;overflow:auto}.tech-inspector .action-row{margin-top:6px}
+
+.unit-rules{display:flex;gap:10px;flex-wrap:wrap;padding:8px 0;color:#a5d7d5}.unit-rules>span{display:flex;align-items:center;gap:3px;font:12px ui-monospace,monospace}.unit-rules .icon{width:21px;height:21px}
+.tech-inspector .order-action{min-width:100px;flex-direction:row;flex-wrap:wrap;min-height:48px;padding:8px}
+#province .recruit-row{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));overflow-x:hidden;touch-action:pan-y;gap:6px}
+#province .recruit-row button{min-width:0!important;width:100%}
+@media(max-width:760px){#province .recruit-row{grid-template-columns:repeat(4,minmax(0,1fr))}}

@@ -1,4 +1,4 @@
-//! Rules v4: pieces, occupation, settlement, and one shared treasury.
+//! Current rules: conquest or complete-tree spaceflight, persistent combat and guarded approaches.
 use super::{dot, hash, norm, Event, Tile};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -6,11 +6,15 @@ use std::cmp::Reverse;
 use std::collections::{BinaryHeap, VecDeque};
 
 pub const INFLUENCE_GOAL: u16 = 540;
-pub const SPACE_GOAL: u16 = 360;
+pub const SPACE_GOAL: u16 = 180;
+/// Standing orders keep working while the player considers their next choice.
+pub const ORDER_INTERVAL: u32 = 6;
 pub const SETTLER: u8 = 13;
-pub const BRANCHES: [[u8; 3]; 3] = [[1, 3, 5], [2, 4, 6], [7, 8, 9]];
+pub const BRANCHES: [[u8; 3]; 11] = [[1,24,3],[2,23,5],[14,25,35],[15,4,11],[16,26,32],[17,27,34],[18,28,6],[19,31,9],[20,7,8],[21,29,33],[22,30,10]];
+pub mod roster;
+use roster::{definition,technologies,naval,air,ground,UNIT_COUNT};
 
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Spec {
     pub hp: f32,
     pub damage: f32,
@@ -23,36 +27,7 @@ pub struct Spec {
     pub sight: u16,
     pub boarding_capacity: u8,
 }
-pub fn spec(k: u8) -> Spec {
-    let (hp, damage, min, range, reload, speed, cost, train, sight) = match k {
-        0 => (110., 18., 1, 1, 10, 7, 55, 22, 2), // guard: braces against charges
-        1 => (85., 23., 1, 1, 10, 4, 85, 28, 2),
-        2 => (65., 17., 1, 2, 12, 8, 75, 26, 2),
-        3 => (155., 30., 1, 1, 12, 6, 165, 38, 2),
-        4 => (65., 34., 2, 3, 20, 12, 135, 36, 3),
-        5 => (80., 25., 1, 1, 10, 5, 145, 34, 3),
-        6 => (55., 17., 1, 2, 12, 5, 155, 36, 3),
-        7 => (125., 24., 1, 2, 14, 6, 100, 30, 3),
-        8 => (90., 29., 1, 2, 16, 7, 155, 38, 2),
-        9 => (180., 27., 1, 3, 14, 8, 210, 45, 4),
-        10 => (65., 0., 0, 0, 10, 8, 190, 35, 2),
-        11 => (65., 0., 0, 0, 10, 12, 260, 50, 2),
-        12 => (65., 10., 1, 1, 10, 4, 45, 18, 3),
-        _ => (40., 0., 0, 0, 10, 9, 115, 35, 2),
-    };
-    Spec {
-        hp,
-        damage,
-        min,
-        range,
-        reload,
-        speed,
-        cost,
-        train,
-        sight,
-        boarding_capacity: if k == 9 { 3 } else { 0 },
-    }
-}
+pub fn spec(k: u8) -> Spec { definition(k).spec }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Player {
@@ -65,6 +40,8 @@ pub struct Player {
     pub unlocked: Vec<u8>,
     pub research: i8,
     pub research_left: u16,
+    #[serde(default)]
+    pub research_queue: Vec<u8>,
     pub cooldown: u32,
     pub launch: u16,
     pub launch_tile: Option<usize>,
@@ -89,6 +66,8 @@ pub struct City {
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Unit {
+    #[serde(default)]
+    pub facing:Option<usize>,
     #[serde(default)]
     pub boarded_on: Option<usize>,
     pub id: usize,
@@ -133,6 +112,10 @@ pub struct Strike {
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Game {
+    /// Optional offline acceleration for an immutable adjacency graph. Never
+    /// serialized; callers changing tile adjacency must clear/rebuild this.
+    #[serde(skip)]
+    pub distance_cache: Option<std::sync::Arc<Vec<Vec<u16>>>>,
     pub seed: u32,
     pub tick: u32,
     pub difficulty: u8,
@@ -220,6 +203,7 @@ impl Game {
                 unlocked: vec![0, 12, 13],
                 research: -1,
                 research_left: 0,
+                research_queue: vec![],
                 cooldown: 0,
                 launch: 0,
                 launch_tile: None,
@@ -229,6 +213,7 @@ impl Game {
             })
             .collect();
         let mut g = Self {
+            distance_cache: None,
             seed,
             tick: 0,
             difficulty: difficulty.min(2),
@@ -266,6 +251,7 @@ impl Game {
     }
     fn spawn(&mut self, owner: usize, kind: u8, tile: usize) {
         self.squads.push(Unit {
+            facing: self.tiles[tile].near.first().copied(),
             boarded_on: None,
             id: self.next_unit,
             owner,
@@ -298,6 +284,9 @@ impl Game {
         self.squads.iter().find(|u| u.tile == tile && u.boarded_on.is_none())
     }
     pub fn distances(&self, start: usize) -> Vec<u16> {
+        if let Some(rows) = &self.distance_cache {
+            if let Some(row) = rows.get(start) { return row.clone(); }
+        }
         let mut d = vec![u16::MAX; self.tiles.len()];
         if start >= d.len() {
             return d;
@@ -313,6 +302,10 @@ impl Game {
             }
         }
         d
+    }
+    pub fn cache_distances(&mut self) {
+        self.distance_cache = None;
+        self.distance_cache = Some(std::sync::Arc::new((0..self.tiles.len()).map(|i|self.distances(i)).collect()));
     }
     pub fn weather(&self) -> Vec<[f32; 4]> {
         (0..3)
@@ -393,7 +386,7 @@ impl Game {
         self.squads.iter().any(|a| {
             a.owner == p && a.boarded_on.is_none()
                 && (d[a.tile] <= 1
-                    || ((a.mode == 2 && a.effect_until > self.tick) || a.kind == 9)
+                    || ((a.mode == 2 && a.effect_until > self.tick) || matches!(a.kind,9|28|33))
                         && d[a.tile] <= 3)
         })
     }
@@ -401,17 +394,16 @@ impl Game {
         if tile >= self.tiles.len() {
             return false;
         }
-        match kind {
-            7..=9 => self.tiles[tile].terrain == 0,
-            6 => true,
-            1 | 3 => !matches!(self.tiles[tile].terrain, 0 | 4),
-            _ => self.tiles[tile].terrain != 0,
-        }
+        if naval(kind) {self.tiles[tile].terrain==0}
+        else if air(kind) {true}
+        else if definition(kind).mounted {!matches!(self.tiles[tile].terrain,0|4)}
+        else {self.tiles[tile].terrain!=0}
     }
+
     pub fn move_cost(&self, u: &Unit, to: usize) -> u16 {
         let t = self.tiles[to].terrain;
         let mut n = spec(u.kind).speed;
-        if u.kind != 6 && !(7..=9).contains(&u.kind) {
+        if ground(u.kind) {
             if t == 0 {
                 n = 18;
             } else if t == 4 {
@@ -427,7 +419,7 @@ impl Game {
             }
         }
         if self.storm(to) > 0.5 {
-            n += if u.kind == 6 {
+            n += if air(u.kind) {
                 5
             } else if t == 0 {
                 3
@@ -442,6 +434,21 @@ impl Game {
             n += 3;
         }
         n
+    }
+    /// A guard holds its neighbouring ground. Entering or withdrawing
+    /// is legal; crossing between two cells in the same guard's zone is not.
+    /// Planning sees only detected guards; execution discovers hidden blockers.
+    pub fn guard_blocks(&self, u: &Unit, from: usize, to: usize, vision: Option<&[bool]>) -> bool {
+        if air(u.kind) { return false; }
+        self.squads.iter().any(|g| g.owner != u.owner && g.hp>0. && g.boarded_on.is_none()
+            && g.refit<0 && self.tiles[g.tile].near.contains(&from) && self.tiles[g.tile].near.contains(&to)
+            && (g.kind==0 && ground(u.kind) || matches!(g.kind,16|26|30) && naval(u.kind)==naval(g.kind)
+                && g.left==0 && g.path.len()==1 && (self.in_front(g,from)||self.in_front(g,to)))
+            && vision.is_none_or(|v|self.detected(u.owner,g,v)))
+    }
+
+    pub fn space_ready(&self, p: usize) -> bool {
+        technologies().all(|k| self.players[p].unlocked.contains(&k))
     }
     pub fn path(&self, u: &Unit, to: usize) -> Option<Vec<usize>> {
         if u.boarded_on.is_some() || (!self.can_enter(u.kind, to) && self.boarding_target(u, to).is_none()) {
@@ -468,7 +475,8 @@ impl Game {
             }
             for &j in &self.tiles[i].near {
                 let boarding = j == to && self.boarding_target(u, j).is_some();
-                if !boarding && (!self.can_enter(u.kind, j) || occupied.iter().any(|s| s.tile == j)) {
+                if !boarding && (!self.can_enter(u.kind, j) || occupied.iter().any(|s| s.tile == j)
+                    || self.guard_blocks(u, i, j, Some(&vision))) {
                     continue;
                 }
                 let n = cost + self.move_cost(u, j) as u32;
@@ -493,26 +501,11 @@ impl Game {
         Some(path)
     }
     pub fn research_info(&self, k: u8) -> Option<(u16, u16, Vec<u8>, u32)> {
-        for b in BRANCHES {
-            if let Some(level) = b.iter().position(|&x| x == k) {
-                return Some((
-                    [65, 145, 235][level],
-                    [24, 44, 64][level],
-                    if level == 0 {
-                        vec![]
-                    } else {
-                        vec![b[level - 1]]
-                    },
-                    [0, 240, 540][level],
-                ));
-            }
-        }
-        match k {
-            10 => Some((300, 90, vec![3, 4], 780)),
-            11 => Some((310, 90, vec![4, 6], 840)),
-            _ => None,
-        }
+        if k>=UNIT_COUNT || !definition(k).researchable {return None;}
+        let d=definition(k);
+        Some((d.research_cost,d.research_seconds,d.prerequisites.clone(),0))
     }
+
     pub fn cap(&self, p: usize) -> usize {
         (5 + self
             .cities
@@ -545,6 +538,7 @@ impl Game {
         if p >= self.players.len() || self.winner >= 0 || !self.players[p].alive {
             return Err(1);
         }
+        if kind == "refit" { return Err(6); }
         if kind != "stop" && self.players[p].cooldown > self.tick {
             return Err(2);
         }
@@ -554,6 +548,15 @@ impl Game {
             .find(|u| u.id == from && u.owner == p)
             .cloned();
         match kind {
+            "plan" => {
+                if value==255 {self.players[p].research_queue.clear();}
+                else {
+                    if value>=UNIT_COUNT || !definition(value).researchable {return Err(6);}
+                    let mut queue=vec![];
+                    self.research_path(p,value,&mut queue);
+                    self.players[p].research_queue=queue;
+                }
+            }
             "research" => {
                 let (cost, time, req, gate) = self.research_info(value).ok_or(6)?;
                 let a = &mut self.players[p];
@@ -578,7 +581,7 @@ impl Game {
                     .position(|c| c.tile == from && c.owner == p)
                     .ok_or(3)?;
                 if kind == "train" {
-                    if value > 13
+                    if value >= UNIT_COUNT
                         || !self.players[p].unlocked.contains(&value)
                         || self.cities[c].training >= 0
                         || self.squads.iter().filter(|u| u.owner == p).count()
@@ -591,7 +594,7 @@ impl Game {
                     {
                         return Err(6);
                     }
-                    if (7..=9).contains(&value)
+                    if naval(value)
                         && !self.tiles[from]
                             .near
                             .iter()
@@ -636,7 +639,7 @@ impl Game {
                     }
                 }
             }
-            "move" | "stop" | "ability" | "explore" | "refit" | "attack" | "disband" | "disembark" => {
+            "move" | "stop" | "ability" | "explore" | "attack" | "disband" | "disembark" | "face" => {
                 let index = self
                     .squads
                     .iter()
@@ -670,6 +673,12 @@ impl Game {
                     if kind == "move" {
                         self.move_unit(index);
                     }
+                } else if kind == "face" {
+                    if !definition(u.kind).directional || u.left>0 || !self.tiles[u.tile].near.contains(&to) {return Err(4);}
+                    self.squads[index].facing=Some(to);
+                    self.squads[index].locked_until=self.tick+8;
+                    self.squads[index].path=vec![u.tile];
+                    self.squads[index].to=u.tile;
                 } else if kind == "disembark" {
                     self.disembark(index, to)?;
                 } else if kind == "disband" {
@@ -680,30 +689,6 @@ impl Game {
                     self.sync_passengers();
                 } else if kind == "attack" {
                     self.order_attack(index, to, 0)?;
-                } else if kind == "refit" {
-                    if self.passenger_count(u.id) > spec(value).boarding_capacity as usize
-                        || u.left > 0
-                        || u.founding
-                        || matches!(u.kind, 10 | 11 | 13)
-                        || value > 13
-                        || value == u.kind
-                        || matches!(value, 10 | 11 | 13)
-                        || !self.players[p].unlocked.contains(&value)
-                        || self.tiles[u.tile].owner != p as i8
-                        || !self.can_enter(value, u.tile)
-                        || ((7..=9).contains(&value) != (7..=9).contains(&u.kind))
-                    {
-                        return Err(6);
-                    }
-                    let cost = (spec(value).cost as f32 - spec(u.kind).cost as f32 * 0.5).max(30.);
-                    if self.players[p].gold < cost {
-                        return Err(5);
-                    }
-                    self.players[p].gold -= cost;
-                    self.squads[index].refit = value as i8;
-                    self.squads[index].work = 20;
-                    self.squads[index].locked_until = self.tick + 20;
-                    self.squads[index].focus = None;
                 } else if kind == "explore" {
                     self.claim(index)?;
                     let healed = self.squads[index].hp - u.hp;
@@ -735,12 +720,15 @@ impl Game {
                 self.feedback(kind, &u, target, value, 0., 2);
             }
         }
-        self.players[p].cooldown = self.tick + 2;
+        self.players[p].cooldown = self.tick + ORDER_INTERVAL;
         self.last_order = Some((kind.to_owned(), from, to, value));
         Ok(())
     }
     fn ability(&mut self, i: usize, to: usize, value: u8) -> Result<(), u8> {
         let u = self.squads[i].clone();
+        // Defensive infantry and armour dig in by holding a position; no
+        // repeated stance button or player-order expenditure is required.
+        if matches!(u.kind,0|3) { return Err(6); }
         if u.ability_ready > self.tick || u.left > 0 {
             return Err(6);
         }
@@ -760,11 +748,11 @@ impl Game {
             }
             self.players[p].gold -= cost;
             self.squads[i].founding = true;
-            self.squads[i].work = 45;
+            self.squads[i].work = 25;
             self.squads[i].path = vec![u.tile];
             self.squads[i].to = u.tile;
         } else if k == 10 {
-            if !self
+            if !self.space_ready(p) || !self
                 .cities
                 .iter()
                 .any(|c| c.tile == u.tile && c.owner == p && c.production == 3)
@@ -820,7 +808,7 @@ impl Game {
             return Err(6);
         }
         let duration = if k == SETTLER {
-            45
+            25
         } else if k == 11 {
             36
         } else if k == 8 && value == 2 {
@@ -874,7 +862,7 @@ impl Game {
         counts
     }
     fn cover(&self, u: &Unit) -> f32 {
-        if self.tiles[u.tile].terrain == 2 && !matches!(u.kind, 6..=9) { 0.75 } else { 1. }
+        if self.tiles[u.tile].terrain == 2 && ground(u.kind) { 0.75 } else { 1. }
     }
     fn control(&mut self) {
         let sources = self.territory_sources();
@@ -918,6 +906,7 @@ impl Game {
         self.encounters();
         self.movement();
         self.combat();
+        self.support_units();
         self.development();
         self.victory();
     }
@@ -931,6 +920,13 @@ impl Game {
                 self.squads[i].left = self.squads[i].left.saturating_sub(1);
             }
             self.move_unit(i);
+            let u=&mut self.squads[i];
+            if matches!(u.kind,0|3) {
+                let dug_in=u.boarded_on.is_none()&&u.refit<0&&u.left==0&&u.path.len()==1
+                    && self.tick.saturating_sub(u.moved)>=8;
+                u.mode=if dug_in{3}else{0};
+                u.effect_until=if dug_in{self.tick+2}else{0};
+            }
         }
     }
     fn move_unit(&mut self, i: usize) {
@@ -941,6 +937,13 @@ impl Game {
         let to = u.path[1];
         let boarding = self.boarding_target(&u, to);
         if !self.tiles[u.tile].near.contains(&to) || (!self.can_enter(u.kind, to) && boarding.is_none()) {
+            self.squads[i].path = vec![u.tile];
+            self.squads[i].to = u.tile;
+            return;
+        }
+        if self.guard_blocks(&u, u.tile, to, None) {
+            // A late or previously concealed guard stops the route; never walk
+            // through its zone just because a route was queued earlier.
             self.squads[i].path = vec![u.tile];
             self.squads[i].to = u.tile;
             return;
@@ -964,8 +967,14 @@ impl Game {
             return;
         }
         let cooldown = self.move_cost(&u, to);
+        let facing=self.tiles[to].near.iter().copied().max_by(|&a,&b|{
+            let ahead=|t:usize|dot(self.tiles[t].p,self.tiles[to].p)-dot(self.tiles[t].p,self.tiles[u.tile].p);
+            ahead(a).total_cmp(&ahead(b))
+        });
         let s = &mut self.squads[i];
+        s.facing=facing;
         s.tile = to;
+        if matches!(s.kind,0|3) {s.mode=0;s.effect_until=0;}
         s.moved = self.tick;
         s.path.remove(0);
         s.left = cooldown;
@@ -992,6 +1001,15 @@ impl Game {
         false
     }
     pub fn multiplier(a: u8, b: u8) -> f32 {
+        if a>=14 || b>=14 {
+            if a==32 {return if air(b){2.5}else{0.25};}
+            if air(b) && !matches!(a,2|6|7|9|14|23|32) {return 0.;}
+            if definition(a).counters.contains(&b) {return 1.9;}
+            if b==18 && matches!(a,2|14) {return 0.35;}
+            if b==29 && !matches!(a,8|21|4|35) {return 0.65;}
+            if b==3 {return 0.78;}
+            return 1.;
+        }
         match (a, b) {
             (0, 1) => 2.2,
             (1, 2 | 4 | 10 | 13) => 1.8,
@@ -1010,16 +1028,21 @@ impl Game {
     }
     pub fn damage(&self, a: &Unit, b: &Unit) -> f32 {
         let mut x = spec(a.kind).damage * Self::multiplier(a.kind, b.kind);
-        if self.tiles[a.tile].terrain == 0 && !matches!(a.kind, 6..=9) {
+        if self.tiles[a.tile].terrain == 0 && ground(a.kind) {
             return 0.;
         }
-        if (7..=9).contains(&a.kind) && self.tiles[b.tile].terrain != 0 {
+        if naval(a.kind) && self.tiles[b.tile].terrain != 0 {
             x *= 0.65;
         }
         if a.kind == 8 && self.tiles[b.tile].terrain != 0 {
             return 0.;
         }
         x *= self.cover(b);
+        if definition(b.kind).directional && b.kind!=34 && b.left==0 && b.path.len()==1 && self.in_front(b,a.tile) {
+            x *= if matches!(a.kind,18|4|25|35|11){0.8}else{0.25};
+        }
+        if self.squads.iter().any(|u|u.kind==34 && u.owner==b.owner && u.id!=b.id && u.boarded_on.is_none() && u.left==0 && u.path.len()==1 && self.tiles[u.tile].near.contains(&b.tile) && self.in_front(u,a.tile)) {x*=0.6;}
+
         if b.mode == 3 && b.effect_until > self.tick && matches!(b.kind, 0 | 3 | 7 | 9) {
             x *= 0.55;
         }
@@ -1040,8 +1063,9 @@ impl Game {
     fn combat(&mut self) {
         let mut hits = vec![0.; self.squads.len()];
         let mut fired = vec![];
-        // A player's pieces fire only after an explicit attack/ability order. Standing next
-        // to an enemy, moving into it, or scouting never implicitly starts an attack.
+        // Standing combat pieces maintain their position and fire when recovered.
+        // Explicit focus picks a target; it never grants an extra shot or chase.
+        let mut visions: Vec<Option<Vec<bool>>> = vec![None;self.players.len()];
         for i in 0..self.squads.len() {
             let u = self.squads[i].clone();
             if u.boarded_on.is_some() || u.refit >= 0
@@ -1049,20 +1073,27 @@ impl Game {
                 || u.left > 0
                 || u.locked_until > self.tick
                 || u.fire_at > 0
+                || u.ready > self.tick
+                || u.path.len() > 1
+                || spec(u.kind).damage == 0.
             {
                 continue;
             }
-            if u.owner == 8 {
-                let d = self.distances(u.tile);
-                if let Some(t) = self
-                    .squads
-                    .iter()
-                    .filter(|b| b.boarded_on.is_none() && b.owner != 8 && d[b.tile] <= 1)
-                    .min_by_key(|b| b.hp as u16)
-                    .map(|b| b.tile)
-                {
-                    let _ = self.order_attack(i, t, 0);
-                }
+            let d = self.distances(u.tile);
+            let sp = spec(u.kind);
+            let mut targets: Vec<_> = self.squads.iter()
+                .filter(|b| b.boarded_on.is_none() && b.owner != u.owner
+                    && d[b.tile] >= sp.min && d[b.tile] <= sp.range
+                    && (u.owner == 8 || self.detected(u.owner, b,
+                        visions[u.owner].get_or_insert_with(||self.vision(u.owner)))))
+                .map(|b| (u.focus != Some(b.id), d[b.tile], b.id, b.tile)).collect();
+            targets.sort_unstable();
+            for (_,_,_,tile) in targets {
+                // Never automatically splash our own formation. A deliberate
+                // barrage can accept that risk; normal hold-position fire cannot.
+                if definition(u.kind).splash && self.squads.iter().any(|a| a.owner == u.owner
+                    && a.boarded_on.is_none() && self.tiles[tile].near.contains(&a.tile)) { continue; }
+                if self.order_attack(i, tile, 0).is_ok() { break; }
             }
         }
         let mut pushes = vec![];
@@ -1072,7 +1103,7 @@ impl Game {
             }
             let target = a.aim;
             let d = self.distances(target);
-            let splash = matches!(a.kind, 4) || a.salvo > 0 && matches!(a.kind, 2 | 6 | 7);
+            let splash = definition(a.kind).splash || a.salvo > 0 && matches!(a.kind, 2 | 6 | 7);
             if a.kind == 5 && a.salvo > 0 {
                 for c in &mut self.cities {
                     if c.tile == target && c.owner != a.owner {
@@ -1099,8 +1130,9 @@ impl Game {
             fired.push((i, target));
         }
         for (i, t) in fired {
+            if self.squads[i].kind==21 {hits[i]+=self.squads[i].hp;}
             self.squads[i].fire_at = 0;
-            self.squads[i].focus = None;
+            // Keep the focus between shots. Move/Stop/abilities replace it.
             self.squads[i].revealed = self.tick + 12;
             self.event(
                 if self.squads[i].kind == 4 || self.squads[i].kind == 6 {
@@ -1121,6 +1153,9 @@ impl Game {
                     d[t] > d[u.tile] && self.can_enter(u.kind, t) && self.occupant(t).is_none()
                 }) {
                     self.squads[i].tile = to;
+                    self.squads[i].moved = self.tick;
+                    self.squads[i].mode = 0;
+                    self.squads[i].effect_until = 0;
                     self.squads[i].path = vec![to];
                     self.squads[i].left = 0;
                     self.squads[i].locked_until = self.squads[i].locked_until.max(self.tick + 4);
@@ -1171,6 +1206,17 @@ impl Game {
                     p.research = -1;
                 }
             }
+            p.research_queue.retain(|k|!p.unlocked.contains(k)&&p.research!=*k as i8);
+            if p.alive && p.research<0 {
+                if let Some(&k)=p.research_queue.first() {
+                    let d=definition(k);
+                    if p.gold>=d.research_cost as f32 && d.prerequisites.iter().all(|k|p.unlocked.contains(k)) {
+                        p.gold-=d.research_cost as f32;
+                        p.research=k as i8;p.research_left=d.research_seconds;
+                        p.research_queue.remove(0);
+                    }
+                }
+            }
         }
         for i in 0..self.cities.len() {
             let c = self.cities[i].clone();
@@ -1178,7 +1224,7 @@ impl Game {
             if let Some(u) = occupant.filter(|u| {
                 u.owner < self.players.len()
                     && u.owner != c.owner
-                    && !matches!(u.kind, 6..=9)
+                    && ground(u.kind)
                     && u.left == 0
             }) {
                 if self.cities[i].claimant != u.owner as i8 {
@@ -1212,7 +1258,7 @@ impl Game {
                     if let Some(tile) = spots.into_iter().find(|&t| {
                         self.occupant(t).is_none()
                             && self.can_enter(c.training as u8, t)
-                            && ((7..=9).contains(&(c.training as u8)) || self.tiles[t].terrain > 0)
+                            && (naval(c.training as u8) || self.tiles[t].terrain > 0)
                     }) {
                         self.spawn(c.owner, c.training as u8, tile);
                         self.cities[i].training = -1;
@@ -1222,11 +1268,11 @@ impl Game {
             if self.tick % 5 == 0 && c.disabled_until <= self.tick {
                 let blockade = self.squads.iter().any(|u| {
                     u.owner != c.owner
-                        && (7..=9).contains(&u.kind)
+                        && naval(u.kind)
                         && self.tiles[c.tile].near.contains(&u.tile)
                 });
                 self.players[c.owner].gold +=
-                    (3. + c.production as f32 * 2. + farms[i] as f32 * 0.25)
+                    (4. + c.production as f32 * 4. + farms[i] as f32 * 0.25)
                         * if blockade { 0.5 } else { 1. };
             }
         }
@@ -1293,7 +1339,7 @@ impl Game {
                 self.players[p].gold = (self.players[p].gold - upkeep).max(0.);
             }
             if let Some(tile) = self.players[p].launch_tile {
-                if self.cities.iter().any(|c| c.tile == tile && c.owner == p)
+                if self.space_ready(p) && self.cities.iter().any(|c| c.tile == tile && c.owner == p)
                     && self.squads.iter().any(|u| {
                         u.tile == tile
                             && u.owner == p
@@ -1315,51 +1361,28 @@ impl Game {
             self.control();
         }
     }
-    fn capital_goal(&self) -> usize {
-        self.players.len().div_ceil(2).max(2)
-    }
     fn victory(&mut self) {
         self.eliminate_landless();
         for p in 0..self.players.len() {
-            let capitals = self
-                .cities
-                .iter()
-                .filter(|c| c.owner == p && c.capital >= 0)
-                .count();
             let cities = self.cities.iter().filter(|c| c.owner == p).count();
             if !self.players[p].alive {
                 continue;
             }
             self.players[p].score = cities as u32;
-            self.players[p].domination = if capitals >= self.capital_goal() {
-                self.players[p].domination + 1
-            } else {
-                0
-            };
-            // Non-decreasing finite objective. Territory, not elapsed match time, supplies points.
-            if self.tick % 4 == 0 {
-                self.players[p].mandate = self.players[p].mandate.saturating_add(capitals as u16);
-            }
-            if self.tick % 12 == 0 {
-                self.players[p].mandate = self.players[p]
-                    .mandate
-                    .saturating_add(cities.saturating_sub(capitals) as u16);
-            }
+            // Retain save fields for compatibility, but they no longer score or win.
+            self.players[p].domination = 0;
+            self.players[p].mandate = 0;
         }
         let mut winners: Vec<_> = (0..self.players.len())
             .filter(|&p| {
                 self.players[p].alive
-                    && (self.players[p].launch >= SPACE_GOAL
-                        || self.players[p].domination >= 90
-                        || self.players[p].mandate >= INFLUENCE_GOAL
+                    && (self.space_ready(p) && self.players[p].launch >= SPACE_GOAL
                         || self.players.iter().filter(|a| a.alive).count() == 1)
             })
             .collect();
         winners.sort_by_key(|&p| {
             Reverse((
                 self.players[p].launch >= SPACE_GOAL,
-                self.players[p].domination,
-                self.players[p].mandate,
                 hash(self.seed ^ p as u32),
             ))
         });
@@ -1425,7 +1448,7 @@ impl Game {
                 let mut value = serde_json::to_value(a).unwrap();
                 if c.owner == p || spectator {
                     value["farms"] = json!(farms[n]);
-                    value["income"] = json!(3. + c.production as f32 * 2. + farms[n] as f32 * 0.25);
+                    value["income"] = json!(4. + c.production as f32 * 4. + farms[n] as f32 * 0.25);
                     if c.owner == p && c.radius < 3 {
                         let expanded = self.territory_sources_expanding(Some(n));
                         let tiles: Vec<_> = expanded.iter().enumerate()
@@ -1462,7 +1485,7 @@ impl Game {
             .map(|e| json!({"id":format!("{}:{}:{}", e.tick, e.action, e.unit),"tick":e.tick,"action":e.action,"owner":e.owner,
                 "unit":e.unit,"kind":e.kind,"from":e.from,"to":e.to,"value":e.value,
                 "amount":e.amount,"duration":e.duration})).collect();
-        json!({"spectator":spectator,"feedback":feedback,"tiles":tiles,"players":players,"cities":cities,"squads":squads,"strikes":strikes,"marches":[],"events":events,"weather":self.weather(),"discoveries":self.discoveries.iter().filter(|d|v[d.tile]||d.seen&(1<<p)!=0).map(|d|json!({"tile":d.tile,"kind":d.kind,"variant":d.variant,"used":if v[d.tile]{d.used}else{d.known_used&(1<<p)!=0},"owner":if v[d.tile]{d.owner}else{-1}})).collect::<Vec<_>>(),"rules":{"tactics":true,"capital_goal":self.capital_goal(),"mandate_goal":INFLUENCE_GOAL,"space_goal":SPACE_GOAL,"specs":(0..14).map(spec).collect::<Vec<_>>(),"unit_cap":self.cap(p)}})
+        json!({"spectator":spectator,"feedback":feedback,"tiles":tiles,"players":players,"cities":cities,"squads":squads,"strikes":strikes,"marches":[],"events":events,"weather":self.weather(),"discoveries":self.discoveries.iter().filter(|d|v[d.tile]||d.seen&(1<<p)!=0).map(|d|json!({"tile":d.tile,"kind":d.kind,"variant":d.variant,"used":if v[d.tile]{d.used}else{d.known_used&(1<<p)!=0},"owner":if v[d.tile]{d.owner}else{-1}})).collect::<Vec<_>>(),"rules":{"tactics":true,"victory_modes":["conquest","space"],"space_goal":SPACE_GOAL,"order_interval":ORDER_INTERVAL,"specs":(0..UNIT_COUNT).map(spec).collect::<Vec<_>>(),"unit_cap":self.cap(p)}})
     }
 }
 
@@ -1530,6 +1553,9 @@ pub fn execute(input: &[u8]) -> Vec<u8> {
     serde_json::to_vec(&result.unwrap_or_else(|e| json!({"error":99,"detail":e}))).unwrap()
 }
 
+mod utility;
+#[cfg(test)]
+mod era_tests;
 mod transport;
 mod actions;
 mod discoveries;

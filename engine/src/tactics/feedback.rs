@@ -29,7 +29,7 @@ impl Game {
         duration: u16,
     ) {
         let mut audience = if u.owner < 8 { 1 << u.owner } else { 0 };
-        if matches!(action, "shot" | "hit" | "heal") {
+        if matches!(action, "shot" | "hit" | "heal" | "support") {
             for p in 0..self.players.len() {
                 let v = self.vision(p);
                 if v[to] && self.detected(p, u, &v) {
@@ -64,6 +64,8 @@ impl Game {
                 a.launch = 0;
                 a.launch_tile = None;
                 a.domination = 0;
+                a.mandate = 0;
+                a.score = 0;
             }
         }
         // Settlers and foundations cannot resurrect a civilization after its last city falls.

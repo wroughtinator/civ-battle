@@ -11,16 +11,16 @@ const coast=state.tiles.findIndex(t=>t.terrain===1&&t.near.some(j=>state.tiles[j
 const page=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/style.css"><style>
 #review{position:fixed;top:8px;left:8px;display:flex;flex-wrap:wrap;gap:4px;max-width:95vw}#review button,#review select{padding:5px 9px;font-size:12px;color:#e6e9cf;background:#15323b;border:1px solid #617b7e;border-radius:5px}output{position:fixed;bottom:10px;left:12px;color:white;font:12px monospace;text-shadow:0 1px 3px black}#audit{position:fixed;right:10px;bottom:38px;max-height:170px;max-width:440px;overflow:auto;background:#101b22dc;color:#def;padding:10px;font:11px monospace;white-space:pre-wrap}#audit:empty{display:none}</style></head>
 <body><canvas id="globe"></canvas><div id="review"></div><pre id="audit" aria-label="Audit results"></pre><output></output><script type="module">
-import{Globe}from'/globe.js';import{unitNames}from'/planning.js';import{modelNames}from'/model-assets.js';
+import{naval}from'/roster.js';import{Globe}from'/globe.js';import{unitNames}from'/planning.js';import{modelNames}from'/model-assets.js';
 const state=await(await fetch('/fixture.json')).json(),catalog=await(await fetch('/assets/forge/catalog.json')).json();
 const g=new Globe(document.querySelector('canvas'),i=>g.focus(i));g.setWorld(state.tiles);g.setState(state,0);g.targetDistance=1.4;g.targetOffset=0;g.focus(${coast});
 let selected=0,serial=0,walking=false,last=0,elapsed=0,frames=0,auto=false,chosen='Coast',auditRunning=false,strikeStart=null;
 const errors=[],observedPoses=new Set(),seenProjectiles=new Set();
 const nav=document.querySelector('#review'),button=(name,fn)=>{const b=document.createElement('button');b.textContent=name;b.onclick=fn;nav.append(b);};
 function clear(){state.squads=[];state.strikes=[];strikeStart=null;g.effects.items=[];g.setState(state,0);}
-function select(k){clear();selected=k;chosen=modelNames[k];const sea=k>=7&&k<=9,tile=sea?state.tiles[${coast}].near.find(j=>state.tiles[j].terrain===0):${coast};state.squads=[{id:40,kind:k,owner:0,tile,to:tile,path:[tile],hp:100,ready:0,refit:-1}];g.setState(state,0);g.focus(tile);g.targetDistance=1.38;}
+function select(k){clear();selected=k;chosen=modelNames[k];const sea=naval(k),tile=sea?state.tiles[${coast}].near.find(j=>state.tiles[j].terrain===0):${coast};state.squads=[{id:40,kind:k,owner:0,tile,to:tile,path:[tile],hp:100,ready:0,refit:-1}];g.setState(state,0);g.treeGroups.clear();g.treeInstances=[];g.propInstances.clear();g.focus(tile);g.targetDistance=1.38;}
 function attack(){const u=state.squads[0];if(!u)return;const to=state.tiles[u.tile].near[0];g.effects.accept({...state,feedback:[{id:++serial,tick:100,action:'shot',unit:40,kind:selected,from:u.tile,to,value:0,duration:1}]});}
-function step(){const u=state.squads[0];if(!u)return;const sea=u.kind>=7&&u.kind<=9,to=state.tiles[u.tile].near.find(j=>sea?state.tiles[j].terrain===0:state.tiles[j].terrain!==0&&state.tiles[j].terrain!==4);if(to!==undefined){u.tile=to;g.setState(state,0);g.focus(to);}}
+function step(){const u=state.squads[0];if(!u)return;const sea=naval(u.kind),to=state.tiles[u.tile].near.find(j=>sea?state.tiles[j].terrain===0:state.tiles[j].terrain!==0&&state.tiles[j].terrain!==4);if(to!==undefined){u.tile=to;g.setState(state,0);g.focus(to);}}
 function showAsset(entry){chosen=entry.name;if(modelNames.includes(entry.name)){select(modelNames.indexOf(entry.name));return;}clear();chosen=entry.name;g.loadStatic(entry.name,entry.category==='tree');const p=state.tiles[${coast}].p,origin=p.map(v=>v*1.023);g.propInstances.set(entry.name,[[...origin,.5,.085,.085,.085,1]]);if(entry.category==='tree')g.treeGroups.set(entry.name,[[...origin,.5,.085,.085,.085,1]]);g.focus(${coast});g.targetDistance=1.38;}
 button('Globe',()=>{clear();chosen='Mini Earth';g.targetDistance=3.1;});
 button('Grass',()=>{clear();chosen='Meadow';g.focus(state.tiles.findIndex(t=>t.terrain===1&&!t.near.some(j=>state.tiles[j].terrain===0)));g.targetDistance=1.48;});
@@ -42,8 +42,8 @@ button('Run visual audit',async()=>{
    if(entry.category==='unit'){attack();await waitFrames(75);step();await waitFrames(8);}
    results.push({name:entry.name,loaded:true,poses:[...observedPoses],webglErrors:errors.length});
   }
-  for(const kind of[1,2]){strike(kind);await waitFrames(15);results.push({name:kind===2?'nuclear-flight':'ballistic-flight',loaded:!!g.models[kind===2?15:14],webglErrors:errors.length});}
-  report.textContent=JSON.stringify({passed:results.length===57&&errors.length===0&&results.every(r=>r.loaded)&&results.filter(r=>catalog.models.find(m=>m.name===r.name)?.category==='unit').every(r=>['idle','walk','attack'].every(p=>r.poses.includes(p)))&&seenProjectiles.size===8,assets:results.length,errors,projectiles:[...seenProjectiles],results},null,2);
+  for(const kind of[1,2]){strike(kind);await waitFrames(15);results.push({name:kind===2?'nuclear-flight':'ballistic-flight',loaded:!!g.models[modelNames.indexOf(kind===2?'nuke':'missile')],webglErrors:errors.length});}
+  report.textContent=JSON.stringify({passed:results.length===catalog.models.length+2&&errors.length===0&&results.every(r=>r.loaded)&&results.filter(r=>catalog.models.find(m=>m.name===r.name)?.category==='unit').every(r=>['idle','walk','attack'].every(p=>r.poses.includes(p)))&&seenProjectiles.size===8,assets:results.length,errors,projectiles:[...seenProjectiles],results},null,2);
  }catch(e){report.textContent=JSON.stringify({passed:false,error:e.message,results},null,2);}finally{auditRunning=false;}
 });
 setInterval(()=>{if(auditRunning)return;if(auto)attack();if(walking)step();},1600);
@@ -58,4 +58,4 @@ createServer((req,res)=>{
  const p=resolve(root,'.'+decodeURIComponent(req.url.split('?')[0]));
  if(!p.startsWith(root+'\\')&&!p.startsWith(root+'/')){res.writeHead(403).end();return;}
  try{res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.json':'application/json'})[extname(p)]||'application/octet-stream');res.end(readFileSync(p));}catch{res.writeHead(404).end();}
-}).listen(8797,'127.0.0.1',()=>console.log('Asset Forge review http://127.0.0.1:8797'));
+}).listen(Number(process.env.FORGE_PREVIEW_PORT)||8797,'127.0.0.1',()=>console.log('Asset Forge review running'));

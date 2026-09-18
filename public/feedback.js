@@ -10,7 +10,7 @@ export class EventTimeline {
    if(this.seen.has(e.id))continue;this.seen.add(e.id);
    // Reconnecting must not replay a dozen seconds of old attacks.
    if(state.tick-e.tick>3)continue;
-   const lead=e.action==='shot'?Math.max(.85,e.duration-(state.tick-e.tick)):0;
+   const lead=(e.action==='shot'||e.action==='support')?Math.max(.85,e.duration-(state.tick-e.tick)):0;
    const item={...e,start:now,end:now+(e.action==='pickup'?4:e.action==='shot'?lead+1:2.5)*1000,flight:lead*1000};
    this.items.push(item);fresh.push(item);
   }
@@ -22,7 +22,7 @@ export class EventTimeline {
 
 // Symbols describe the actual payout, including coin fallbacks, never the unopened chest.
 export const pickupSymbols=e=>({0:['coin','coin','coin'],1:['coin','coin','coin'],2:['scout'],3:['shield'],4:['coin','coin','coin'],5:['telescope'],6:['heart','heart'],7:e.amount>0?['heart','bolt']:['bolt'],8:['cloud','shield'],9:['horse']})[e.value]||['coin'];
-export const actionSymbol=e=>e.action==='shot'?(e.value?abilities(e.kind)[0]?.icon:'swords'):e.action==='ability'?(abilities(e.kind).find(a=>a.value===e.value)?.icon||'bolt'):({disembark:'disembark',move:'route',stop:'hand',refit:'refit',disband:'disband',explore:'telescope',heal:'heart'})[e.action]||unitIcons[e.kind];
+export const actionSymbol=e=>e.action==='shot'?(e.value?abilities(e.kind)[0]?.icon:'swords'):e.action==='ability'?(abilities(e.kind).find(a=>a.value===e.value)?.icon||'bolt'):({support:'heart',face:'face',disembark:'disembark',move:'route',stop:'hand',refit:'refit',disband:'disband',explore:'telescope',heal:'heart'})[e.action]||unitIcons[e.kind];
 
 export class FeedbackLayer {
  constructor(audio){this.audio=audio;this.timeline=new EventTimeline();this.nodes=[];this.root=document.createElement('div');this.root.id='action-feedback';this.root.setAttribute('aria-hidden','true');document.body.append(this.root);}

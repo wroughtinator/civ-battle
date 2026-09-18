@@ -1,0 +1,271 @@
+{
+  "name": "balloon",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "envelope",
+      "position": [
+        0,
+        0.95,
+        0
+      ],
+      "size": [
+        0.8,
+        0.95,
+        0.8
+      ],
+      "material": 7,
+      "color": [
+        168,
+        151,
+        114
+      ],
+      "shape": "cylinder",
+      "segments": 10,
+      "taper": 0.65
+    },
+    {
+      "name": "top",
+      "position": [
+        0,
+        1.47,
+        0
+      ],
+      "size": [
+        0.52,
+        0.22,
+        0.52
+      ],
+      "material": 7,
+      "color": [
+        168,
+        151,
+        114
+      ],
+      "shape": "cylinder",
+      "segments": 10,
+      "taper": 0.1
+    },
+    {
+      "name": "basket",
+      "position": [
+        0,
+        0.17,
+        0
+      ],
+      "size": [
+        0.24,
+        0.26,
+        0.24
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ]
+    },
+    {
+      "name": "rope-0.12-0.12",
+      "position": [
+        -0.12,
+        0.43,
+        -0.12
+      ],
+      "size": [
+        0.012,
+        0.48,
+        0.012
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ]
+    },
+    {
+      "name": "rope-0.120.12",
+      "position": [
+        -0.12,
+        0.43,
+        0.12
+      ],
+      "size": [
+        0.012,
+        0.48,
+        0.012
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ]
+    },
+    {
+      "name": "rope0.12-0.12",
+      "position": [
+        0.12,
+        0.43,
+        -0.12
+      ],
+      "size": [
+        0.012,
+        0.48,
+        0.012
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ]
+    },
+    {
+      "name": "rope0.120.12",
+      "position": [
+        0.12,
+        0.43,
+        0.12
+      ],
+      "size": [
+        0.012,
+        0.48,
+        0.012
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ]
+    },
+    {
+      "name": "lens",
+      "position": [
+        0,
+        0.24,
+        0.17
+      ],
+      "size": [
+        0.1,
+        0.08,
+        0.16
+      ],
+      "material": 13,
+      "color": [
+        159,
+        129,
+        55
+      ]
+    }
+  ],
+  "animations": [
+    {
+      "name": "idle",
+      "duration": 3,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -3
+              ]
+            },
+            {
+              "time": 1.5,
+              "rotation": [
+                0,
+                0,
+                3
+              ]
+            },
+            {
+              "time": 3,
+              "rotation": [
+                0,
+                0,
+                -3
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "walk",
+      "duration": 1.5,
+      "tracks": [
+        {
+          "part": 2,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -7
+              ]
+            },
+            {
+              "time": 0.75,
+              "rotation": [
+                0,
+                0,
+                7
+              ]
+            },
+            {
+              "time": 1.5,
+              "rotation": [
+                0,
+                0,
+                -7
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "attack",
+      "duration": 1,
+      "tracks": [
+        {
+          "part": 7,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                -35,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                0,
+                35,
+                0
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                -35,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

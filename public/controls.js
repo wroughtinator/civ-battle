@@ -2,12 +2,13 @@
 import {passengers,landingTiles,canEnter,canFound,distances,lineOfSight,prerequisites,researchCost,researchGate} from './planning.js';
 
 const blocked=(reason,icon='lock',count=0)=>({reason,icon,count});
-const naval=k=>k>=7&&k<=9;
-export const refitChoices=(state,u)=>u.kind<10||u.kind===12
- ? state.players[u.owner].unlocked.filter(k=>k!==u.kind&&![10,11,13].includes(k)&&naval(k)===naval(u.kind)) : [];
+import {units,naval,air} from './roster.js';
+// Retained export for old callers; current rules have no unit conversions.
+export const refitChoices=()=>[];
 export const abilityCost=(state,u,value)=>u.kind===13?35+25*state.cities.filter(c=>c.owner===u.owner).length:u.kind===10?180:u.kind===11?150:u.kind===8&&value===2?65:0;
 
 export function targetTiles(world,state,u,kind,value=0){
+ if(kind==='face')return world[u.tile].near;
  if(kind==='disembark')return landingTiles(world,state,u);
  const s=state.rules.specs[u.kind],missile=kind==='ability'&&(u.kind===11||u.kind===8&&value===2);
  const max=missile?(u.kind===11?9:7):kind==='ability'&&u.kind===6?3:s.range,min=missile?0:s.min;
@@ -15,16 +16,18 @@ export function targetTiles(world,state,u,kind,value=0){
  return d.flatMap((n,i)=>{
   if(n<min||n>max||!state.tiles[i]?.visible)return [];
   if(!missile&&u.kind===8&&world[i].terrain>0)return [];
-  if(!missile&&![4,6].includes(u.kind)&&!lineOfSight(world,u.tile,i))return [];
+  if(!missile&&!units[u.kind].indirect&&!lineOfSight(world,u.tile,i))return [];
   if(kind==='ability'&&u.kind===5&&value===1&&!state.cities.some(c=>c.tile===i&&c.owner!==u.owner))return [];
   return [i];
  });
 }
 
 export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
+ if(kind==='refit')return blocked('Units cannot change type; recruit in a city');
  const p=state.players[slot];
  if(!p?.alive||state.winner>=0)return blocked('Player cannot issue orders');
  if(kind!=='stop'&&p.cooldown>state.tick)return blocked('Order recovering','clock',p.cooldown-state.tick);
+ if(kind==='plan')return value===255||units[value]?.researchable?null:blocked('Choose a technology');
  if(kind==='research'){
   if(p.unlocked.includes(value))return blocked('Already researched','check');
   if(p.research>=0)return blocked('Research in progress','clock',p.research_left);
@@ -49,10 +52,12 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
  }
  const u=state.squads.find(u=>u.id===from&&u.owner===slot);
  if(!u)return blocked('Select your unit');
+ if(kind==='ability'&&[0,3].includes(u.kind))return blocked('Digs in automatically after holding position','shield');
  if(u.boarded_on!=null)return blocked('Aboard a carrier: disembark from its action panel','disembark');
  if(u.refit>=0)return blocked('Refitting','clock',u.work);
- if(kind==='move'||kind==='stop')return kind==='stop'&&u.path.length<2&&!u.founding?blocked('No movement or construction to stop','hand'):null;
+ if(kind==='move'||kind==='stop')return kind==='stop'&&u.path.length<2&&!u.founding&&u.focus==null?blocked('No movement, focus or construction to stop','hand'):null;
  if(u.locked_until>state.tick)return blocked('Unit committed','clock',u.locked_until-state.tick);
+ if(kind==='face')return !units[u.kind].directional||u.left?blocked('Requires a stationary directional unit','face'):to!=null&&!world[u.tile].near.includes(to)?blocked('Face an adjacent hex','face'):null;
  if(kind==='disband')return null;
  if(u.left)return blocked('Movement cooldown','clock',u.left);
  if(u.founding)return blocked('City construction in progress','clock',u.work);
@@ -60,14 +65,6 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
   if(!passengers(state,u).length)return blocked('No passengers aboard','board');
   const tiles=landingTiles(world,state,u);
   return (to==null?tiles.length>0:tiles.includes(to))?null:blocked('Requires adjacent empty land suitable for a passenger','territory');
- }
- if(kind==='refit'){
-  if(passengers(state,u).length>(state.rules.specs[value]?.boarding_capacity||0))return blocked('Disembark passengers before refitting','board');
-  if(!refitChoices(state,u).includes(value))return blocked('No available refit');
-  if(state.tiles[u.tile]?.owner!==slot)return blocked('Requires friendly territory','territory');
-  if(!canEnter(world,value,u.tile))return blocked('Unsuitable terrain','territory');
-  const cost=Math.max(30,state.rules.specs[value].cost-state.rules.specs[u.kind].cost*.5);
-  return p.gold<cost?blocked('Not enough coins','coin'):null;
  }
  if(kind==='explore'){
   const d=state.discoveries?.find(d=>d.tile===u.tile&&!d.used);
@@ -92,6 +89,7 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
    return canFound(world,state,u.tile)?null:blocked('Requires four hexes from cities','territory',4);
   }
   if(k===10){
+   if(!p.unlocked.includes(10)||!prerequisites(10).every(k=>p.unlocked.includes(k)))return blocked('Requires every technology, including orbital research','flask');
    if(p.launch_tile!=null)return blocked('Launch already in progress','rocket');
    return state.cities.some(c=>c.tile===u.tile&&c.owner===slot&&c.production===3)?null:blocked('Requires your production-three city','factory');
   }
@@ -102,8 +100,8 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
  const missile=special&&(k===11||k===8&&value===2);
  if(!missile){
   if(!state.rules.specs[k].damage)return blocked('This unit cannot attack','swords');
-  if(world[u.tile].terrain===0&&![6,7,8,9].includes(k))return blocked('Cannot attack while embarked','sail');
-  if(k===4&&state.tick-u.moved<10)return blocked('Artillery is setting up','clock',10-(state.tick-u.moved));
+  if(world[u.tile].terrain===0&&!naval(k)&&!air(k))return blocked('Cannot attack while embarked','sail');
+  if(state.tick-u.moved<units[k].setup)return blocked('Artillery is setting up','clock',units[k].setup-(state.tick-u.moved));
  }
  const targets=targetTiles(world,state,u,kind,value);
  return (to==null?targets.length>0:targets.includes(to))?null:blocked('No valid target in range','territory');

@@ -1,4 +1,23 @@
-# Deployments
+# Repository instructions
+
+## Meridian Strategy Audit
+
+- For changes intended to affect strategy or balance, use `npm run analyze:design`
+  before and after the change. Default analysis runtime is 120 seconds; first
+  compilation is separate. Read `docs/DESIGN_AUDIT.md` for interpretation and limits.
+- Preserve the baseline and compare identical seeds/configuration. `--check`
+  exits nonzero for FAIL or INCONCLUSIVE. Neither verdict certifies strategic depth.
+- Extend the audit policy/action coverage when adding mechanics. A feature the
+  test policies cannot use is outside its certification scope. Do not tune the
+  evaluator or weaken thresholds merely to make a rule change pass.
+- Treat the input-restraint gate as a design requirement: constant high APM,
+  blind repeated commands, and fast/shallow play defeating slower/deeper thinking
+  are reported separately. Preserve those tests when changing the audit.
+- Also use `npm run analyze:planning` for combat/development planning changes.
+  Read `docs/PLANNING_AUDIT.md`: its focused skirmish and peaceful-space PASS
+  supplements, and never replaces, the full-game audit verdict.
+
+## Deployment rules
 
 - Deploy with `bash deploy.sh` or `npm run deploy`. Use `--dry-run` to validate without publishing. Do not bypass the Wrangler deployment guard.
 - Before deploying from another checkout, bring in the latest deployment tooling and `releases/` catalog from the shared branch. The script refuses to drop any release already present in production. Resolve that failure by incorporating the missing archives, never by disabling the check.

@@ -7,3 +7,9 @@ opt-level = "s"
 lto = true
 panic = "abort"
 strip = true
+
+# Native design experiments favor throughput; deployed release/WASM stays unchanged.
+[profile.audit]
+inherits = "release"
+opt-level = 3
+lto = "thin"

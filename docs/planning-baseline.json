@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "name": "Meridian Planning Audit",
+  "scope": "Generated three-piece skirmishes and peaceful single-city full-tree launches. Not a full-game, multiplayer, meta-diversity or universal APM certificate.",
+  "config": {
+    "budgets": [
+      4,
+      32
+    ],
+    "combat_horizon": 32,
+    "combat_metric": "paired material advantage; army elimination reported separately",
+    "order_interval": 8,
+    "restraint_low_interval": 2,
+    "schema": 2,
+    "seconds": 120,
+    "seed": 51000,
+    "space_metric": "actual peaceful launch completion time",
+    "type": "config"
+  },
+  "elapsed_seconds": 120.0001068,
+  "ended_cleanly": true,
+  "combat": {
+    "breadth": {
+      "samples": 267,
+      "mean": 0.648876404494382,
+      "interval95": [
+        0.5657619414989751,
+        0.7319908674897889
+      ],
+      "verdict": "PASS",
+      "army_elimination": {
+        "wins": 162,
+        "losses": 83,
+        "unresolved": 286,
+        "mutual_destruction": 3
+      }
+    },
+    "foresight": {
+      "samples": 267,
+      "mean": 0.6853932584269663,
+      "interval95": [
+        0.6022787954315594,
+        0.7685077214223732
+      ],
+      "verdict": "PASS",
+      "army_elimination": {
+        "wins": 167,
+        "losses": 76,
+        "unresolved": 287,
+        "mutual_destruction": 4
+      }
+    },
+    "restraint": {
+      "samples": 266,
+      "mean": 0.6907894736842105,
+      "interval95": [
+        0.607518927052737,
+        0.774060020315684
+      ],
+      "verdict": "PASS",
+      "army_elimination": {
+        "wins": 140,
+        "losses": 61,
+        "unresolved": 330,
+        "mutual_destruction": 1
+      }
+    }
+  },
+  "space": {
+    "samples": 395,
+    "mean": 0.9367088607594937,
+    "interval95": [
+      0.868375357531316,
+      1
+    ],
+    "verdict": "PASS",
+    "mean_seconds_saved": 64.95189873417722,
+    "unfinished": 0
+  },
+  "gates": {
+    "combat_breadth": "PASS",
+    "combat_foresight": "PASS",
+    "combat_restraint": "PASS",
+    "peaceful_space": "PASS"
+  },
+  "verdict": "PASS",
+  "build_seconds": 2.2443781999999994,
+  "source_fingerprint": "bc44bfd50628a6e7ecc3e9cb24e62bd435cda303ac4df930246e1b655314c561"
+}

@@ -1,0 +1,452 @@
+{
+  "name": "palisade",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "hull",
+      "position": [
+        0,
+        0.2,
+        0
+      ],
+      "size": [
+        0.58,
+        0.13,
+        0.52
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ]
+    },
+    {
+      "name": "wheel0",
+      "position": [
+        -0.31,
+        0.12,
+        -0.18
+      ],
+      "size": [
+        0.24,
+        0.075,
+        0.24
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "shape": "cylinder",
+      "segments": 8,
+      "rotation": [
+        0,
+        0,
+        90
+      ]
+    },
+    {
+      "name": "wheel1",
+      "position": [
+        -0.31,
+        0.12,
+        0.18
+      ],
+      "size": [
+        0.24,
+        0.075,
+        0.24
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "shape": "cylinder",
+      "segments": 8,
+      "rotation": [
+        0,
+        0,
+        90
+      ]
+    },
+    {
+      "name": "wheel2",
+      "position": [
+        0.31,
+        0.12,
+        -0.18
+      ],
+      "size": [
+        0.24,
+        0.075,
+        0.24
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "shape": "cylinder",
+      "segments": 8,
+      "rotation": [
+        0,
+        0,
+        90
+      ]
+    },
+    {
+      "name": "wheel3",
+      "position": [
+        0.31,
+        0.12,
+        0.18
+      ],
+      "size": [
+        0.24,
+        0.075,
+        0.24
+      ],
+      "material": 5,
+      "color": [
+        52,
+        56,
+        58
+      ],
+      "shape": "cylinder",
+      "segments": 8,
+      "rotation": [
+        0,
+        0,
+        90
+      ]
+    },
+    {
+      "name": "stake0",
+      "position": [
+        -0.29,
+        0.53,
+        0.22
+      ],
+      "size": [
+        0.12,
+        0.73,
+        0.12
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "taper": 0.6
+    },
+    {
+      "name": "stake1",
+      "position": [
+        -0.145,
+        0.53,
+        0.22
+      ],
+      "size": [
+        0.12,
+        0.73,
+        0.12
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "taper": 0.6
+    },
+    {
+      "name": "stake2",
+      "position": [
+        0,
+        0.53,
+        0.22
+      ],
+      "size": [
+        0.12,
+        0.73,
+        0.12
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "taper": 0.6
+    },
+    {
+      "name": "stake3",
+      "position": [
+        0.145,
+        0.53,
+        0.22
+      ],
+      "size": [
+        0.12,
+        0.73,
+        0.12
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "taper": 0.6
+    },
+    {
+      "name": "stake4",
+      "position": [
+        0.29,
+        0.53,
+        0.22
+      ],
+      "size": [
+        0.12,
+        0.73,
+        0.12
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "taper": 0.6
+    },
+    {
+      "name": "crossbar",
+      "position": [
+        0,
+        0.38,
+        0.15
+      ],
+      "size": [
+        0.8,
+        0.08,
+        0.08
+      ],
+      "material": 1,
+      "color": [
+        80,
+        60,
+        40
+      ]
+    }
+  ],
+  "animations": [
+    {
+      "name": "attack",
+      "duration": 0.5,
+      "tracks": [
+        {
+          "part": 10,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -8,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "rotation": [
+                8,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                -8,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "walk",
+      "duration": 0.8,
+      "tracks": [
+        {
+          "part": 1,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                0,
+                180,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                0,
+                360,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 2,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                0,
+                180,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                0,
+                360,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 3,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                0,
+                180,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                0,
+                360,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "part": 4,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                0,
+                180,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                0,
+                360,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "idle",
+      "duration": 2,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -1
+              ]
+            },
+            {
+              "time": 1,
+              "rotation": [
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "time": 2,
+              "rotation": [
+                0,
+                0,
+                -1
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

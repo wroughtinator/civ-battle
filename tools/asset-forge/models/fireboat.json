@@ -1,0 +1,262 @@
+{
+  "name": "fireboat",
+  "texture_size": 256,
+  "parts": [
+    {
+      "name": "hull",
+      "position": [
+        0,
+        0.08,
+        0
+      ],
+      "size": [
+        0.28,
+        0.19,
+        0.96
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "taper": 0.65
+    },
+    {
+      "name": "bow",
+      "position": [
+        0,
+        0.09,
+        0.48
+      ],
+      "size": [
+        0.28,
+        0.2,
+        0.28
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ],
+      "rotation": [
+        90,
+        0,
+        0
+      ],
+      "taper": 0.05
+    },
+    {
+      "name": "oil-0.25",
+      "position": [
+        0,
+        0.24,
+        -0.25
+      ],
+      "size": [
+        0.21,
+        0.23,
+        0.21
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ],
+      "shape": "cylinder",
+      "segments": 8
+    },
+    {
+      "name": "oil0",
+      "position": [
+        0,
+        0.24,
+        0
+      ],
+      "size": [
+        0.21,
+        0.23,
+        0.21
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ],
+      "shape": "cylinder",
+      "segments": 8
+    },
+    {
+      "name": "oil0.25",
+      "position": [
+        0,
+        0.24,
+        0.25
+      ],
+      "size": [
+        0.21,
+        0.23,
+        0.21
+      ],
+      "material": 8,
+      "color": [
+        75,
+        48,
+        31
+      ],
+      "shape": "cylinder",
+      "segments": 8
+    },
+    {
+      "name": "wick",
+      "position": [
+        0,
+        0.45,
+        0.2
+      ],
+      "size": [
+        0.025,
+        0.32,
+        0.025
+      ],
+      "material": 0,
+      "color": [
+        123,
+        91,
+        55
+      ]
+    },
+    {
+      "name": "flame",
+      "position": [
+        0,
+        0.65,
+        0.2
+      ],
+      "size": [
+        0.15,
+        0.29,
+        0.14
+      ],
+      "material": 14,
+      "color": [
+        158,
+        133,
+        62
+      ],
+      "shape": "cylinder",
+      "segments": 5,
+      "taper": 0.04
+    }
+  ],
+  "animations": [
+    {
+      "name": "idle",
+      "duration": 0.5,
+      "tracks": [
+        {
+          "part": 6,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                0,
+                0,
+                -12
+              ]
+            },
+            {
+              "time": 0.25,
+              "rotation": [
+                0,
+                0,
+                12
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                0,
+                0,
+                -12
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "attack",
+      "duration": 0.5,
+      "tracks": [
+        {
+          "part": 6,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -38,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "rotation": [
+                38,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.5,
+              "rotation": [
+                -38,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "walk",
+      "duration": 0.8,
+      "tracks": [
+        {
+          "part": 0,
+          "keys": [
+            {
+              "time": 0,
+              "rotation": [
+                -2,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.4,
+              "rotation": [
+                2,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.8,
+              "rotation": [
+                -2,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

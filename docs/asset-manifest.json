@@ -23,8 +23,8 @@
     },
     {
       "file": "public/assets/fleet.mesh",
-      "bytes": 8064,
-      "sha256": "cfcce200751608611945bd662a31d451bfdcf527483b0f98023c547d567971ed",
+      "bytes": 8640,
+      "sha256": "74e47f567fc7f3aea655d5f423857979d4969d70ccdc937d144d43bc5478c6b4",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -44,15 +44,15 @@
     },
     {
       "file": "public/assets/forge/archer.png",
-      "bytes": 48095,
-      "sha256": "b447801a92550aa3fcc8c537cc3e1a8461d416ff47921fe770de19444accd682",
+      "bytes": 46090,
+      "sha256": "0431357b4c388bdcdafcea7c858d81ceaaecc54b3774a56f4ddb8d4698f07752",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/forge/archer.rig",
       "bytes": 83672,
-      "sha256": "717ea924774448fda24454882d0dac1b8da09fa87a50f7cbb94e66b9ee1a2fcd",
+      "sha256": "a22888b8cbd03f777ac70b86187b924ab9cdf4abfd5622cc56bcafa63a037a28",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -81,6 +81,20 @@
       "file": "public/assets/forge/artillery.rig",
       "bytes": 51808,
       "sha256": "8db4c2792555c7afeb2f9b7696cca8f24d38edbf9047e3e8f52d9b3176fd205b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/balloon.png",
+      "bytes": 36739,
+      "sha256": "1f58a05cb4ba1852ffe8b8e21820d0105bd37f9ab115461418411a0aae938daa",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/balloon.rig",
+      "bytes": 70936,
+      "sha256": "d142577a9fbabb3356841783df6018515169ec55ae03e560e67f2d976c526db1",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -207,6 +221,34 @@
       "file": "public/assets/forge/bullet.rig",
       "bytes": 6848,
       "sha256": "1e2fb08ad6979bc45f0fa38e77981a053b9e7900d20bd19e2e69c7c692b9bbdd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/bulwark.png",
+      "bytes": 48942,
+      "sha256": "a458b1a33f0288413fcae0c2d156d7fbc7b4b06bbec00fad1b6590eda3f5851a",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/bulwark.rig",
+      "bytes": 61284,
+      "sha256": "ebff6aaba52fcc9a5f0d94bc97e62ad7048e928178f9512c7abfee66779a46ec",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/canoe.png",
+      "bytes": 50384,
+      "sha256": "aed6dea16f67f68b2cef079c989c177a9c7e1d52ecf067e0bf0dd38bc639926a",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/canoe.rig",
+      "bytes": 28656,
+      "sha256": "997d03a83164872bfb1a9d2b7eb6461e3470d45a1481dada2be0d7d83a3caf48",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -338,8 +380,8 @@
     },
     {
       "file": "public/assets/forge/catalog.json",
-      "bytes": 6806,
-      "sha256": "41411f5cfe90835709c8badfd65512d6f2647abce0cf3457a2b764559d8c42ba",
+      "bytes": 10279,
+      "sha256": "0a69a460275d7d544bd4270856342886df6a5f9f4df46c00bd997d32761934d0",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -354,6 +396,20 @@
       "file": "public/assets/forge/cavalry.rig",
       "bytes": 80484,
       "sha256": "1b06e1b8c6c0e32dea26235faf54298ed8f048bb79a3163f0b31131dfe15f7e4",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/chain-boom.png",
+      "bytes": 51759,
+      "sha256": "6e00fa4fe27472ff08d1006039c29e21bc996b12ed55544c401f54a01336b9f8",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/chain-boom.rig",
+      "bytes": 45984,
+      "sha256": "56ad1bb13b58a3cd179648e5f52a129c437f239ac4594ebfddfbd8d61649f30e",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -540,30 +596,100 @@
       "source": "tools/asset-forge/catalog.json"
     },
     {
+      "file": "public/assets/forge/fireboat.png",
+      "bytes": 44143,
+      "sha256": "1d7792c4d5d42cb58cf925f017f27e61725158df3129f78428faddfbd029f770",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/fireboat.rig",
+      "bytes": 30524,
+      "sha256": "5e978b12c34a20dec06514df1c7183828f3840c27af0fcdc4a8f304474b20708",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/flak.png",
+      "bytes": 43778,
+      "sha256": "413e0ccf9325a2fd1028760349e05f898ec2dfae5fee897e19b4ebec103a09d9",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/flak.rig",
+      "bytes": 68140,
+      "sha256": "d13ddb21475e5e4a6d9baefdf48717f7493d7d3420df3d081d54aa2d568fb239",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
       "file": "public/assets/forge/fleet.png",
-      "bytes": 41182,
-      "sha256": "993add074b973a33f9378120ce47f233b6387e34c13151d456569290982ca7e4",
+      "bytes": 44696,
+      "sha256": "9b9a6aadd3cd039030cdd3e903259585bed1022b181f65b3dea4707cd82b12c0",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/forge/fleet.rig",
-      "bytes": 65816,
-      "sha256": "51c51207de8a6d3c15be59bfa254b5ff82ab884b250dc4f76350f98bc4f17690",
+      "bytes": 71508,
+      "sha256": "11b13fc6c481020ec22cea2d2fb02549a2bfc37aec67f7f3a013d708c4afafe1",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/forge/guard.png",
-      "bytes": 48985,
-      "sha256": "c97c3c2e8cef156aa75ca9ad7f56e50dc2cc2f119cfeac9b14fbfc8f1b323efe",
+      "bytes": 51221,
+      "sha256": "de777a36a1b40388ff49be290ab6a6f0a65392443228b94a55b41aced7ef1042",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/forge/guard.rig",
-      "bytes": 66984,
-      "sha256": "cfc78d31c9c0349152bfba02f7fe2ee3a41384017e2b0b485edc11c683bfbcdd",
+      "bytes": 67660,
+      "sha256": "3f70b27720a59ebb620dc2baf85824bd174e8b9e2c9743614a865e653d09e31c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/herbalist.png",
+      "bytes": 56433,
+      "sha256": "7384cc0bb54a8c271675803355c3aaf74170b2d0cd51df1492aa676cfedf080c",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/herbalist.rig",
+      "bytes": 78780,
+      "sha256": "374d845bfe3ae973fabd81f3ed85e2f75b0be9e2c99dbed91c5c6b43d12941bd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/ironclad.png",
+      "bytes": 34375,
+      "sha256": "708b6a85f28c77a35f63a83d88f4323e218b6825460c850bf5d931e196287c49",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/ironclad.rig",
+      "bytes": 30748,
+      "sha256": "0ab9ae052b07805128c93c855d5fdbbe1dd1b33287afa9c4ad7923f16c1fd47d",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/lancer.png",
+      "bytes": 52659,
+      "sha256": "7d8f0a4c1ef9f4e2e634b2d0257fae573c23ba0c2d11711e74f6fe2f0d763765",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/lancer.rig",
+      "bytes": 81796,
+      "sha256": "e2e3c1c45797c45b8fa900274d6867652feb8ca1378106672bbddae4e60c84bd",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -582,6 +708,20 @@
       "source": "tools/asset-forge/catalog.json"
     },
     {
+      "file": "public/assets/forge/medic.png",
+      "bytes": 52571,
+      "sha256": "8033fb203907782de018700053ae2396b3298fb4000fe9a588a97b40d2c22535",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/medic.rig",
+      "bytes": 72556,
+      "sha256": "efadabb12446d7550a364aa93e2bc5552181d704133e16b071bf9650ef28d992",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
       "file": "public/assets/forge/missile.png",
       "bytes": 40084,
       "sha256": "15bf4a1a2d250db2b120746611ba026a395cb229aefd90f3c72571105b5c7c3c",
@@ -596,6 +736,20 @@
       "source": "tools/asset-forge/catalog.json"
     },
     {
+      "file": "public/assets/forge/mortar-team.png",
+      "bytes": 47322,
+      "sha256": "cffb7f1f2b108cd2330fa65914b0e50250e6e104a05d3d78ca0b6b23b06e1cee",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/mortar-team.rig",
+      "bytes": 60376,
+      "sha256": "bda1e9b84ec235d718ab37e8f39965da013daa30bbfa9881b7bec52e46c40711",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
       "file": "public/assets/forge/mortar.png",
       "bytes": 37157,
       "sha256": "4d7dc875f5159f087b469cb4c7a817219ec3bd476469b0bfb53f0994bc1c4c2b",
@@ -606,6 +760,20 @@
       "file": "public/assets/forge/mortar.rig",
       "bytes": 6848,
       "sha256": "d9e1673d2424358009459635ba88ca1dfb42f91c012f19d3fe1d213864859921",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/musketeer.png",
+      "bytes": 46924,
+      "sha256": "908d84df777036473972e2254fead059690527decd38566ed35d416460125987",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/musketeer.rig",
+      "bytes": 78788,
+      "sha256": "d53691abed891947bf948e7a260858d95117026997397a8a69cda892bc8b9ca1",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -638,6 +806,76 @@
       "source": "tools/asset-forge/catalog.json"
     },
     {
+      "file": "public/assets/forge/outrigger.png",
+      "bytes": 52708,
+      "sha256": "3eed2fded3f8845c945e404c553db03bdad0a79cf4619a00b8da7177806d04ce",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/outrigger.rig",
+      "bytes": 57100,
+      "sha256": "667dd2f2aefbdf90f773fb0fca6768e2ecc3479ed7b99e20dc788a7ae525a836",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/palisade.png",
+      "bytes": 45347,
+      "sha256": "8158852a5ee441bd0d13fa9571aca09e5e112d4feac1cca7406efba6f77d2667",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/palisade.rig",
+      "bytes": 70072,
+      "sha256": "5118143fea957fe98a719a362ff810781cf061f252cde9d69f64faea0029c32f",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/pikeman.png",
+      "bytes": 45101,
+      "sha256": "04b1b7b13d240f0ccf03fe330eea0858abe8b92df5be9a6bceb6d24cc13d6e4b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/pikeman.rig",
+      "bytes": 68000,
+      "sha256": "30614dd44add4ada39a97a5d625a03d7d3e6b8f893f0b6efbf805cdb8d9f96b6",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/radar-truck.png",
+      "bytes": 45031,
+      "sha256": "db6aeef33b9de068ad259f9fb15ad6e915d891a729a9000c8bfaa53ef57040f4",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/radar-truck.rig",
+      "bytes": 80264,
+      "sha256": "06c41c5450a6bbcc24a2235a54da660955baddf24c29ae235360440dafe0f9ec",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/ram.png",
+      "bytes": 47082,
+      "sha256": "3f3a7500b3677f5b430d2e2b44c584c571f0662e3d0db544b40d9c2fe6538b32",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/ram.rig",
+      "bytes": 64900,
+      "sha256": "fb94e28c5b225b7afa1b3806a5bd6a93f23765be1af9dfd93ce7c9679f22fe9b",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
       "file": "public/assets/forge/recon.png",
       "bytes": 45635,
       "sha256": "9a9e0b0ad23427baccb5d2c1bb161eb893153b2c64bb17de40e8a5eb666428dc",
@@ -648,6 +886,20 @@
       "file": "public/assets/forge/recon.rig",
       "bytes": 66984,
       "sha256": "90b9fae69237a7eeb12d5464d4934b7f014d9fb6cdb56ff09829d2f6d5e830d3",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/rocket-battery.png",
+      "bytes": 34517,
+      "sha256": "a55d4e3704a5f3dd5013a0a52f82e8dbf0dcd614e668056df293a7d4e4952e5d",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/rocket-battery.rig",
+      "bytes": 94476,
+      "sha256": "c6d44538d17f3565d2987accf2e6d79abb7d16e84c28fab8016b64b6100ef331",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -681,15 +933,15 @@
     },
     {
       "file": "public/assets/forge/scout.png",
-      "bytes": 43851,
-      "sha256": "0219358df759ebd8a5b2b1343655139742255b490da0dec6bf6d38f2c08f8253",
+      "bytes": 43456,
+      "sha256": "6327fc887e18c8682042abfa7b0fffb62a18078b348890efec972c4493aa37b0",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
     {
       "file": "public/assets/forge/scout.rig",
       "bytes": 61424,
-      "sha256": "777e11fbc7abf1cef5fe4fd55683b2dbe2d422e64f5541af767dff2520d2c007",
+      "sha256": "7718eea54aaeadd6cd33596e0a12833c14ba7b1a79a2f33a9787e349bde2d9e2",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -722,6 +974,20 @@
       "source": "tools/asset-forge/catalog.json"
     },
     {
+      "file": "public/assets/forge/shield-truck.png",
+      "bytes": 54341,
+      "sha256": "7f7699ba5ea8e1c86718495ef016bb40df0af0cb1bd491315389108d39b43fcd",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/shield-truck.rig",
+      "bytes": 61392,
+      "sha256": "7075129a8b9fd58dc4cc6ef4f9a59f00c29a3fab2807af7d09b340e4b5bf7201",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
       "file": "public/assets/forge/site.mesh",
       "bytes": 3120,
       "sha256": "1c67504c744699b7de1d29e08e4967e510303cc32b5467ff433da0e600b7e29b",
@@ -736,6 +1002,20 @@
       "source": "tools/asset-forge/catalog.json"
     },
     {
+      "file": "public/assets/forge/slinger.png",
+      "bytes": 52236,
+      "sha256": "dc3fb9f1ccb25d489c42a23b8314693de0a40510780ceb034ac53cee44ef4410",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/slinger.rig",
+      "bytes": 66996,
+      "sha256": "ede4fda11e0eb89c3a348f800003514efb9bd7ba10944941cc9edf76d749aeb9",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
       "file": "public/assets/forge/submarine.png",
       "bytes": 46993,
       "sha256": "7b7e00be188ee05b2e29bd058668ec5a82584f3784a082f2263229ca97f012e7",
@@ -746,6 +1026,20 @@
       "file": "public/assets/forge/submarine.rig",
       "bytes": 36364,
       "sha256": "f96a0a4a850293f19fc982e8954699701d6eb84392b4145117a64d7241fe466d",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/supply-cart.png",
+      "bytes": 49917,
+      "sha256": "91fe1f45f1bfa2fe5c14985496004625f82e52652b21927c8a036d77257a2b07",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/supply-cart.rig",
+      "bytes": 69816,
+      "sha256": "3263b73a4539ef60619cd8b18305894c07b963ad5661dcb3774ff3f8e522a709",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },
@@ -781,6 +1075,20 @@
       "file": "public/assets/forge/torpedo.rig",
       "bytes": 16284,
       "sha256": "76988ff29c0e48abaae37e806d1c02642a564c11233a6ed74dd2d151be2236ef",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/transport.png",
+      "bytes": 50137,
+      "sha256": "0cd987539628cce256dc686ef4f00f39c3ef01849b87fa3683fa99e34484a419",
+      "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
+      "source": "tools/asset-forge/catalog.json"
+    },
+    {
+      "file": "public/assets/forge/transport.rig",
+      "bytes": 30584,
+      "sha256": "a24ca79fa6dd0c21a4fd5b55908a2ee80e9fc72ca77286530c0bf127f8afa904",
       "license": "Original geometry and AI-generated materials; see docs/ASSETS.md",
       "source": "tools/asset-forge/catalog.json"
     },

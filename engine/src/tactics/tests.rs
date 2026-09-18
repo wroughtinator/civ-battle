@@ -90,6 +90,36 @@ fn forest_cover_protects_ground_units_from_every_attacker_but_not_aircraft() {
 }
 
 #[test]
+fn holding_digs_in_without_orders_and_departure_removes_it() {
+    let mut g=quiet();let i=g.squads.iter().position(|u|u.owner==0&&u.kind==0).unwrap();
+    g.tick=0;g.squads[i].moved=0;let id=g.squads[i].id;
+    assert_eq!(g.command(0,"ability",id,0,0),Err(6));
+    g.step(7);assert_ne!(g.squads[i].mode,3);
+    g.step(1);assert_eq!(g.squads[i].mode,3);assert_eq!(g.players[0].cooldown,0);
+    let attacker=g.squads.iter().find(|u|u.owner==1).unwrap().clone();let defended=g.squads[i].clone();let mut exposed=defended.clone();exposed.mode=0;
+    assert!((g.damage(&attacker,&defended)-g.damage(&attacker,&exposed)*0.55).abs()<0.001);
+    let to=*g.tiles[defended.tile].near.iter().find(|&&t|g.can_enter(0,t)&&g.occupant(t).is_none()).unwrap();
+    g.command(0,"move",id,to,0).unwrap();assert_eq!(g.squads[i].mode,0);
+}
+
+#[test]
+fn research_depends_on_prerequisites_and_money_not_elapsed_match_time() {
+    let mut g=quiet();g.players[0].gold=1000.;g.players[0].unlocked.extend([1,24]);
+    assert_eq!(g.tick,0);assert!(g.command(0,"research",0,0,3).is_ok());
+    assert_eq!(g.players[0].research,3);
+    for k in technologies() {assert_eq!(g.research_info(k).unwrap().3,0);}
+}
+
+#[test]
+fn offline_distance_cache_preserves_rules_and_never_enters_saves() {
+    let mut uncached=Game::with_players(42,2,2);let mut cached=uncached.clone();cached.cache_distances();
+    for i in 0..cached.tiles.len(){assert_eq!(cached.distances(i),uncached.distances(i));}
+    for _ in 0..200 {uncached.tick_one(true);cached.tick_one(true);}
+    let encoded=serde_json::to_value(&cached).unwrap();assert_eq!(encoded,serde_json::to_value(&uncached).unwrap());assert!(encoded.get("distance_cache").is_none());
+    let restored:Game=serde_json::from_value(encoded).unwrap();assert!(restored.distance_cache.is_none());
+}
+
+#[test]
 fn smaller_lobbies_keep_the_full_globe_and_neighbouring_eight_player_starts() {
     for seed in [1, 42, 43, 6201, 12345, 4294967295] {
         let full = Game::new(seed, 1);
@@ -106,7 +136,7 @@ fn smaller_lobbies_keep_the_full_globe_and_neighbouring_eight_player_starts() {
             assert_eq!(g.players.len(), count);
             assert_eq!(g.cities.len(), count);
             assert_eq!(g.tiles.iter().filter(|t| t.capital >= 0).count(), count);
-            assert_eq!(g.capital_goal(), count.div_ceil(2).max(2));
+            assert_eq!(g.view(0)["rules"]["victory_modes"], json!(["conquest","space"]));
             for (a, b) in g.tiles.iter().zip(&full.tiles) {
                 assert_eq!(a.p, b.p);
                 assert_eq!(a.terrain, b.terrain);
@@ -154,7 +184,7 @@ fn every_lobby_size_simulates_restores_and_rejects_nonexistent_players() {
 }
 
 #[test]
-fn two_players_have_no_phantom_opponents_and_four_use_two_capitals_for_domination() {
+fn conquest_requires_every_other_civilization_to_lose_all_cities() {
     let mut duel = Game::with_players(42, 2, 1);
     for p in &mut duel.players {
         p.bot = false;
@@ -179,7 +209,11 @@ fn two_players_have_no_phantom_opponents_and_four_use_two_capitals_for_dominatio
     four.step(89);
     assert_eq!(four.winner, -1);
     four.step(1);
-    assert_eq!(four.winner, 0);
+    assert_eq!(four.winner, -1);
+    for c in &mut four.cities { c.owner=0; }
+    four.step(1);
+    assert_eq!(four.winner,0);
+    assert_eq!(four.players.iter().filter(|p|p.alive).count(),1);
 }
 
 #[test]
@@ -368,11 +402,12 @@ fn one_treasury_and_unit_unlocks() {
     let c = g.cities.iter().find(|c| c.owner == 0).unwrap().tile;
     assert_eq!(g.command(0, "train", c, 0, 3), Err(6));
     g.command(0, "research", 0, 0, 1).unwrap();
-    assert_eq!(g.players[0].gold, 105.);
+    assert_eq!(g.players[0].gold, 152.);
     assert_eq!(g.command(0, "train", c, 0, 0), Err(2));
-    g.step(2);
+    g.step(ORDER_INTERVAL);
+    g.players[0].gold=152.; // Isolate purchase cost from the income tick.
     g.command(0, "train", c, 0, 0).unwrap();
-    assert_eq!(g.players[0].gold, 50.);
+    assert_eq!(g.players[0].gold, 97.);
     g.step(24);
     assert!(g.players[0].unlocked.contains(&1));
     assert!(!g.players[0].unlocked.contains(&3));
@@ -406,7 +441,7 @@ fn settlers_found_over_time_and_consume_the_piece() {
     g.spawn(0, SETTLER, tile);
     let id = g.squads[0].id;
     g.command(0, "ability", id, 0, 0).unwrap();
-    g.step(44);
+    g.step(24);
     assert_eq!(g.cities.len(), 8);
     assert!(g.squads.iter().any(|u| u.id == id));
     g.step(3);
@@ -423,6 +458,7 @@ fn rerouting_preserves_the_last_step_cooldown() {
     let committed = g.squads[0].left;
     g.step(2);
     let farther = g.tiles[b].near.iter().copied().find(|&t| t != a).unwrap();
+    g.players[0].cooldown=0; // Isolate movement commitment from shared orders.
     g.command(0, "move", id, farther, 0).unwrap();
     assert_eq!(&g.squads[0].path[..2], &[b, farther]);
     assert_eq!(g.squads[0].tile, b);
@@ -521,13 +557,13 @@ fn deterministic_restore_and_occupancy_over_a_match() {
     assert!(a.players.iter().all(|p| p.gold >= 0.));
 }
 #[test]
-fn no_score_timeout_and_finite_territorial_objective() {
+fn passive_survival_and_old_influence_never_win() {
     let mut g = quiet();
-    g.step(1200);
-    assert_eq!(g.winner, -1);
-    g.step(960);
-    assert!(g.winner >= 0);
-    assert_eq!(g.players[g.winner as usize].mandate, INFLUENCE_GOAL);
+    g.players[0].mandate=u16::MAX;
+    g.players[0].domination=u16::MAX;
+    g.step(7200);
+    assert_eq!(g.winner,-1);
+    assert!(g.players.iter().all(|p|p.mandate==0&&p.domination==0));
 }
 #[test]
 fn discoveries_are_secret_single_use_and_do_not_stack() {
@@ -549,7 +585,7 @@ fn discoveries_are_secret_single_use_and_do_not_stack() {
     g.command(p, "explore", id, 0, 0).unwrap();
     assert_eq!(g.squads.len(), 2);
     assert_ne!(g.squads[0].tile, g.squads[1].tile);
-    g.step(2);
+    g.step(ORDER_INTERVAL);
     assert_eq!(g.command(p, "explore", id, 0, 0), Err(6));
 }
 #[test]
@@ -575,7 +611,7 @@ fn encounter_distribution_has_ten_types_and_quarter_density() {
 }
 
 #[test]
-fn refit_costs_the_same_currency_and_leaves_a_vulnerable_piece() {
+fn units_cannot_be_converted_even_with_money_and_research() {
     let mut g = quiet();
     let i = g
         .squads
@@ -585,13 +621,10 @@ fn refit_costs_the_same_currency_and_leaves_a_vulnerable_piece() {
     let id = g.squads[i].id;
     g.players[0].unlocked.push(3);
     g.players[0].gold = 200.;
-    g.command(0, "refit", id, 0, 3).unwrap();
-    assert_eq!(g.players[0].gold, 62.5);
-    assert_eq!(g.command(0, "move", id, 0, 0), Err(2));
-    g.step(19);
-    assert_eq!(g.squads.iter().find(|u| u.id == id).unwrap().kind, 0);
-    g.step(1);
-    assert_eq!(g.squads.iter().find(|u| u.id == id).unwrap().kind, 3);
+    assert_eq!(g.command(0, "refit", id, 0, 3), Err(6));
+    assert_eq!(g.players[0].gold, 200.);
+    assert_eq!(g.squads[i].kind, 0);
+    assert_eq!(g.players[0].cooldown, 0);
 }
 #[test]
 fn ballistic_strikes_warn_and_damage_friendly_pieces() {
@@ -621,6 +654,7 @@ fn launch_needs_an_occupied_production_city_and_can_be_disrupted() {
     g.squads.clear();
     g.spawn(0, 10, tile);
     g.players[0].gold = 500.;
+    g.players[0].unlocked=(0..UNIT_COUNT).collect();
     let id = g.squads[0].id;
     g.command(0, "ability", id, 0, 0).unwrap();
     g.step(30);
@@ -629,6 +663,67 @@ fn launch_needs_an_occupied_production_city_and_can_be_disrupted() {
     g.step(15);
     assert_eq!(g.players[0].launch, 0);
     assert_eq!(g.players[0].launch_tile, None);
+}
+
+#[test]
+fn orbital_research_requires_every_other_technology_and_launch_is_the_only_non_conquest_win() {
+    let mut g=quiet();g.tick=900;g.squads.clear();
+    g.players[0].gold=10000.;
+    for missing in technologies().filter(|&k|k!=10) {
+        g.players[0].unlocked=(0..UNIT_COUNT).filter(|&k|k!=10&&k!=missing).collect();
+        assert_eq!(g.command(0,"research",0,0,10),Err(6));
+    }
+    g.players[0].unlocked=(0..UNIT_COUNT).filter(|&k|k!=10).collect();
+    g.command(0,"research",0,0,10).unwrap();g.step(90);
+    assert!(g.space_ready(0));
+    let tile=g.cities.iter_mut().find(|c|c.owner==0).map(|c|{c.production=3;c.tile}).unwrap();
+    g.spawn(0,10,tile);let id=g.squads.last().unwrap().id;
+    g.command(0,"ability",id,0,0).unwrap();g.step(SPACE_GOAL as u32-1);
+    assert_eq!(g.winner,-1);g.step(1);
+    assert_eq!(g.winner,0);assert_eq!(g.victory,2);
+    assert_eq!(g.players.iter().filter(|p|p.alive).count(),8);
+}
+
+#[test]
+fn injected_engineer_cannot_bypass_full_tree_requirement() {
+    let mut g=quiet();g.squads.clear();g.players[0].gold=1000.;
+    let tile=g.cities.iter_mut().find(|c|c.owner==0).map(|c|{c.production=3;c.tile}).unwrap();
+    g.spawn(0,10,tile);let id=g.squads[0].id;
+    assert_eq!(g.command(0,"ability",id,0,0),Err(6));
+    g.players[0].launch=SPACE_GOAL;g.step(1);assert_eq!(g.winner,-1);
+}
+
+#[test]
+fn normal_focus_repeats_and_spamming_cannot_accelerate_it() {
+    let(mut a,_,target)=arena();
+    a.squads[1].kind=13;a.squads[1].hp=10000.;
+    let id=a.squads[0].id;
+    a.command(0,"attack",id,target,0).unwrap();
+    let mut b=a.clone();
+    for _ in 0..50 {
+        let _=b.command(0,"attack",id,target,0);
+        a.step(1);b.step(1);
+    }
+    assert!(a.squads[1].hp<10000.-spec(0).damage*2.);
+    assert_eq!(a.squads[1].hp,b.squads[1].hp);
+    assert_eq!(a.squads[0].fire_at,b.squads[0].fire_at);
+    assert_eq!(a.squads[0].focus,Some(a.squads[1].id));
+}
+
+#[test]
+fn guard_zone_blocks_crossing_but_allows_approach_withdrawal_and_air() {
+    let(mut g,guard,from)=arena();
+    let to=*g.tiles[guard].near.iter().find(|&&t|t!=from&&g.tiles[from].near.contains(&t)).unwrap();
+    let retreat=*g.tiles[from].near.iter().find(|&&t|t!=guard&&!g.tiles[guard].near.contains(&t)).unwrap();
+    let u=g.squads[1].clone();
+    assert!(g.guard_blocks(&u,from,to,None));
+    assert!(!g.guard_blocks(&u,from,retreat,None));
+    assert!(!g.guard_blocks(&u,retreat,from,None));
+    let mut air=u.clone();air.kind=6;assert!(!g.guard_blocks(&air,from,to,None));
+    let route=g.path(&u,to).unwrap();assert_ne!(route,vec![from,to]);
+    g.squads[1].path=vec![from,to];g.squads[1].to=to;g.move_unit(1);
+    assert_eq!(g.squads[1].tile,from);assert_eq!(g.squads[1].path,vec![from]);
+    g.squads.remove(0);assert!(!g.guard_blocks(&u,from,to,None));
 }
 #[test]
 fn concealed_world_changes_do_not_change_the_bot_order() {
@@ -645,11 +740,12 @@ fn concealed_world_changes_do_not_change_the_bot_order() {
 }
 
 #[test]
-fn moving_or_standing_near_an_enemy_never_implicitly_attacks() {
+fn standing_units_defend_without_repeated_player_orders() {
     let (mut g, _, _) = arena();
-    let hp: Vec<_> = g.squads.iter().map(|u| u.hp).collect();
+    let enemy=g.squads[1].id;
     g.step(40);
-    assert_eq!(g.squads.iter().map(|u| u.hp).collect::<Vec<_>>(), hp);
+    assert!(g.squads.iter().find(|u|u.id==enemy).is_none_or(|u|u.hp<85.));
+    assert!(g.players.iter().all(|p|p.cooldown==0));
 }
 
 #[test]
@@ -665,12 +761,13 @@ fn explicit_attack_commits_once_and_queued_movement_waits() {
     assert_eq!(g.command(0, "disband", id, 0, 0), Err(2));
     assert_eq!(g.command(0, "ability", id, 0, 0), Err(2));
     let to = g.tiles[a].near.iter().copied().find(|&t| t != b).unwrap();
+    g.players[0].cooldown=0; // Test queuing during the unit commitment itself.
     g.command(0, "move", id, to, 0).unwrap();
     g.step(until - g.tick - 1);
     assert_eq!(g.squads[0].tile, a);
     g.step(30);
     assert_eq!(g.squads[0].tile, to);
-    assert_eq!(g.squads[1].hp, damaged);
+    assert!(g.squads.iter().find(|u|u.owner==1).is_none_or(|u|u.hp<=damaged));
 }
 
 #[test]
@@ -722,6 +819,7 @@ fn planner_keeps_investing_during_a_standing_battle() {
     g.players[0].gold = 900.;
     g.players[0].unlocked = vec![0, 1, 2, 7, 12, 13];
     g.bot_policy(0, 0);
+    g.tick_one(false);
     assert!(
         g.players[0].research >= 0,
         "repeated available attacks must not starve development"

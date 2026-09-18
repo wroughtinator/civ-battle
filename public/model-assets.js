@@ -1,5 +1,6 @@
 // Asset Forge packed rigid rigs and instanced props. No runtime glTF dependency.
-export const modelNames=['guard','cavalry','archer','tank','artillery','recon','drone','fleet','submarine','carrier','engineer','launcher','scout','settler','missile','nuke','satellite','arrow','shell','mortar','bullet','bomb','torpedo','rocket','aircraft'];
+import {units} from './roster.js';
+export const modelNames=[...units.map(u=>u.model),'missile','nuke','satellite','arrow','shell','mortar','bullet','bomb','torpedo','rocket','aircraft'];
 export const treeNames=['tree-oak','tree-pine','tree-birch'];
 export function orientationBasis(up,forward,flight=false){
  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=p=>p.map(v=>v/Math.hypot(...p));

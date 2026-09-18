@@ -7,9 +7,9 @@ import {abilities} from '../public/planning.js';
 
 test('every icon and every unit action has a manual entry and a feedback symbol',()=>{
  for(const key of iconNames){assert.ok(manualEntries[key]?.[0]);assert.ok(manualEntries[key]?.[1].length>30,key);}
- for(let kind=0;kind<14;kind++)for(const a of abilities(kind))assert.ok(manualEntries[actionSymbol({action:'ability',kind,value:a.value})]);
+ for(let kind=0;kind<36;kind++)for(const a of abilities(kind))assert.ok(manualEntries[actionSymbol({action:'ability',kind,value:a.value})]);
  assert.match(manualEntries.settle[1],/four hex steps/);
- assert.match(manualEntries.settle[1],/45 seconds/);
+ assert.match(manualEntries.settle[1],/25 seconds/);
 });
 
 test('authoritative presentation events deduplicate, survive repeated snapshots, and skip stale replays',()=>{

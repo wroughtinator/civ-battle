@@ -1,5 +1,6 @@
 // Presentation seconds only. These do not alter windup, damage, or recovery rules.
-export const attackStyles=[
+import {units} from './roster.js';
+const baseStyles=[
  {type:'slash',seconds:.32,color:[1,.88,.58],kick:.006},
  {type:'charge',seconds:.42,color:[1,.72,.32],kick:.020},
  {type:'arrow',seconds:.45,color:[1,.88,.48],kick:.002},
@@ -15,6 +16,7 @@ export const attackStyles=[
  {type:'stab',seconds:.26,color:[.91,1,.78],kick:.010},
  {type:'bash',seconds:.32,color:[1,.78,.39],kick:.004},
 ];
+export const attackStyles=units.map(u=>baseStyles[u.style]);
 export const unitScales=[.105,.095,.103,.120,.112,.091,.108,.165,.155,.170,.110,.115,.100,.112];
 export function attackTiming(event,now){
  const style=attackStyles[event.kind]||attackStyles[0],end=event.start+event.flight;

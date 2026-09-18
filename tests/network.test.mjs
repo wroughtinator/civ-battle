@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const base=process.env.BASE_URL||'http://127.0.0.1:8793';
+const server=(process.env.BASE_URL||'http://127.0.0.1:8793').replace(/\/$/,'');
+// Use the current release like a real browser. Unversioned sockets intentionally
+// target the bootstrap rules and must not attach to newly pinned rooms.
+const base=server.includes('/releases/')?server:server+(await fetch(server+'/api/health').then(r=>r.json())).clientPath.replace(/\/$/,'');
 async function post(path,body={}){const r=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return{status:r.status,...await r.json()};}
 function client(room,token){
  const ws=new WebSocket(base.replace(/^http/,'ws')+`/api/rooms/${room}/ws`,['meridian',token]);const messages=[];const waiters=[];
@@ -38,6 +41,26 @@ test('reject cross-origin writes and malformed rooms',async()=>{
  assert.equal((await post('/api/rooms/not-a-room/join')).status,404);
  assert.equal((await fetch(base+'/api/health')).status,200);
  assert.equal((await post('/api/rooms',null)).status,400);
+});
+
+test('research goals reach authority, respect six-second recovery and keep rival queues private',async t=>{
+ const made=await post('/api/rooms',{seed:42,count:2});
+ const joined=await post(`/api/rooms/${made.room}/join`);
+ const host=client(made.room,made.token),guest=client(made.room,joined.token);
+ t.after(()=>{host.ws.close();guest.ws.close();});
+ await Promise.all([host.wait(m=>m.type==='welcome'),guest.wait(m=>m.type==='welcome')]);
+ assert.equal((await host.send({type:'start',seq:1})).error,0);
+ const running=await host.wait(m=>m.type==='state'&&m.phase==='running');
+ assert.equal(running.rules.specs.length,36);assert.equal(running.rules.order_interval,6);
+ assert.equal((await host.send({type:'command',kind:'plan',value:3,seq:2})).error,0);
+ assert.equal((await host.send({type:'command',kind:'plan',value:10,seq:3})).error,2);
+ const planned=await host.wait(m=>m.type==='state'&&m.players[0].research_queue?.includes(3));
+ const rival=await guest.wait(m=>m.type==='state'&&m.revision>=planned.revision);
+ assert.equal(rival.players[0].research_queue,undefined);
+ await host.wait(m=>m.type==='state'&&m.tick>=planned.players[0].cooldown);
+ assert.equal((await host.send({type:'command',kind:'plan',value:255,seq:4})).error,0);
+ const stopped=await host.wait(m=>m.type==='state'&&m.revision>planned.revision&&m.players[0].research_queue?.length===0);
+ assert.equal(stopped.players[0].research,1,'clearing future work preserves the paid cavalry study');
 });
 test('simultaneous invitations cannot overbook the eight-player lobby',async()=>{
  const host=await post('/api/rooms',{seed:42,count:8});
@@ -86,7 +109,7 @@ test('two humans can start alone on a full globe, resizing never removes joined 
  assert.equal(made.status,201);
  const host=client(made.room,made.token);t.after(()=>host.ws.close());
  const welcome=await host.wait(m=>m.type==='welcome');const initial=await host.wait(m=>m.type==='state');
- assert.equal(initial.players.length,2);assert.equal(initial.tiles.length,642);assert.equal(initial.cities.length,2);assert.equal(initial.rules.capital_goal,2);
+ assert.equal(initial.players.length,2);assert.equal(initial.tiles.length,642);assert.equal(initial.cities.length,2);assert.deepEqual(initial.rules.victory_modes,['conquest','space']);
  const capitals=welcome.world.filter(t=>t.capital>=0);assert.equal(capitals.length,2);
  const separation=Math.acos(capitals[0].p.reduce((sum,v,i)=>sum+v*capitals[1].p[i],0));
  assert.ok(separation<Math.PI/2,'neighbouring starts should be on the same hemisphere');

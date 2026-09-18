@@ -2,17 +2,29 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {makeEngine} from '../worker/wasm.js';
-import {canFound} from '../public/planning.js';
+import {canFound,abilities} from '../public/planning.js';
 import {orderBlock,targetTiles,refitChoices} from '../public/controls.js';
+import {units} from '../public/roster.js';
 const run=makeEngine(new WebAssembly.Module(readFileSync(new URL('../worker/engine.wasm',import.meta.url))));
 function fixture(){
  const state=run({op:'new',seed:42,difficulty:1}).state;
  state.tick=300;state.players.forEach(p=>p.bot=false);state.players[0].gold=1000;
- state.players[0].unlocked=Array.from({length:14},(_,i)=>i);
+ state.players[0].unlocked=Array.from({length:36},(_,i)=>i);
  state.discoveries=[];
  return state;
 }
 const view=state=>({...run({op:'view',state,player:0}).state,tick:state.tick,winner:state.winner});
+test('automatic defence has no action button and research has no elapsed-time gate',()=>{
+ const state=fixture(),u=state.squads.find(u=>u.owner===0&&u.kind===0);state.tick=0;
+ for(const k of [0,3]){u.kind=k;assert.deepEqual(abilities(k),[]);compare(state,'ability',{from:u.id,value:0},false);}
+ state.players[0].unlocked=[0,1,24,12,13];compare(state,'research',{value:3},true);
+});
+test('launch requires every technology in both the controls and WASM',()=>{
+ const state=fixture(),city=state.cities.find(c=>c.owner===0),u=state.squads.find(u=>u.owner===0&&u.tile===city.tile);
+ city.production=3;u.kind=10;const data={from:u.id,value:0};
+ compare(state,'ability',data,true);
+ for(let k=1;k<36;k++){if([12,13].includes(k))continue;const missing=structuredClone(state);missing.players[0].unlocked=missing.players[0].unlocked.filter(x=>x!==k);compare(missing,'ability',data,false);}
+});
 function compare(state,kind,data,enabled){
  assert.equal(orderBlock(state.tiles,view(state),0,kind,data)===null,enabled);
  const result=run({op:'command',state,player:0,kind,...data});
@@ -25,7 +37,7 @@ test('founding is visibly available only for a stationary, affordable settler on
  const data={from:u.id,value:0};
  const result=compare(state,'ability',data,true);
  assert.equal(result.state.squads.find(s=>s.id===u.id).founding,true);
- assert.equal(result.state.squads.find(s=>s.id===u.id).work,45);
+ assert.equal(result.state.squads.find(s=>s.id===u.id).work,25);
  for(const change of [s=>s.players[0].gold=0,s=>s.squads.find(s=>s.id===u.id).left=9,s=>s.squads.find(s=>s.id===u.id).locked_until=310,s=>s.squads.find(s=>s.id===u.id).tile=s.cities[0].tile]){
   const changed=structuredClone(state);change(changed);compare(changed,'ability',data,false);
  }
@@ -56,7 +68,7 @@ test('a fifth settlement is enabled and accepted when its site and funds are val
 test('refit cost, commitment, terrain and artillery setup disable actions before submission',()=>{
  const state=fixture(),u=state.squads.find(u=>u.owner===0&&u.kind===0);
  state.players[0].gold=20;compare(state,'refit',{from:u.id,value:3},false);
- state.players[0].gold=1000;compare(state,'refit',{from:u.id,value:3},true);
+ state.players[0].gold=1000;compare(state,'refit',{from:u.id,value:3},false);assert.deepEqual(refitChoices(view(state),u),[]);
  u.kind=4;u.moved=state.tick-5;
  const targets=targetTiles(state.tiles,view(state),u,'attack');assert.ok(targets.length);
  compare(state,'attack',{from:u.id,to:targets[0]},false);
@@ -79,4 +91,31 @@ test('Stop remains available during order recovery and preserves step cooldown',
  u.path=[u.tile,state.tiles[u.tile].near[0]];u.to=u.path[1];u.left=5;state.players[0].cooldown=state.tick+2;
  const result=compare(state,'stop',{from:u.id},true),stopped=result.state.squads.find(s=>s.id===u.id);
  assert.deepEqual(stopped.path,[u.tile]);assert.equal(stopped.left,5);assert.equal(stopped.tile,u.tile);
+});
+
+test('all 36 client unit specs match WASM and only 33 belong to the research tree',()=>{
+ const state=fixture();assert.deepEqual(view(state).rules.specs,units.map(u=>u.spec));
+ assert.equal(units.filter(u=>u.researchable).length,33);
+ assert.equal(view(state).rules.order_interval,6);assert.equal(view(state).rules.space_goal,180);
+});
+
+test('research goals queue locked prerequisites without an up-front payment and hide enemy plans',()=>{
+ const state=fixture();state.players[0].unlocked=[0,12,13];state.players[0].gold=0;
+ const planned=compare(state,'plan',{value:3},true).state;
+ assert.deepEqual(planned.players[0].research_queue,[1,24,3]);assert.equal(planned.players[0].gold,0);
+ assert.equal(run({op:'view',state:planned,player:1}).state.players[0].research_queue,undefined);
+ for(const value of [0,12,13,36,254])compare(state,'plan',{value},false);
+ compare(state,'plan',{value:255},true);
+});
+
+test('facing affordance agrees with authority for land walls, floating barriers and shield trucks',()=>{
+ for(const kind of [16,26,30,34]){
+  const state=fixture(),u=state.squads.find(u=>u.owner===0);u.kind=kind;
+  const to=state.tiles[u.tile].near[0];
+  const result=compare(state,'face',{from:u.id,to},true).state;
+  assert.equal(result.squads.find(s=>s.id===u.id).facing,to);
+  assert.equal(result.squads.find(s=>s.id===u.id).locked_until,state.tick+8);
+  compare(state,'face',{from:u.id,to:u.tile},false);
+  u.left=2;compare(state,'face',{from:u.id,to},false);
+ }
 });
