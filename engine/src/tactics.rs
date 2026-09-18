@@ -187,9 +187,9 @@ impl Game {
                 radius: 1,
                 production: 1,
                 training: -1,
+                queue: Vec::new(),
                 left: 0,
                 total: 0,
-                queue: Vec::new(),
                 claimant: -1,
                 capture: 0,
                 disabled_until: 0,
@@ -565,9 +565,6 @@ impl Game {
                 a.research = value as i8;
                 a.research_left = time;
             }
-            "train" | "upgrade" => {
-                let c = self
-                    .cities
             "enqueue" | "clear_queue" => {
                 let c = self.cities.iter().position(|c| c.tile == from && c.owner == p).ok_or(3)?;
                 if kind == "clear_queue" {
@@ -580,6 +577,9 @@ impl Game {
                     self.start_queued(c);
                 }
             }
+            "train" | "upgrade" => {
+                let c = self
+                    .cities
                     .iter()
                     .position(|c| c.tile == from && c.owner == p)
                     .ok_or(3)?;
@@ -1213,6 +1213,17 @@ impl Game {
             }
         }
     }
+    fn start_queued(&mut self, c: usize) {
+        let city = &self.cities[c];
+        if city.training >= 0 || city.disabled_until > self.tick { return; }
+        let Some(&kind) = city.queue.first() else { return; };
+        let (owner, tile) = (city.owner, city.tile);
+        // Use the same costs, capacity reservation and validation as a direct order.
+        if self.command(owner, "train", tile, 0, kind).is_ok() {
+            self.cities[c].queue.remove(0);
+        }
+    }
+
     fn development(&mut self) {
         let mut changed = false;
         let farms = self.farm_counts(&self.territory_sources());
@@ -1231,17 +1242,6 @@ impl Game {
             let c = self.cities[i].clone();
             let occupant = self.occupant(c.tile).cloned();
             if let Some(u) = occupant.filter(|u| {
-    fn start_queued(&mut self, c: usize) {
-        let city = &self.cities[c];
-        if city.training >= 0 || city.disabled_until > self.tick { return; }
-        let Some(&kind) = city.queue.first() else { return; };
-        let (owner, tile) = (city.owner, city.tile);
-        // Use the same costs, capacity reservation and validation as a direct order.
-        if self.command(owner, "train", tile, 0, kind).is_ok() {
-            self.cities[c].queue.remove(0);
-        }
-    }
-
                 u.owner < self.players.len()
                     && u.owner != c.owner
                     && ground(u.kind)
@@ -1256,6 +1256,7 @@ impl Game {
                 }
                 if self.cities[i].capture >= if u.kind == 5 { 6 } else { 12 } {
                     self.cities[i].owner = u.owner;
+                    self.cities[i].queue.clear();
                     self.cities[i].training = -1;
                     self.cities[i].left = 0;
                     self.cities[i].claimant = -1;
@@ -1275,7 +1276,6 @@ impl Game {
                 if self.cities[i].left == 0 {
                     let mut spots = vec![c.tile];
                     spots.extend(self.tiles[c.tile].near.iter().copied());
-                    self.cities[i].queue.clear();
                     if let Some(tile) = spots.into_iter().find(|&t| {
                         self.occupant(t).is_none()
                             && self.can_enter(c.training as u8, t)
@@ -1286,6 +1286,7 @@ impl Game {
                     }
                 }
             }
+            self.start_queued(i);
             if self.tick % 5 == 0 && c.disabled_until <= self.tick {
                 let blockade = self.squads.iter().any(|u| {
                     u.owner != c.owner
@@ -1304,7 +1305,6 @@ impl Game {
             if u.boarded_on.is_some() { continue; }
             if u.refit >= 0 {
                 self.squads[i].work = self.squads[i].work.saturating_sub(1);
-            self.start_queued(i);
                 if self.squads[i].work == 0 {
                     self.squads[i].kind = u.refit as u8;
                     self.squads[i].hp = (u.hp / spec(u.kind).hp * spec(u.refit as u8).hp)
@@ -1339,6 +1339,7 @@ impl Game {
                 radius: 1,
                 production: 1,
                 training: -1,
+                queue: Vec::new(),
                 left: 0,
                 total: 0,
                 claimant: -1,
@@ -1357,7 +1358,6 @@ impl Game {
                     .filter(|u| u.owner == p && u.kind != SETTLER)
                     .count()
                     .saturating_sub(3) as f32
-                queue: Vec::new(),
                     * 0.7;
                 self.players[p].gold = (self.players[p].gold - upkeep).max(0.);
             }
@@ -1459,6 +1459,7 @@ impl Game {
                 let mut a = c.clone();
                 if c.owner != p {
                     a.training = -1;
+                    a.queue.clear();
                     a.left = 0;
                     a.total = 0;
                     if !v[c.tile] {
@@ -1477,7 +1478,6 @@ impl Game {
                         let tiles: Vec<_> = expanded.iter().enumerate()
                             .filter(|(i, source)| **source == Some(n) && sources[*i] != Some(n) && v[*i])
                             .map(|(i, _)| i).collect();
-                    a.queue.clear();
                         let new_farms = tiles.iter().filter(|&&i| self.farmland(i)
                             && sources[i].is_none_or(|other| self.cities[other].owner != p)).count();
                         value["expansion_tiles"] = json!(tiles);
@@ -1589,5 +1589,6 @@ use discoveries::Discovery;
 
 #[cfg(test)]
 mod tests;
+
 #[cfg(test)]
 mod manufacture_tests;
