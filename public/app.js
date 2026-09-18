@@ -14,8 +14,9 @@ let state=null,world=[],slot=0,room=null,token=null,ws=null,seq=0,inflight=null,
 let selected=-1,marchFrom=-1,marchRatio=0,previewEngine=null,previewState=null,count=8,difficulty=1,seed=crypto.getRandomValues(new Uint32Array(1))[0],civ=0;
 let techOpen=false,lastTick=0,lastStateAt=performance.now(),sound=false,audio=null,markerNodes=[],marchNodes=[],hasStarted=false,retry=0,reconnectTimer,toastTimer;
 let leaving=false,creating=null,readyResolve=null,pointerHeld=false,pendingRender=false;
-document.addEventListener('pointerdown',()=>pointerHeld=true,true);
-const finishPointer=()=>requestAnimationFrame(()=>{pointerHeld=false;if(pendingRender&&state){pendingRender=false;render();rebuildMarkers();}});
+const heldPointers=new Set();
+document.addEventListener('pointerdown',e=>{heldPointers.add(e.pointerId);pointerHeld=true;},true);
+const finishPointer=e=>{heldPointers.delete(e.pointerId);requestAnimationFrame(()=>{pointerHeld=heldPointers.size>0;if(!pointerHeld&&pendingRender&&state){pendingRender=false;render();rebuildMarkers();}});};
 document.addEventListener('pointerup',finishPointer,true);document.addEventListener('pointercancel',finishPointer,true);
 let arsenal=false,activeUnit=-1,targetOrder=null;
 let callsign=1000+crypto.getRandomValues(new Uint32Array(1))[0]%9000;const encountered=new Set();
