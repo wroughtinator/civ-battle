@@ -1,6 +1,6 @@
 # Three eras expansion — 2026-09-18
 
-Implemented in mutable source and locally verified. Not deployed. The final audit results below distinguish measured planning benefits from full strategic certification.
+Implemented in mutable source and verified before landing. The audit results below distinguish measured planning benefits from full strategic certification. The landing integration section records the subsequently merged shared-branch changes.
 
 ## What changed
 
@@ -66,6 +66,31 @@ Ordinary research costs 18/32/48 coins and takes 8/12/16 seconds by era; orbital
 Only complete spaceflight or elimination of every rival civilization wins. Capturing the last city eliminates that civilization. No coin victory, passive score victory, forced timer ending or refitting was added.
 
 ## Verification results
+
+### Landing integration with current main
+
+Landing preserved main's loading screen, mobile rendering caches, player outlines, title showcase, scoreboard modal, host transfer and gold-only treasure chests. The scoreboard now reports surviving cities and launch progress, rather than the removed influence score. No archived release was modified or removed. The older screenshots and measurements below remain a record of the pre-merge version; [this tree screenshot](era-landed-tree.jpg) and [this renderer report](era-landed-assets.json) cover the merged UI.
+
+The gold-only discovery rules change simulation outcomes, so both full-game seed families were rerun for 120 seconds each with the original configurations and unchanged gates. The merged rules produced **FAIL / INCONCLUSIVE**: the main run found zero qualifying consequential positions, while the holdout found two with one delayed reversal. Higher-compute full-game wins were 58.9% over 28 pairs and 50.0% over 19 pairs; neither establishes a reliable advantage. Same-policy input frequency and blind repetition passed on both seeds; fast/shallow versus slower/deeper remained inconclusive.
+
+| Merged full-game pacing | Seed 42000 | Seed 43000 |
+|---|---:|---:|
+| Completed two-player matches | 734 | 750 |
+| Mean two-player duration | 14.8 min | 14.4 min |
+| Two-player completions within 15 min | 56.9% | 66.8% |
+| Completed eight-player matches | 224 | 237 |
+| Mean eight-player duration | 13.2 min | 13.2 min |
+| Eight-player completions within 15 min | 90.6% | 90.7% |
+| Diagnostic stalls | 71/2830 (2.5%) | 77/2759 (2.8%) |
+| Space share of counted victories | 90.6% | 93.4% |
+
+Every researchable type was recruited on both merged seed families. Guards fell below the 40% policy warning threshold in the main run; no policy did in the holdout. Every completed eight-player game still ended in space. These outcomes preserve the same central limitation: conquest is uncommon and full strategic depth is unverified. Evidence: [merged design run](era-design-landed.json) and [merged holdout](era-design-landed-holdout.json).
+
+The [merged planning recheck](era-planning-landed.json), seed 51000 and 120 seconds, passed all four gates: breadth 66.5% (247 pairs), foresight 63.7% (247), slower/deeper restraint 72.6% (246), and peaceful-space scheduling 88.4% (796 maps). The mean peaceful launch benefit was 13.3 seconds, with no unfinished launches. These remain bounded material/scheduling measurements, not full-game wins. The separate planning holdout below predates the main-branch merge and is retained as historical evidence.
+
+Merged implementation validation passed 61 current-rule Rust tests, nine native audit tests, 119 offline JavaScript tests and seven live local network tests. All 79 rendered asset checks passed with the current outline/caching renderer and no browser errors. The real local room exercised title-to-lobby-to-match, scoreboard city/launch columns, research goal queuing and the six-second order recovery. The built-in deployment dry run passed all archive, loading and retained-production checks.
+
+### Pre-merge evidence
 
 Each final run used **120 seconds of analysis**, plus cached compilation. The main and holdout runs use the same frozen engine and controllers. The baseline is preserved, including its failures. Policy coverage and the combat scenario pool expanded with the roster, so before/after numbers are not a pure causal estimate of rule changes.
 
