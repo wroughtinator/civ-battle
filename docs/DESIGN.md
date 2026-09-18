@@ -16,7 +16,7 @@ A city changes owner only after an enemy ground piece stands on its exact center
 
 ## Movement and deliberate actions
 
-Movement uses terrain-weighted Dijkstra paths over actual edges. Land forces can embark slowly; cavalry/tanks cannot cross mountains; ships/submarines/carriers stay on water; drones fly. Occupied known cells block routes. A hidden obstruction is discovered on arrival, not through the command validator. Friendly congestion can replan without free movement. Orders changed midway finish their committed edge.
+Movement uses terrain-weighted Dijkstra paths over actual edges. Land forces can board friendly carriers (capacity three) as the final step of a route; passengers cannot act and die with their transport. Disembark targets adjacent empty suitable land and unloads the first compatible passenger, applying its movement cooldown and stopping/committing the carrier for two seconds; cavalry/tanks cannot cross mountains; ships/submarines/carriers stay on water; drones fly. Occupied known cells block routes. A hidden obstruction is discovered on arrival, not through the command validator. Friendly congestion can replan without free movement. Orders changed midway finish their committed edge.
 
 Movement and attack are independent. A normal attack is an explicit command, with a visible range and a short windup. It fires once, then the unit must finish its recovery. Units do not automatically attack merely because another piece is nearby. Barbarians are explicitly hostile and act automatically. Movement can be planned during recovery but does not execute until the commitment ends. Other abilities and disbanding cannot bypass it. The server enforces a two-second player order interval in addition to the unit's commitment.
 

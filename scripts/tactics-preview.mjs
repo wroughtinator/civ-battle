@@ -23,6 +23,15 @@ if(process.env.TACTICS_PREVIEW_SCENE==='combat'){
  Object.assign(archer,{tile,to:tile,path:[tile],locked_until:0,fire_at:0});
  state.squads=[archer,{...archer,id:201,kind:0,owner:1,tile:target,to:target,path:[target],hp:110},settler];state.discoveries=[];
 }
+if(process.env.TACTICS_PREVIEW_SCENE==='transport'){
+ const ship=state.squads.find(u=>u.kind===9),guard=state.squads.find(u=>u.kind===0),tank=state.squads.find(u=>u.kind===3),settler=state.squads.find(u=>u.kind===13);
+ const sea=q.find(i=>d[i]>0&&d[i]<6&&state.tiles[i].terrain===0&&state.tiles[i].near.some(j=>state.tiles[j].terrain===1));
+ const land=state.tiles[sea].near.find(i=>state.tiles[i].terrain===1);
+ Object.assign(ship,{tile:sea,to:sea,path:[sea]});
+ Object.assign(guard,{tile:land,to:land,path:[land]});
+ for(const u of [tank,settler])Object.assign(u,{tile:sea,to:sea,path:[sea],boarded_on:ship.id});
+ state.squads=[ship,guard,tank,settler];state.discoveries=[];
+}
 if(process.env.TACTICS_PREVIEW_SCENE==='spectator'){
  state.cities.find(c=>c.owner===0).owner=1;
  const next=run({op:'step',state,ticks:1}).state;Object.assign(state,next);

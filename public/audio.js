@@ -9,6 +9,20 @@ export class Soundscape {
  }catch(e){this.loading=false;console.warn('Audio unavailable',e);}}
  toggle(){this.enabled=!this.enabled;localStorage.setItem('meridian:muted',this.enabled?'0':'1');if(this.master)this.master.gain.setTargetAtTime(this.enabled?.55:0,this.ctx.currentTime,.1);if(this.enabled){this.unlock();this.play('confirm',.25);}return this.enabled;}
  play(name,volume=.35,pan=0,rate=1){if(!this.enabled||!this.ready||document.hidden||this.voices>=12)return;const now=this.ctx.currentTime,cue=this.cues[name];if(!cue||now-(this.lastCue.get(name)||-99)<.07)return;this.lastCue.set(name,now);const source=this.ctx.createBufferSource(),gain=this.ctx.createGain(),panner=this.ctx.createStereoPanner();source.buffer=this.buffer;source.playbackRate.value=rate;gain.gain.value=volume;panner.pan.value=Math.max(-1,Math.min(1,pan));source.connect(gain).connect(panner).connect(this.master);source.start(0,cue.start,cue.duration);this.voices++;source.onended=()=>{this.voices--;source.disconnect();gain.disconnect();panner.disconnect();};}
+ pickup(){
+  if(!this.enabled||!this.ctx||document.hidden||this.ctx.state!=='running'||this.voices>=12)return;
+  const now=this.ctx.currentTime;
+  if(now-(this.lastCue.get('pickup')??-99)<.1)return;
+  this.lastCue.set('pickup',now);
+  // A soft ascending major arpeggio, with a bell-like octave shimmer.
+  for(const [i,hz] of [523.25,659.25,783.99,1046.5].entries()){
+   const osc=this.ctx.createOscillator(),gain=this.ctx.createGain(),start=now+i*.085;
+   osc.type='sine';osc.frequency.value=hz;
+   gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(.17,start+.008);gain.gain.exponentialRampToValueAtTime(.001,start+.65);
+   osc.connect(gain).connect(this.master);osc.start(start);osc.stop(start+.7);this.voices++;
+   osc.onended=()=>{this.voices--;osc.disconnect();gain.disconnect();};
+  }
+ }
  command(kind,value){const sounds={move:'order',stop:'click',ability:'launch',upgrade:'engine',march:'order',build:'engine',research:'confirm',train:'engine',maneuver:'order',strike:value===2?'warning':'launch',satellite:'launch',start:'confirm',configure:'click',civ:'click'};this.play(sounds[kind]||'click',kind==='strike'?.36:.24,0,kind==='train'?.85:1);}
  events(state,previous,world,globe,slot){if(!previous||previous.phase!=='running')return;
   for(const e of state.events||[]){if(state.feedback&&[1,2].includes(e.kind))continue;const key=`${e.tick}:${e.kind}:${e.tile}:${e.player}`;if(this.seen.has(key)||e.tick<=previous.tick-2)continue;this.seen.add(key);if(this.seen.size>300)this.seen.delete(this.seen.values().next().value);const p=globe.project(world[e.tile].p),global=e.kind===6||e.kind===9;const own=e.player===slot;

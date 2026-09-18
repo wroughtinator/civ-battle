@@ -238,7 +238,7 @@ export class Globe {
     }
    }
    if(!this.preview&&s.visible&&s.owner>=0&&t.terrain===1&&!this.state.cities.some(c=>c.tile===i))prop('farm',0,0,.066);
-   const discovery=this.state?.discoveries?.find(d=>d.tile===i);if(discovery&&s.visible)prop('discovery-'+discovery.kind,0,0,discovery.used?.035:.065,(discovery.variant%628)/100);
+   const discovery=this.state?.discoveries?.find(d=>d.tile===i&&!d.used);if(discovery)prop('discovery-'+discovery.kind,0,0,.095,0);
    if(t.site)prop('site',0,0,.05);
    if(s.owner>=0&&t.capital>=0)prop('capital-'+(this.state?.players[s.owner]?.civ||0),0,0,.085);
    if(s.owner>=0&&s.building)prop('building-'+s.building,t.capital>=0?.052:0,0,.065);
@@ -304,7 +304,7 @@ export class Globe {
  unitPosition(s,now=performance.now()){return this.motion?.position(s,this.world,now)||{p:this.world[s.tile].p,forward:null,moving:false};}
  updateUnits(now){const data=[],elapsed=Math.min(2,(now-(this.receivedAt||now))/1000);const tri=(a,b,c,col)=>{const n=norm(cross(add(b,mul(a,-1)),add(c,mul(a,-1))));for(const p of[a,b,c])data.push(...p,...n,...col);};
   const ring=(p,r,col,height)=>{const e=norm(cross(Math.abs(p[1])>.98?[1,0,0]:[0,1,0],p)),n=cross(p,e),point=(a,rad)=>add(mul(p,height),add(mul(e,Math.cos(a)*rad),mul(n,Math.sin(a)*rad)));for(let j=0;j<32;j++){const a=j/32*Math.PI*2,b=(j+1)/32*Math.PI*2;tri(point(a,r),point(b,r),point(b,r*.87),col);tri(point(a,r),point(b,r*.87),point(a,r*.87),col);}};
-  for(const s of this.state?.squads||[]){const{p}=this.unitPosition(s,now);const col=palette[s.owner]||[.75,.35,.22];ring(p,s.kind===9?.055:.032,col,this.world[s.tile].terrain===0?1.008:ground(p,this.world[s.tile].terrain===4?1:0)+.003);
+  for(const s of this.state?.squads||[]){if(s.boarded_on!=null)continue;const{p}=this.unitPosition(s,now);const col=palette[s.owner]||[.75,.35,.22];ring(p,s.kind===9?.055:.032,col,this.world[s.tile].terrain===0?1.008:ground(p,this.world[s.tile].terrain===4?1:0)+.003);
    if(s.mode===2&&s.effect_until>this.state.tick){ring(p,.035+(now%1800)/1800*.13,[.25,.76,.76],1.018);}
    if(s.founding){ring(p,.038,[.94,.78,.42],ground(p,0)+.009);ring(p,.018+(now%1500)/1500*.025,[.94,.78,.42],ground(p,0)+.035);}
    if(s.mode===3&&s.effect_until>this.state.tick){ring(p,.039,[.38,.74,1],ground(p,0)+.03);}
@@ -338,7 +338,7 @@ export class Globe {
  }
  drawModels(now){const g=this.gl,elapsed=Math.min(2,(now-(this.receivedAt||now))/1000);
   const draw=(kind,up,forward,radius,scale,owner,flash=0,animation)=>{const mesh=this.models[kind];if(!mesh){this.loadModel(kind);return;}g.uniformMatrix3fv(this.u.modelBasis,false,orientationBasis(up,forward,animation?.flight));g.uniform3fv(this.u.modelOrigin,add(mul(up,radius),forward?mul(norm(forward),animation?.kick||0):[0,0,0]));g.uniform1f(this.u.modelScale,scale);g.uniform1f(this.u.modelFlash,flash);g.uniform3fv(this.u.modelTint,palette[owner]||[.65,.27,.18]);mesh.draw(g.TRIANGLES,this.u,animation);};
-  for(const s of this.state?.squads||[]){
+  for(const s of this.state?.squads||[]){if(s.boarded_on!=null)continue;
    const {p,forward:stepForward,moving}=this.unitPosition(s,now);
    if(this.rotate(p)[2]<1/this.distance-.12)continue;
    this.headings??=new Map();if(stepForward)this.headings.set(s.id,stepForward);

@@ -8,12 +8,23 @@ export const researchCost=k=>k===10?300:k===11?310:[65,145,235][branches.flatMap
 export const researchGate=k=>k===10?780:k===11?840:[0,240,540][branches.flatMap(b=>b.includes(k)?[b.indexOf(k)]:[])[0]];
 export function distances(world,start){const d=Array(world.length).fill(Infinity),q=[start];d[start]=0;for(let x=0;x<q.length;x++)for(const j of world[q[x]].near)if(d[j]===Infinity){d[j]=d[q[x]]+1;q.push(j);}return d;}
 export function canEnter(world,k,i){return !!world[i]&&(k>=7&&k<=9?world[i].terrain===0:k===6?true:k===1||k===3?world[i].terrain!==0&&world[i].terrain!==4:world[i].terrain!==0);}
+export const passengers=(state,u)=>state.squads.filter(s=>s.boarded_on===u.id);
+export const boardingCapacity=(state,u)=>state.rules.specs[u.kind].boarding_capacity||0;
+export function boardingTarget(world,state,u,to){
+ if(u.boarded_on!=null||!world[to]||world[to].terrain!==0||canEnter(world,u.kind,to))return null;
+ return state.squads.find(s=>s.tile===to&&s.boarded_on==null&&s.owner===u.owner&&s.refit<0&&passengers(state,s).length<boardingCapacity(state,s))||null;
+}
+export function landingTiles(world,state,u){
+ if(!boardingCapacity(state,u))return [];
+ const cargo=passengers(state,u);
+ return world[u.tile].near.filter(i=>world[i].terrain!==0&&!state.squads.some(s=>s.boarded_on==null&&s.tile===i)&&cargo.some(s=>canEnter(world,s.kind,i)));
+}
 export function movementCost(world,state,u,i){const t=world[i].terrain;let n=state.rules.specs[u.kind].speed;if(u.kind!==6&&!(u.kind>=7&&u.kind<=9)){if(t===0)n=18;else if(t===4)n+=7;else if(t===2)n+=u.kind===5?0:u.kind===1?7:3;}if(state.tiles[i]?.storm>.5)n+=u.kind===6?5:t===0?3:1;if(u.mode===3&&u.kind===1&&u.effect_until>state.tick)n=Math.max(2,n-2);if(u.mode===1&&u.kind===8)n+=3;return n;}
 export function route(world,state,u,to){
- if(!canEnter(world,u.kind,to))return null;const start=u.tile;
- const occupied=new Map(state.squads.filter(s=>s.id!==u.id).map(s=>[s.tile,s]));
+ if(u.boarded_on!=null||(!canEnter(world,u.kind,to)&&!boardingTarget(world,state,u,to)))return null;const start=u.tile;
+ const occupied=new Map(state.squads.filter(s=>s.id!==u.id&&s.boarded_on==null).map(s=>[s.tile,s]));
  const d=Array(world.length).fill(Infinity),prev=Array(world.length).fill(-1),done=new Set();d[start]=0;
- while(done.size<world.length){let i=-1,best=Infinity;for(let j=0;j<d.length;j++)if(!done.has(j)&&d[j]<best){i=j;best=d[j];}if(i<0)break;if(i===to)break;done.add(i);for(const j of world[i].near){const other=occupied.get(j);if(!canEnter(world,u.kind,j)||other)continue;const n=d[i]+movementCost(world,state,u,j);if(n<d[j]){d[j]=n;prev[j]=i;}}}
+ while(done.size<world.length){let i=-1,best=Infinity;for(let j=0;j<d.length;j++)if(!done.has(j)&&d[j]<best){i=j;best=d[j];}if(i<0)break;if(i===to)break;done.add(i);for(const j of world[i].near){const other=occupied.get(j);if(!(j===to&&boardingTarget(world,state,u,j))&&(!canEnter(world,u.kind,j)||other))continue;const n=d[i]+movementCost(world,state,u,j);if(n<d[j]){d[j]=n;prev[j]=i;}}}
  if(!Number.isFinite(d[to]))return null;const path=[to];while(path[0]!==start)path.unshift(prev[path[0]]);if(start!==u.tile)path.unshift(u.tile);return {path,seconds:Math.max(0,d[to]-(path.length>1?movementCost(world,state,u,to):0))+(path.length>1?(u.left||0):0)};
 }
 export function lineOfSight(world,from,to){const d=distances(world,to),q=[from],seen=new Set(q);for(let i=0;i<q.length;i++){if(q[i]===to)return true;for(const j of world[q[i]].near)if(!seen.has(j)&&d[j]<d[q[i]]&&(j===to||world[j].terrain!==4)){seen.add(j);q.push(j);}}return false;}

@@ -2,8 +2,8 @@
   "files": [
     {
       "file": "app.js",
-      "bytes": 35383,
-      "brotli_bytes": 10318
+      "bytes": 35066,
+      "brotli_bytes": 10214
     },
     {
       "file": "assets/audio/cues.json",
@@ -248,7 +248,7 @@
     {
       "file": "assets/forge/catalog.json",
       "bytes": 6806,
-      "brotli_bytes": 468
+      "brotli_bytes": 464
     },
     {
       "file": "assets/forge/cavalry.png",
@@ -262,103 +262,103 @@
     },
     {
       "file": "assets/forge/discovery-0.mesh",
-      "bytes": 3120,
-      "brotli_bytes": 573
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-0.png",
-      "bytes": 30767,
-      "brotli_bytes": 30771
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-1.mesh",
-      "bytes": 2160,
-      "brotli_bytes": 385
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-1.png",
-      "bytes": 38873,
-      "brotli_bytes": 38877
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-2.mesh",
-      "bytes": 3120,
-      "brotli_bytes": 573
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-2.png",
-      "bytes": 30767,
-      "brotli_bytes": 30771
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-3.mesh",
-      "bytes": 3120,
-      "brotli_bytes": 573
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-3.png",
-      "bytes": 30767,
-      "brotli_bytes": 30771
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-4.mesh",
-      "bytes": 2400,
-      "brotli_bytes": 537
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-4.png",
-      "bytes": 46211,
-      "brotli_bytes": 46215
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-5.mesh",
-      "bytes": 2640,
-      "brotli_bytes": 507
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-5.png",
-      "bytes": 34440,
-      "brotli_bytes": 34444
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-6.mesh",
-      "bytes": 2880,
-      "brotli_bytes": 472
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-6.png",
-      "bytes": 76346,
-      "brotli_bytes": 76351
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-7.mesh",
-      "bytes": 2880,
-      "brotli_bytes": 468
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-7.png",
-      "bytes": 60796,
-      "brotli_bytes": 60800
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-8.mesh",
-      "bytes": 5280,
-      "brotli_bytes": 929
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-8.png",
-      "bytes": 41579,
-      "brotli_bytes": 41583
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/discovery-9.mesh",
-      "bytes": 3120,
-      "brotli_bytes": 573
+      "bytes": 10080,
+      "brotli_bytes": 1492
     },
     {
       "file": "assets/forge/discovery-9.png",
-      "bytes": 30370,
-      "brotli_bytes": 30194
+      "bytes": 34151,
+      "brotli_bytes": 33983
     },
     {
       "file": "assets/forge/drone.png",
@@ -642,8 +642,8 @@
     },
     {
       "file": "audio.js",
-      "bytes": 4734,
-      "brotli_bytes": 1755
+      "bytes": 5546,
+      "brotli_bytes": 2003
     },
     {
       "file": "combat-visuals.js",
@@ -652,13 +652,13 @@
     },
     {
       "file": "controls.js",
-      "bytes": 6564,
-      "brotli_bytes": 1946
+      "bytes": 7186,
+      "brotli_bytes": 2125
     },
     {
       "file": "engine.wasm",
-      "bytes": 423255,
-      "brotli_bytes": 109322
+      "bytes": 427707,
+      "brotli_bytes": 110577
     },
     {
       "file": "favicon.svg",
@@ -667,18 +667,18 @@
     },
     {
       "file": "feedback.js",
-      "bytes": 2502,
-      "brotli_bytes": 1011
+      "bytes": 3113,
+      "brotli_bytes": 1231
     },
     {
       "file": "globe.js",
-      "bytes": 44005,
-      "brotli_bytes": 13471
+      "bytes": 44019,
+      "brotli_bytes": 13479
     },
     {
       "file": "icons.js",
-      "bytes": 8710,
-      "brotli_bytes": 3129
+      "bytes": 8844,
+      "brotli_bytes": 3193
     },
     {
       "file": "index.html",
@@ -727,8 +727,8 @@
     },
     {
       "file": "manual-data.js",
-      "bytes": 21897,
-      "brotli_bytes": 7104
+      "bytes": 21873,
+      "brotli_bytes": 7134
     },
     {
       "file": "manual.js",
@@ -747,8 +747,8 @@
     },
     {
       "file": "planning.js",
-      "bytes": 5820,
-      "brotli_bytes": 2026
+      "bytes": 6694,
+      "brotli_bytes": 2224
     },
     {
       "file": "style.css",
@@ -757,8 +757,8 @@
     },
     {
       "file": "tactics.css",
-      "bytes": 17853,
-      "brotli_bytes": 4353
+      "bytes": 18698,
+      "brotli_bytes": 4612
     },
     {
       "file": "terrain.js",
@@ -766,8 +766,8 @@
       "brotli_bytes": 1028
     }
   ],
-  "total_bytes": 5824764,
-  "estimated_brotli_bytes": 3863960,
+  "total_bytes": 5823461,
+  "estimated_brotli_bytes": 3794696,
   "audio_lazy_bytes": 473732,
   "note": "Brotli figures are local compression measurements, not a claim about negotiated CDN content encoding. Audio loads after interaction. No physical mobile GPU benchmark has been made."
 }

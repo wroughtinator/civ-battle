@@ -106,15 +106,16 @@ for(let b=1;b<=7;b++){
  const m=new Model('farm','prop');for(const x of[-.3,.3])for(let j=0;j<4;j++)m.add('row'+x+j,[x,.04,(j-1.5)*.19],[.34,.08,.08],14);m.finish();
  const site=new Model('site','prop');for(const [i,x,z]of[[0,-.25,.2],[1,.25,.2],[2,0,-.25]])site.add('crate'+i,[x,.12,z],[.25,.24,.25],5);site.cyl('antenna',[0,.4,0],[.025,.8,.025],6,{segments:4});site.finish();
 }
+// All unopened discoveries share the chest silhouette introduced on main.
 for(let k=0;k<10;k++){
  const m=new Model('discovery-'+k,'prop');
- if([0,2,3,9].includes(k)){m.add('tent',[0,.24,0],[.65,.48,.55],k===9?4:7,{taper:.05});m.cyl('pole',[.4,.4,0],[.025,.8,.025],0,{segments:4});m.add('banner',[.5,.65,0],[.2,.18,.018],k===9?12:4);}
- if(k===1){m.add('chest',[0,.16,0],[.55,.32,.4],0);m.add('band',[0,.165,.21],[.08,.30,.018],13);}
- if(k===4){m.add('hull',[0,.16,0],[.35,.22,.8],0,{taper:.55});m.cyl('mast',[0,.48,0],[.035,.7,.035],0,{rotation:[15,0,12],segments:4});}
- if(k===5){m.add('shrine',[0,.2,0],[.4,.4,.4],10);m.cyl('crystal',[0,.6,0],[.32,.45,.32],15,{taper:.06,segments:5});}
- if(k===6){for(const x of[-.27,.27])m.add('pillar'+x,[x,.28,0],[.15,.56,.18],10);m.add('lintel',[0,.57,0],[.75,.18,.22],10);}
- if(k===7){for(const [i,x,z]of[[0,-.25,.05],[1,0,-.08],[2,.25,.12]])m.add('supplies'+i,[x,.12,z],[.2,.24,.24],i===1?13:0);}
- if(k===8){m.cyl('mast',[0,.5,0],[.05,1,.05],6,{segments:5});m.cyl('dish',[0,.7,0],[.55,.12,.55],6,{taper:.1});for(const x of[-.3,.3])m.add('battery'+x,[x,.15,0],[.2,.3,.25],4);}
- m.add('used-marker',[.35,.08,.3],[.035,.16,.035],13);m.finish();
+ m.add('chest',[0,.20,0],[.72,.4,.5],0);
+ m.cyl('rounded-lid',[0,.39,0],[.5,.72,.30],0,{rotation:[0,0,90],segments:8});
+ for(const x of[-.25,.25]){
+  m.add('front-band'+x,[x,.20,.258],[.065,.4,.022],13);
+  m.add('back-band'+x,[x,.20,-.258],[.065,.4,.022],13);
+  m.cyl('lid-band'+x,[x,.39,0],[.515,.067,.315],13,{rotation:[0,0,90],segments:8});
+ }
+ m.add('lock',[0,.30,.28],[.10,.14,.035],13);m.finish();
 }
 writeFileSync(join(root,'catalog.json'),JSON.stringify({version:1,materials:'sources/materials.png',terrain:'sources/terrain.png',models:catalog},null,2)+'\n');console.log(`Authored ${catalog.length} models`);

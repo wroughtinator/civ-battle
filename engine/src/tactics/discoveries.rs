@@ -62,52 +62,27 @@ impl Game {
     }
     pub fn claim(&mut self, i: usize) -> Result<(), u8> {
         let u = self.squads[i].clone();
-        if u.left > 0 || u.owner >= 8 {
+        if u.owner >= 8 {
             return Err(4);
         }
-        let n = self
-            .discoveries
-            .iter()
-            .position(|d| d.tile == u.tile && !d.used)
-            .ok_or(6)?;
+        let n = self.discoveries.iter().position(|d| d.tile == u.tile && !d.used).ok_or(6)?;
         let k = self.discoveries[n].kind;
-        if k == 0
-            && self
-                .squads
-                .iter()
-                .any(|s| s.owner == 8 && self.distances(u.tile)[s.tile] <= 2)
-        {
-            return Err(6);
-        }
-        if k == 9 && self.players[u.owner].gold < 50. {
-            return Err(5);
-        }
+        let mut reward = k;
+        let mut amount = 0.;
         if matches!(k, 2 | 3 | 9) {
-            let kind = if k == 2 {
-                12
-            } else if k == 3 {
-                0
+            let kind = if k == 2 { 12 } else if k == 3 { 0 } else { 1 };
+            let tile = self.tiles[u.tile].near.iter().copied().find(|&t| {
+                self.tiles[t].terrain > 0 && self.can_enter(kind, t) && self.occupant(t).is_none()
+            });
+            if self.squads.iter().filter(|s| s.owner == u.owner).count() < self.cap(u.owner) && tile.is_some() {
+                self.spawn(u.owner, kind, tile.unwrap());
+                self.squads.last_mut().unwrap().hp = spec(kind).hp * if k == 9 { 0.8 } else { 0.55 };
             } else {
-                1
-            };
-            if self.squads.iter().filter(|s| s.owner == u.owner).count() >= self.cap(u.owner) {
-                return Err(6);
+                // A chest always pays out, even when reinforcements cannot fit.
+                self.players[u.owner].gold += 35.;
+                reward = 1;
+                amount = 35.;
             }
-            let tile = self.tiles[u.tile]
-                .near
-                .iter()
-                .copied()
-                .find(|&t| {
-                    self.tiles[t].terrain > 0
-                        && self.can_enter(kind, t)
-                        && self.occupant(t).is_none()
-                })
-                .ok_or(4)?;
-            if k == 9 {
-                self.players[u.owner].gold -= 50.;
-            }
-            self.spawn(u.owner, kind, tile);
-            self.squads.last_mut().unwrap().hp = spec(kind).hp * if k == 9 { 0.8 } else { 0.55 };
         }
         match k {
             0 => self.players[u.owner].gold += 45.,
@@ -125,7 +100,13 @@ impl Game {
         self.discoveries[n].owner = u.owner as i8;
         self.discoveries[n].seen |= 1 << u.owner;
         self.discoveries[n].known_used |= 1 << u.owner;
-        self.event(3, u.owner, u.tile);
+        amount += match k { 0 => 45., 1 => 35., 4 => 55., 6 | 7 => self.squads[i].hp - u.hp, _ => 0. };
+        if k == 6 && amount == 0. {
+            self.players[u.owner].gold += 35.;
+            reward = 1;
+            amount = 35.;
+        }
+        self.feedback("pickup", &u, u.tile, reward, amount, 4);
         Ok(())
     }
     pub(super) fn encounters(&mut self) {

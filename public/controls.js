@@ -1,5 +1,5 @@
 // Visible-state affordances. Rust still validates every submitted command.
-import {canEnter,canFound,distances,lineOfSight,prerequisites,researchCost,researchGate} from './planning.js';
+import {passengers,landingTiles,canEnter,canFound,distances,lineOfSight,prerequisites,researchCost,researchGate} from './planning.js';
 
 const blocked=(reason,icon='lock',count=0)=>({reason,icon,count});
 const naval=k=>k>=7&&k<=9;
@@ -8,6 +8,7 @@ export const refitChoices=(state,u)=>u.kind<10||u.kind===12
 export const abilityCost=(state,u,value)=>u.kind===13?35+25*state.cities.filter(c=>c.owner===u.owner).length:u.kind===10?180:u.kind===11?150:u.kind===8&&value===2?65:0;
 
 export function targetTiles(world,state,u,kind,value=0){
+ if(kind==='disembark')return landingTiles(world,state,u);
  const s=state.rules.specs[u.kind],missile=kind==='ability'&&(u.kind===11||u.kind===8&&value===2);
  const max=missile?(u.kind===11?9:7):kind==='ability'&&u.kind===6?3:s.range,min=missile?0:s.min;
  const d=distances(world,u.tile);
@@ -48,13 +49,20 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
  }
  const u=state.squads.find(u=>u.id===from&&u.owner===slot);
  if(!u)return blocked('Select your unit');
+ if(u.boarded_on!=null)return blocked('Aboard a carrier: disembark from its action panel','disembark');
  if(u.refit>=0)return blocked('Refitting','clock',u.work);
  if(kind==='move'||kind==='stop')return kind==='stop'&&u.path.length<2&&!u.founding?blocked('No movement or construction to stop','hand'):null;
  if(u.locked_until>state.tick)return blocked('Unit committed','clock',u.locked_until-state.tick);
  if(kind==='disband')return null;
  if(u.left)return blocked('Movement cooldown','clock',u.left);
  if(u.founding)return blocked('City construction in progress','clock',u.work);
+ if(kind==='disembark'){
+  if(!passengers(state,u).length)return blocked('No passengers aboard','board');
+  const tiles=landingTiles(world,state,u);
+  return (to==null?tiles.length>0:tiles.includes(to))?null:blocked('Requires adjacent empty land suitable for a passenger','territory');
+ }
  if(kind==='refit'){
+  if(passengers(state,u).length>(state.rules.specs[value]?.boarding_capacity||0))return blocked('Disembark passengers before refitting','board');
   if(!refitChoices(state,u).includes(value))return blocked('No available refit');
   if(state.tiles[u.tile]?.owner!==slot)return blocked('Requires friendly territory','territory');
   if(!canEnter(world,value,u.tile))return blocked('Unsuitable terrain','territory');

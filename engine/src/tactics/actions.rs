@@ -3,7 +3,7 @@ impl Game {
     pub(super) fn order_attack(&mut self, i: usize, to: usize, salvo: u8) -> Result<(), u8> {
         let u = self.squads[i].clone();
         let s = spec(u.kind);
-        if u.locked_until > self.tick || u.left > 0 || u.refit >= 0 || u.founding {
+        if u.boarded_on.is_some() || u.locked_until > self.tick || u.left > 0 || u.refit >= 0 || u.founding {
             return Err(2);
         }
         let range = if salvo > 0 && u.kind == 6 { 3 } else { s.range };

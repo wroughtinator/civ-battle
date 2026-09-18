@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {iconNames} from '../public/icons.js';
 import {manualEntries,unitDetails} from '../public/manual-data.js';
-import {EventTimeline,actionSymbol} from '../public/feedback.js';
+import {EventTimeline,actionSymbol,pickupSymbols} from '../public/feedback.js';
 import {abilities} from '../public/planning.js';
 
 test('every icon and every unit action has a manual entry and a feedback symbol',()=>{
@@ -19,4 +19,12 @@ test('authoritative presentation events deduplicate, survive repeated snapshots,
  assert.equal(timeline.accept({seed:1,tick:101,feedback:[cue]},2000).length,0);
  assert.equal(timeline.accept({seed:1,tick:110,feedback:[{...cue,id:11}]},10000).length,0);
  assert.equal(timeline.accept({seed:2,tick:100,feedback:[cue]},11000).length,1);
+});
+
+test('pickup rewards use only known symbols and stay visible for four seconds',()=>{
+ for(let value=0;value<10;value++)for(const symbol of pickupSymbols({value,amount:20}))assert.ok(iconNames.includes(symbol),symbol);
+ assert.deepEqual(pickupSymbols({value:7,amount:0}),['bolt']);
+ const timeline=new EventTimeline(),state={seed:1,tick:10,feedback:[{id:1,tick:10,action:'pickup',value:1,amount:35}]};
+ assert.equal(timeline.accept(state,1000)[0].end,5000);
+ assert.equal(timeline.accept(state,2000).length,0);
 });

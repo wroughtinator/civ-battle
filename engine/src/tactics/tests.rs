@@ -811,3 +811,207 @@ fn a_single_step_snaps_immediately_and_keeps_its_full_final_cooldown() {
     assert_eq!(g.squads[0].left, 0);
     assert_eq!(g.squads[0].tile, b);
 }
+
+
+fn transport_arena() -> (Game, usize, usize, usize) {
+    let (mut g, land, sea) = arena();
+    g.squads.truncate(1);
+    g.tiles[sea].terrain = 0;
+    g.spawn(0, 9, sea);
+    let ship = g.squads[1].id;
+    (g, land, sea, ship)
+}
+
+#[test]
+fn transport_boards_all_ground_types_but_not_air_or_sea_and_is_friendly_only() {
+    for kind in [0, 1, 2, 3, 4, 5, 10, 11, 12, 13] {
+        let (mut g, land, sea, ship) = transport_arena();
+        g.squads[0].kind = kind;
+        let id = g.squads[0].id;
+        assert_eq!(g.path(&g.squads[0], sea), Some(vec![land, sea]));
+        g.command(0, "move", id, sea, 0).unwrap();
+        assert_eq!(g.squads[0].boarded_on, Some(ship));
+        assert_eq!(g.occupant(sea).unwrap().id, ship);
+        g.players[0].cooldown = 0;
+        for cmd in ["move", "stop", "attack", "ability", "explore", "refit", "disband", "disembark"] {
+            assert!(g.command(0, cmd, id, land, 0).is_err(), "{cmd}");
+        }
+    }
+    for kind in [6, 7, 8, 9] {
+        let (mut g, _, sea, _) = transport_arena();
+        g.squads[0].kind = kind;
+        assert!(g.path(&g.squads[0], sea).is_none());
+    }
+    let (mut g, _, sea, _) = transport_arena();
+    g.squads[1].owner = 1;
+    assert!(g.path(&g.squads[0], sea).is_none());
+    g.squads[1].owner = 0;
+    for kind in [7, 8] {
+        g.squads[1].kind = kind;
+        assert!(g.path(&g.squads[0], sea).is_none());
+    }
+}
+
+#[test]
+fn transport_capacity_rechecks_queued_arrivals_and_never_forms_a_water_bridge() {
+    let (mut g, land, sea, ship) = transport_arena();
+    let beyond = g.tiles[sea].near.iter().copied().find(|&t| t != land && !g.tiles[land].near.contains(&t)).unwrap();
+    // No land route exists: the carrier cannot be used as an intermediate step.
+    for t in &mut g.tiles { t.terrain = 0; }
+    g.tiles[land].terrain = 1;
+    g.tiles[beyond].terrain = 1;
+    assert!(g.path(&g.squads[0], beyond).is_none());
+    for _ in 0..2 { g.spawn(0, 0, sea); g.squads.last_mut().unwrap().boarded_on = Some(ship); }
+    let first = g.squads[0].id;
+    g.squads[0].left = 1;
+    g.command(0, "move", first, sea, 0).unwrap();
+    g.spawn(0, 13, land);
+    let last = g.squads.len()-1;
+    g.squads[last].path = vec![land, sea];
+    g.squads[last].to = sea;
+    g.squads[0].left = 0;
+    g.move_unit(0);
+    g.move_unit(last);
+    assert_eq!(g.passenger_count(ship), 3);
+    assert_eq!(g.squads[last].tile, land);
+    assert_eq!(g.squads[last].boarded_on, None);
+}
+
+#[test]
+fn transport_moves_restores_and_unloads_one_compatible_passenger_with_cooldown() {
+    let (mut g, land, sea, ship) = transport_arena();
+    g.squads[0].kind = 3;
+    g.squads[0].hp = 53.;
+    let tank = g.squads[0].id;
+    g.command(0, "move", tank, sea, 0).unwrap();
+    g.spawn(0, 13, land);
+    let settler = g.squads.last().unwrap().id;
+    g.players[0].cooldown = 0;
+    g.command(0, "move", settler, sea, 0).unwrap();
+    let next = g.tiles[sea].near.iter().copied().find(|&t| t != land).unwrap();
+    g.tiles[next].terrain = 0;
+    g.players[0].cooldown = 0;
+    g.command(0, "move", ship, next, 0).unwrap();
+    assert!(g.squads.iter().all(|u| u.tile == next));
+    let saved = serde_json::to_vec(&g).unwrap();
+    g = serde_json::from_slice(&saved).unwrap();
+    assert_eq!(g.passenger_count(ship), 2);
+    let landing = g.tiles[next].near.iter().copied().find(|&t| t != sea).unwrap();
+    g.tiles[landing].terrain = 4;
+    g.players[0].cooldown = 0;
+    assert!(g.command(0, "disembark", ship, landing, 0).is_err());
+    g.squads[1].left = 0;
+    g.command(0, "disembark", ship, landing, 0).unwrap();
+    let u = g.squads.iter().find(|u| u.id == settler).unwrap();
+    assert_eq!(u.boarded_on, None);
+    assert_eq!(u.tile, landing);
+    assert!(u.left > 0);
+    assert_eq!(g.squads[0].boarded_on, Some(ship));
+    assert_eq!(g.squads[0].hp, 53.);
+    assert_eq!(g.squads[1].locked_until, g.tick+2);
+    g.players[0].cooldown = 0;
+    g.squads[1].locked_until = 0;
+    assert!(g.command(0, "disembark", ship, landing, 0).is_err());
+    assert!(g.command(0, "disembark", ship, sea, 0).is_err());
+    g.players[0].unlocked.push(7);
+    g.tiles[next].owner = 0;
+    assert!(g.command(0, "refit", ship, 0, 7).is_err());
+}
+
+#[test]
+fn transport_cargo_is_protected_from_splash_but_dies_with_carrier_or_disband() {
+    for disband in [false, true] {
+        let (mut g, _, sea, ship) = transport_arena();
+        let id = g.squads[0].id;
+        g.command(0, "move", id, sea, 0).unwrap();
+        g.strikes.push(Strike { owner: 1, kind: 1, from: sea, to: sea, left: 1, total: 1 });
+        g.combat();
+        assert_eq!(g.squads[0].hp, spec(0).hp);
+        assert_eq!(g.squads[1].hp, spec(9).hp - 75.);
+        assert!(g.view(1)["squads"].as_array().unwrap().iter().all(|u| u["id"] != id));
+        if disband {
+            g.players[0].cooldown = 0;
+            g.command(0, "disband", ship, 0, 0).unwrap();
+        } else {
+            g.strikes.push(Strike { owner: 1, kind: 2, from: sea, to: sea, left: 1, total: 1 });
+            g.combat();
+        }
+        assert!(g.squads.is_empty());
+    }
+}
+
+#[test]
+fn transport_moving_away_cancels_boarding_and_old_saves_default_to_unboarded() {
+    let (mut g, land, sea, ship) = transport_arena();
+    let mut old = serde_json::to_value(&g).unwrap();
+    for u in old["squads"].as_array_mut().unwrap() { u.as_object_mut().unwrap().remove("boarded_on"); }
+    g = serde_json::from_value(old).unwrap();
+    assert!(g.squads.iter().all(|u| u.boarded_on.is_none()));
+    g.squads[0].left = 1;
+    let id = g.squads[0].id;
+    g.command(0, "move", id, sea, 0).unwrap();
+    let next = g.tiles[sea].near.iter().copied().find(|&t| t != land).unwrap();
+    g.tiles[next].terrain = 0;
+    g.players[0].cooldown = 0;
+    g.command(0, "move", ship, next, 0).unwrap();
+    g.squads[0].left = 0;
+    g.move_unit(0);
+    assert_eq!(g.squads[0].tile, land);
+    assert_eq!(g.squads[0].path, vec![land]);
+}
+
+#[test]
+fn walking_collects_every_chest_once_without_spending_or_stopping() {
+    for kind in 0..10 {
+        let (mut g, from, to) = arena();
+        g.squads.retain(|u| u.owner == 0);
+        g.players[0].gold = 0.;
+        g.squads[0].hp = 30.;
+        g.squads[0].ability_ready = g.tick + 100;
+        g.discoveries.push(Discovery {tile:to,kind,variant:0,used:false,owner:-1,seen:0,known_used:0,until:0});
+        g.squads[0].path = vec![from, to];
+        g.squads[0].to = to;
+        g.move_unit(0);
+        assert_eq!(g.squads[0].tile, to);
+        assert!(g.squads[0].left > 0);
+        assert!(g.discoveries[0].used, "kind {kind}");
+        let reward = g.feedback.iter().find(|e| e.action == "pickup").unwrap();
+        assert_eq!(reward.value, kind);
+        assert_eq!(reward.audience, 1);
+        assert_eq!(reward.to, to);
+        match kind {
+            0 => assert_eq!(g.players[0].gold, 45.),
+            1 => assert_eq!(g.players[0].gold, 35.),
+            4 => assert_eq!(g.players[0].gold, 55.),
+            2 | 3 | 9 => { assert_eq!(g.squads.len(), 2); assert_eq!(g.players[0].gold, 0.); }
+            5 => assert_eq!(g.discoveries[0].until, g.tick + 90),
+            6 => assert_eq!(g.squads[0].hp, 75.),
+            7 => { assert_eq!(g.squads[0].hp, 50.); assert_eq!(g.squads[0].ability_ready, g.tick); }
+            8 => assert_eq!(g.storm(to), 0.),
+            _ => unreachable!(),
+        }
+        let gold = g.players[0].gold;
+        assert_eq!(g.claim(0), Err(6));
+        assert_eq!(g.players[0].gold, gold);
+        assert_eq!(g.feedback.iter().filter(|e| e.action == "pickup").count(), 1);
+    }
+}
+#[test]
+fn blocked_reinforcement_and_full_health_chests_pay_coins() {
+    for kind in [2, 3, 6, 9] {
+        let (mut g, from, to) = arena();
+        g.squads.retain(|u| u.owner == 0);
+        for tile in g.tiles[to].near.clone() {
+            if tile != from { g.spawn(0, 0, tile); }
+        }
+        g.players[0].gold = 0.;
+        g.discoveries.push(Discovery {tile:to,kind,variant:0,used:false,owner:-1,seen:0,known_used:0,until:0});
+        // Collect in place to fill every neighbouring hex, including the old position.
+        g.spawn(0, 0, to);
+        g.claim(g.squads.len()-1).unwrap();
+        assert_eq!(g.players[0].gold, 35.);
+        let e = g.feedback.last().unwrap();
+        assert_eq!(e.value, 1);
+        assert_eq!(e.amount, 35.);
+    }
+}

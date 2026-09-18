@@ -26,7 +26,6 @@ input,textarea,[contenteditable=true],#guide{-webkit-user-select:text;user-selec
 }
 @media(max-height:590px) and (min-width:761px){#province{max-height:65dvh}#research{top:70px}.connected-tree{height:300px}#roster{max-height:calc(100dvh - 150px);overflow:auto}}
 
-.discovery-marker{border-radius:8px;min-width:34px;min-height:34px;background:#142e32d9;border-style:dashed}.discovery-marker .icon{width:20px;height:20px}
 
 /* Affordances: available actions are bright; locked actions cannot receive clicks. */
 #province .order-action,#research .order-action{position:relative;color:#e5eee5;background:#345357;border:1px solid #91b6b078;opacity:1}
@@ -70,5 +69,12 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 /* Seat count controls share the same 44px touch targets as game actions. */
 #config{display:grid;grid-template-columns:1fr auto;gap:6px 10px}.player-count{grid-column:1/-1;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:6px}.player-count .config-group{justify-content:center;gap:7px;font-size:17px}.player-count .icon{width:21px;height:21px}.bot-seats{display:flex;align-items:center;gap:5px;margin-left:8px;font-size:14px;color:var(--muted)}#config .player-count button{border:1px solid var(--line)}#difficulty{justify-self:start;padding:0 10px}
 
+.passenger-status{display:flex;align-items:center;gap:10px;padding:9px 14px;background:#153747;border-block:1px solid #396477;color:#e7f5ff}.passenger-status>svg{width:25px;height:25px}.passenger-status strong{font-size:19px;font-variant-numeric:tabular-nums}.passenger-manifest{display:flex;gap:8px;margin-left:8px}.passenger-manifest svg{width:26px;height:26px}
+
+.pickup-reward{gap:9px;padding:14px 18px;color:#ffe49a;background:radial-gradient(ellipse,#654716f5,#172e30f2);border:2px solid #ffd36e;border-radius:22px;box-shadow:0 0 28px #ffcc6680,inset 0 0 18px #ffcc6630;animation:treasure-burst .45s ease-out}
+.pickup-reward .icon{width:36px;height:36px;filter:drop-shadow(0 0 5px #ffd36e88)}
+.pickup-reward .icon:first-child{width:23px;height:23px;color:#b8ffd2}
+@keyframes treasure-burst{from{transform:translate(-50%,-50%) scale(.35);filter:brightness(2.5)}to{transform:translate(-50%,-50%) scale(1);filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){.pickup-reward{animation:none}}
 /* Terrain benefits use the same symbols as upgrades and unit capacity. */
 .terrain-status,.terrain-status>span{display:inline-flex;align-items:center;gap:4px}.terrain-status{margin-left:8px;color:#a9f3c6;font:11px ui-monospace,monospace}.terrain-status .icon{width:15px;height:15px}.cover-badge{position:absolute;right:-7px;top:-7px;width:19px;height:21px;display:flex;align-items:center;justify-content:center;background:#163a2e;border:1px solid #a9f3c6;border-radius:5px;color:#baf2be;pointer-events:none}.unit-marker .cover-badge .icon{width:13px;height:13px}.city-upgrades .order-action{min-height:140px}
