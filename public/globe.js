@@ -1,3 +1,4 @@
+import {OutlinePass} from './outline-pass.js';
 import {GlobeControls} from './globe-controls.js';
 import {attackTiming,drawAttack,unitScales,ballisticPose} from './combat-visuals.js';
 import {RiggedMesh,Woodland,modelNames,treeNames,loadTexture,orientationBasis} from './model-assets.js';
@@ -22,7 +23,7 @@ const ridge=p=>{const q=[p[0]*13+p[2]*5,p[1]*17,p[2]*12-p[0]*4],r=1-Math.abs(noi
 const ground=(p,mountain=0)=>1.008+noise3(mul(p,49))*.004+mountain*(.007+ridge(p)*.078);
 const vertex=`#version 300 es
 precision highp float;
-in vec3 position;in vec3 normal;in vec3 color;in vec3 material;in vec4 joints;in vec4 weights;in vec2 uv;in vec4 treeOrigin;in vec4 treeShape;
+in vec3 position;in vec3 normal;in vec3 color;in vec3 material;in vec4 joints;in vec4 weights;in vec2 uv;in vec4 treeOrigin;in vec4 treeShape;in vec3 teamColor;out vec3 vTeamColor;
 uniform float skinned;uniform mat4 bones[32];uniform float foliage;
 out vec2 vUV;
 uniform vec4 camera;uniform vec2 viewport;uniform float offset;uniform float mode;uniform float time;
@@ -32,12 +33,13 @@ vec3 rotate(vec3 p){float c=cos(camera.x),s=sin(camera.x);p=vec3(c*p.x+s*p.z,p.y
 void main(){vec3 local=position,localNormal=normal;
 if(skinned>.5){mat4 skin=bones[int(joints.x)]*weights.x+bones[int(joints.y)]*weights.y+bones[int(joints.z)]*weights.z+bones[int(joints.w)]*weights.w;local=(skin*vec4(local,1.)).xyz;localNormal=mat3(skin)*localNormal;}
 vec3 world=modelScale>0.?modelOrigin+modelBasis*local*modelScale:local;vec3 n=modelScale>0.?modelBasis*localNormal:localNormal;
-if(foliage>.5){vec3 up=normalize(treeOrigin.xyz),east=normalize(cross(abs(up.y)>.98?vec3(1,0,0):vec3(0,1,0),up)),north=cross(up,east);float c=cos(treeOrigin.w),s=sin(treeOrigin.w);mat3 basis=mat3(east*c+north*s,up,north*c-east*s);vec3 branch=position*treeShape.xyz;if(foliage<1.5)branch.x+=sin(time*1.1+treeOrigin.w+position.y*3.)*.025*position.y*position.y*treeShape.y;world=treeOrigin.xyz+basis*branch;n=normalize(basis*(normal/treeShape.xyz));}
-vSurfaceNormal=n;vUV=uv;if(mode>2.5&&mode<3.5){vec3 q=normalize(world);float billow=sin(q.x*31.+sin(q.y*27.))*sin(q.z*28.+sin(q.x*19.));world=q*(1.078+billow*.009);}vec3 p=rotate(world);float z=camera.z-p.z;float scale=2.75;gl_Position=vec4(p.x*scale/viewport.x+offset*z,p.y*scale,z*1.001-0.02001,z);gl_PointSize=2.;vColor=modelScale>0.?mix(mix(color,modelTint,.12),vec3(1.,.28,.10),modelFlash):color*(foliage>.5?treeShape.w:1.);vNormal=rotate(material.y>.5&&material.y<1.5?normalize(world):n);vPos=p;vWorld=world;vMaterial=material;}`;
+if(foliage>.5){vec3 up=normalize(treeOrigin.xyz),east=normalize(cross(abs(up.y)>.98?vec3(1,0,0):vec3(0,1,0),up)),north=cross(up,east);float c=cos(treeOrigin.w),s=sin(treeOrigin.w);mat3 basis=mat3(east*c+north*s,up,north*c-east*s);vec3 branch=position*treeShape.xyz;if(foliage<1.5)branch.x+=sin(time*1.1+treeOrigin.w+position.y*3.)*.025*position.y*position.y*treeShape.y;world=treeOrigin.xyz+basis*branch;n=normalize(basis*(localNormal/treeShape.xyz));}
+vSurfaceNormal=n;vUV=uv;if(mode>2.5&&mode<3.5){vec3 q=normalize(world);float billow=sin(q.x*31.+sin(q.y*27.))*sin(q.z*28.+sin(q.x*19.));world=q*(1.078+billow*.009);}vec3 p=rotate(world);float z=camera.z-p.z;float scale=2.75;gl_Position=vec4(p.x*scale/viewport.x+offset*z,p.y*scale,z*1.001-0.02001,z);vTeamColor=foliage>1.5?teamColor:modelTint;gl_PointSize=2.;vColor=modelScale>0.?mix(mix(color,modelTint,.12),vec3(1.,.28,.10),modelFlash):color*(foliage>.5?treeShape.w:1.);vNormal=rotate(material.y>.5&&material.y<1.5?normalize(world):n);vPos=p;vWorld=world;vMaterial=material;}`;
 const fragment=`#version 300 es
 precision highp float;
 in vec2 vUV;
 in vec3 vSurfaceNormal;in vec3 vColor;in vec3 vNormal;in vec3 vPos;in vec3 vWorld;in vec3 vMaterial;
+in vec3 vTeamColor;uniform float outline;uniform sampler2D outlineSceneDepth;
 uniform sampler2D treeTexture;uniform sampler2D terrainTexture;
 uniform float mode;uniform float time;uniform vec4 camera;uniform sampler2D oceanNormal;uniform sampler2D oceanRough;uniform sampler2D fogTexture;uniform float preview;uniform vec4 weather[3];
 out vec4 outColor;
@@ -70,7 +72,7 @@ vec3 groundTex(float tile,vec3 p,vec3 surfaceNormal){
  vec3 sampleColor=terrainPlane(q.yz,cell,terrainDx.yz,terrainDy.yz)*w.x+terrainPlane(q.zx,cell,terrainDx.zx,terrainDy.zx)*w.y+terrainPlane(q.xy,cell,terrainDx.xy,terrainDy.xy)*w.z;
  return pow(mix(sampleColor,distant,smoothstep(2.4,4.8,camera.z)*.55),vec3(2.2));
 }
-void main(){terrainDx=dFdx(vWorld)*24.;terrainDy=dFdy(vWorld)*24.;vec3 wn=normalize(vWorld),n=normalize(vNormal),eye=normalize(vec3(0,0,camera.z)-vPos),sun=normalize(vec3(-.6,.85,1.));
+void main(){if(outline>.5){float sceneDepth=texelFetch(outlineSceneDepth,ivec2(gl_FragCoord.xy),0).r;float tolerance=.000001+.75*(abs(dFdx(gl_FragCoord.z))+abs(dFdy(gl_FragCoord.z)));if(gl_FragCoord.z>sceneDepth+tolerance)discard;if(max(max(vTeamColor.r,vTeamColor.g),vTeamColor.b)<=0.)discard;outColor=vec4(vTeamColor,1.);return;}terrainDx=dFdx(vWorld)*24.;terrainDy=dFdy(vWorld)*24.;vec3 wn=normalize(vWorld),n=normalize(vNormal),eye=normalize(vec3(0,0,camera.z)-vPos),sun=normalize(vec3(-.6,.85,1.));
 if(mode>3.5){if(dot(n,eye)<=.015)discard;outColor=vec4(vColor,vMaterial.z);return;}
 if(mode>2.5){
  float facing=dot(n,eye);if(facing<.025)discard;
@@ -148,8 +150,9 @@ export class Globe {
   this.canvas=canvas;this.onSelect=onSelect;this.gl=canvas.getContext('webgl2',{antialias:true,alpha:true,powerPreference:'high-performance'});
   if(!this.gl)throw new Error('WebGL2 unavailable');
   const g=this.gl;const shader=(type,source)=>{const s=g.createShader(type);g.shaderSource(s,source);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS))throw new Error(g.getShaderInfoLog(s));return s;};
-  this.program=g.createProgram();g.attachShader(this.program,shader(g.VERTEX_SHADER,vertex));g.attachShader(this.program,shader(g.FRAGMENT_SHADER,fragment));['position','normal','color','material','joints','weights','uv','treeOrigin','treeShape'].forEach((n,i)=>g.bindAttribLocation(this.program,i,n));g.linkProgram(this.program);if(!g.getProgramParameter(this.program,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(this.program));
-  this.u=Object.fromEntries(['camera','viewport','offset','mode','time','oceanNormal','oceanRough','fogTexture','preview','weather[0]','modelBasis','modelOrigin','modelScale','modelTint','modelFlash','skinned','bones[0]','foliage','treeTexture','terrainTexture'].map(n=>[n,g.getUniformLocation(this.program,n)]));
+  this.program=g.createProgram();g.attachShader(this.program,shader(g.VERTEX_SHADER,vertex));g.attachShader(this.program,shader(g.FRAGMENT_SHADER,fragment));['position','normal','color','material','joints','weights','uv','treeOrigin','treeShape','teamColor'].forEach((n,i)=>g.bindAttribLocation(this.program,i,n));g.linkProgram(this.program);if(!g.getProgramParameter(this.program,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(this.program));
+  this.u=Object.fromEntries(['camera','viewport','offset','mode','time','oceanNormal','oceanRough','fogTexture','preview','weather[0]','modelBasis','modelOrigin','modelScale','modelTint','modelFlash','skinned','bones[0]','foliage','treeTexture','terrainTexture','outline','outlineSceneDepth'].map(n=>[n,g.getUniformLocation(this.program,n)]));
+  this.outlines=new OutlinePass(g);
   this.textures=['ocean-normal.png','ocean-roughness.png'].map((file,unit)=>{const texture=g.createTexture();g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array(unit?[160,160,160,255]:[128,128,255,255]));const img=new Image();img.onload=()=>{g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,img);g.generateMipmap(g.TEXTURE_2D);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR_MIPMAP_LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.REPEAT);};img.src='/assets/forge/'+file;return texture;});
   this.terrainTexture=g.createTexture();g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array([110,120,80,255]));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);loadTexture(g,'terrain',4).then(t=>this.terrainTexture=t).catch(e=>console.warn(e));
   this.fogTexture=g.createTexture();g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.texImage2D(g.TEXTURE_2D,0,g.R8,128,64,0,g.RED,g.UNSIGNED_BYTE,new Uint8Array(8192).fill(255));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
@@ -221,7 +224,7 @@ export class Globe {
    activeMat=[fogValue(i),3,0];
    const up=t.p,east=norm(cross(Math.abs(up[1])>.9?[1,0,0]:[0,1,0],up)),north=cross(up,east);
    const point=(x,y,z)=>{const p=norm(add(add(up,mul(east,x)),mul(north,z)));return mul(p,ground(p,t.terrain===4?1:0)+y);};
-   const prop=(name,x=0,z=0,scale=.065,angle=0)=>{this.loadStatic(name);const list=this.propInstances.get(name)||[];list.push([...point(x,.002,z),angle,scale,scale,scale,1]);this.propInstances.set(name,list);};
+   const prop=(name,x=0,z=0,scale=.065,angle=0,owner=-1)=>{this.loadStatic(name);const list=this.propInstances.get(name)||[];list.push([...point(x,.002,z),angle,scale,scale,scale,1,...(palette[owner]||[0,0,0])]);this.propInstances.set(name,list);};
    if(staticBuild&&(t.terrain===2||t.terrain===1)){
     const count=t.terrain===2?9:2;
     for(let j=0;j<count;j++){
@@ -231,11 +234,11 @@ export class Globe {
      const instance=[...mul(p,surface(p,0)),rnd(i,j,5)*6.283,h*width,h,h*(.7+rnd(i,j,6)*.5),.85+rnd(i,j,7)*.25];this.treeInstances.push(instance);this.treeGroups.get(treeNames[(i+j)%3]).push(instance);
     }
    }
-   if(!this.preview&&s.visible&&s.owner>=0&&t.terrain===1&&!this.state.cities.some(c=>c.tile===i))prop('farm',0,0,.066);
+   if(!this.preview&&s.visible&&s.owner>=0&&t.terrain===1&&!this.state.cities.some(c=>c.tile===i))prop('farm',0,0,.066,0,s.owner);
    const discovery=this.state?.discoveries?.find(d=>d.tile===i&&!d.used);if(discovery)prop('discovery-'+discovery.kind,0,0,.095,0);
    if(t.site)prop('site',0,0,.05);
-   if(s.owner>=0&&t.capital>=0)prop('capital-'+(this.state?.players[s.owner]?.civ||0),0,0,.085);
-   if(s.owner>=0&&s.building)prop('building-'+s.building,t.capital>=0?.052:0,0,.065);
+   if(s.owner>=0&&(t.capital>=0||this.state?.cities.some(c=>c.tile===i)))prop('capital-'+(this.state?.players[s.owner]?.civ||0),0,0,.085,0,s.owner);
+   if(s.owner>=0&&s.building)prop('building-'+s.building,t.capital>=0?.052:0,0,.065,0,s.owner);
   });if(staticBuild){smoothTerrainNormals(land);this.land.update(land);this.air.update(air);this.clouds.update(clouds);this.staticReady=true;}this.lines.update(lines);this.props.update(props);this.rebuildTerritory();this.rebuildSelection();
  }
  rebuildTerritory(){
@@ -355,9 +358,13 @@ export class Globe {
   if(!this.pointer){this.distance+=(this.targetDistance-this.distance)*.09;this.offset+=(this.targetOffset-this.offset)*.06;}
   if(this.targetFocus){this.yaw+=(this.targetFocus[0]-this.yaw)*.085;this.pitch+=(this.targetFocus[1]-this.pitch)*.085;if(Math.abs(this.yaw-this.targetFocus[0])+Math.abs(this.pitch-this.targetFocus[1])<.001)this.targetFocus=null;}
   else if(this.preview&&!this.pointer&&!this.controls.moving)this.yaw+=.0007;
-  g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.useProgram(this.program);g.uniform4f(this.u.camera,this.yaw,this.pitch,this.distance,0);g.uniform2f(this.u.viewport,w/h,1);g.uniform1f(this.u.offset,this.offset);g.uniform1f(this.u.time,this.clock);g.uniform1i(this.u.oceanNormal,0);g.uniform1i(this.u.oceanRough,1);g.uniform1i(this.u.fogTexture,2);g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.uniform1i(this.u.terrainTexture,4);g.uniform1f(this.u.preview,this.preview?1:0);g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.uniform4fv(this.u['weather[0]'],(this.state?.weather||[[.3,.2,.93,.89],[-.8,.3,.5,.89],[.4,-.3,-.85,.9]]).flat());this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});
+  this.outlines.begin(w,h);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.useProgram(this.program);g.uniform4f(this.u.camera,this.yaw,this.pitch,this.distance,0);g.uniform2f(this.u.viewport,w/h,1);g.uniform1f(this.u.offset,this.offset);g.uniform1f(this.u.time,this.clock);g.uniform1i(this.u.oceanNormal,0);g.uniform1i(this.u.oceanRough,1);g.uniform1i(this.u.fogTexture,2);g.activeTexture(g.TEXTURE4);g.bindTexture(g.TEXTURE_2D,this.terrainTexture);g.uniform1i(this.u.terrainTexture,4);g.uniform1f(this.u.preview,this.preview?1:0);g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fogTexture);g.uniform4fv(this.u['weather[0]'],(this.state?.weather||[[.3,.2,.93,.89],[-.8,.3,.5,.89],[.4,-.3,-.85,.9]]).flat());this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});
   g.enable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA);g.depthMask(false);g.uniform1f(this.u.mode,2);this.air.draw(g.TRIANGLES);g.depthMask(true);g.disable(g.BLEND);g.uniform1f(this.u.mode,0);this.land.draw(g.TRIANGLES);g.enable(g.BLEND);g.depthMask(false);g.uniform1f(this.u.mode,4);this.territories.draw(g.TRIANGLES);g.disable(g.DEPTH_TEST);this.territoryBorders.draw(g.TRIANGLES);g.enable(g.DEPTH_TEST);g.depthMask(true);g.disable(g.BLEND);g.uniform1f(this.u.mode,0);for(const [name,mesh]of this.staticMeshes){mesh.instances=mesh.sway?this.treeGroups.get(name)||[]:this.propInstances.get(name)||[];mesh.draw(this);}this.props.draw(g.TRIANGLES);g.uniform1f(this.u.mode,1);this.lines.draw(g.LINES);this.selection.draw(g.TRIANGLES);this.updateRoutes(now);this.routes.draw(g.LINES);
   g.uniform1f(this.u.mode,0);this.updateUnits(now);this.units.draw(g.TRIANGLES);this.updateEffects(now);this.drawModels(now);g.uniform1f(this.u.mode,1);this.effectsMesh.draw(g.TRIANGLES);g.enable(g.BLEND);g.depthMask(false);g.uniform1f(this.u.mode,3);this.clouds.draw(g.TRIANGLES);g.depthMask(true);
+  // A depth-tested player mask uses exactly the same geometry and animation time.
+  this.outlines.beginMask();g.useProgram(this.program);g.uniform1f(this.u.mode,0);g.uniform1f(this.u.outline,1);g.uniform1i(this.u.outlineSceneDepth,7);
+  for(const mesh of this.staticMeshes.values())if(!mesh.sway)mesh.draw(this,true);
+  this.drawModels(now);g.uniform1f(this.u.outline,0);this.outlines.composite(w/c.clientWidth);
   this.onFrame?.(now);requestAnimationFrame(this.frame);
  }
 }

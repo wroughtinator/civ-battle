@@ -65,17 +65,18 @@ export class Woodland {
   this.vao=gl.createVertexArray();this.buffer=gl.createBuffer();this.instanceBuffer=gl.createBuffer();gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,buffer,gl.STATIC_DRAW);
   for(const [loc,size,type,offset] of [[0,3,gl.SHORT,0],[1,3,gl.SHORT,6],[6,2,gl.UNSIGNED_SHORT,16]]){gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,size,type,true,20,offset);}
   gl.bindBuffer(gl.ARRAY_BUFFER,this.instanceBuffer);
-  for(const loc of [7,8]){gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,4,gl.FLOAT,false,32,(loc-7)*16);gl.vertexAttribDivisor(loc,1);}
+  for(const loc of [7,8]){gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,4,gl.FLOAT,false,44,(loc-7)*16);gl.vertexAttribDivisor(loc,1);}
+  gl.enableVertexAttribArray(9);gl.vertexAttribPointer(9,3,gl.FLOAT,false,44,32);gl.vertexAttribDivisor(9,1);
  }
- draw(globe){
+ draw(globe,maskOnly=false){
   const g=this.gl,visible=[];
   for(let i=0;i<this.instances.length;i++){
-   const instance=this.instances[i],p=instance.slice(0,3),v=globe.rotate(p);
+   const instance=this.instances[i];if(maskOnly&&!instance.slice(8,11).some(v=>v>0))continue;const p=instance.slice(0,3),v=globe.rotate(p);
    if(v[2]<1/globe.distance-.10)continue;
-   visible.push(...instance);
+   visible.push(...instance.slice(0,8),...(instance.length===11?instance.slice(8,11):[0,0,0]));
   }
   if(!visible.length)return;
   g.uniform1f(globe.u.foliage,this.sway?1:2);g.activeTexture(g.TEXTURE3);g.bindTexture(g.TEXTURE_2D,this.texture);g.uniform1i(globe.u.treeTexture,3);
-  g.bindVertexArray(this.vao);g.bindBuffer(g.ARRAY_BUFFER,this.instanceBuffer);g.bufferData(g.ARRAY_BUFFER,new Float32Array(visible),g.DYNAMIC_DRAW);g.vertexAttrib3f(2,1,1,1);g.vertexAttrib3f(3,1,4,0);g.drawArraysInstanced(g.TRIANGLES,0,this.count,visible.length/8);g.uniform1f(globe.u.foliage,0);
+  g.bindVertexArray(this.vao);g.bindBuffer(g.ARRAY_BUFFER,this.instanceBuffer);g.bufferData(g.ARRAY_BUFFER,new Float32Array(visible),g.DYNAMIC_DRAW);g.vertexAttrib3f(2,1,1,1);g.vertexAttrib3f(3,1,4,0);g.drawArraysInstanced(g.TRIANGLES,0,this.count,visible.length/11);g.uniform1f(globe.u.foliage,0);
  }
 }
