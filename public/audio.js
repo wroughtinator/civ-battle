@@ -1,13 +1,13 @@
 // A bounded Web Audio mixer. Every event comes from the authenticated player's view.
 export class Soundscape {
- constructor(){this.enabled=localStorage.getItem('meridian:muted')!=='1';this.ready=false;this.voices=0;this.loops={};this.lastCue=new Map();this.lastMix=0;this.seen=new Set();}
+ constructor(){this.enabled=true;try{this.enabled=localStorage.getItem('meridian:muted')!=='1';}catch{}this.ready=false;this.voices=0;this.loops={};this.lastCue=new Map();this.lastMix=0;this.seen=new Set();}
  async unlock(){if(!this.enabled)return;try{
   if(!this.ctx){this.ctx=new AudioContext();this.master=this.ctx.createGain();this.master.gain.value=.55;const limiter=this.ctx.createDynamicsCompressor();limiter.threshold.value=-12;limiter.ratio.value=8;this.master.connect(limiter).connect(this.ctx.destination);}
   await this.ctx.resume();if(this.loading||this.ready)return;
   this.loading=true;const [manifest,response]=await Promise.all([fetch('/assets/audio/cues.json').then(r=>r.json()),fetch('/assets/audio/game-audio.mp3')]);this.cues=manifest;this.buffer=await this.ctx.decodeAudioData(await response.arrayBuffer());this.ready=true;
   for(const name of ['ocean','land','rain']){const cue=this.cues[name],src=this.ctx.createBufferSource(),gain=this.ctx.createGain(),filter=this.ctx.createBiquadFilter();src.buffer=this.buffer;src.loop=true;src.loopStart=cue.start;src.loopEnd=cue.start+cue.duration;gain.gain.value=0;filter.type='lowpass';filter.frequency.value=6500;src.connect(filter).connect(gain).connect(this.master);src.start(0,cue.start);this.loops[name]={gain,filter};}
  }catch(e){this.loading=false;console.warn('Audio unavailable',e);}}
- toggle(){this.enabled=!this.enabled;localStorage.setItem('meridian:muted',this.enabled?'0':'1');if(this.master)this.master.gain.setTargetAtTime(this.enabled?.55:0,this.ctx.currentTime,.1);if(this.enabled){this.unlock();this.play('confirm',.25);}return this.enabled;}
+ toggle(){this.enabled=!this.enabled;try{localStorage.setItem('meridian:muted',this.enabled?'0':'1');}catch{}if(this.master)this.master.gain.setTargetAtTime(this.enabled?.55:0,this.ctx.currentTime,.1);if(this.enabled){this.unlock();this.play('confirm',.25);}return this.enabled;}
  play(name,volume=.35,pan=0,rate=1){if(!this.enabled||!this.ready||document.hidden||this.voices>=12)return;const now=this.ctx.currentTime,cue=this.cues[name];if(!cue||now-(this.lastCue.get(name)||-99)<.07)return;this.lastCue.set(name,now);const source=this.ctx.createBufferSource(),gain=this.ctx.createGain(),panner=this.ctx.createStereoPanner();source.buffer=this.buffer;source.playbackRate.value=rate;gain.gain.value=volume;panner.pan.value=Math.max(-1,Math.min(1,pan));source.connect(gain).connect(panner).connect(this.master);source.start(0,cue.start,cue.duration);this.voices++;source.onended=()=>{this.voices--;source.disconnect();gain.disconnect();panner.disconnect();};}
  pickup(){
   if(!this.enabled||!this.ctx||document.hidden||this.ctx.state!=='running'||this.voices>=12)return;
