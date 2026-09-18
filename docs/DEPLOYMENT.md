@@ -23,6 +23,8 @@ The script takes an exclusive local deployment lock. Direct Wrangler publishing 
 
 Each room stores an immutable release ID in SQLite. The stable `Room` dispatcher loads that release's complete server implementation and WASM for commands, AI, alarms, socket messages, and reconnects. It never substitutes the latest release. Existing lobbies stay pinned when configured or started.
 
+The generated registry defers importing each archived server until a room needs it. The dispatcher waits for that import inside its initialization barrier before accepting requests, alarms, or socket events. This avoids eagerly instantiating every retained WASM engine at Worker startup; archived files remain unchanged, and a missing or failed release load still fails closed.
+
 Invitation links and refreshes resolve the room's release before loading its browser client. Scripts, styles, normal maps, models, audio and preview WASM have release-scoped URLs. Every new room uses the current release, including when created from an old preview. A client whose release does not match its room is sent a reload before receiving a gameplay connection. Existing rooms keep their pinned client when rejoined. Choosing an archived release changes new rooms and the homepage, not existing rooms.
 
 The initial bootstrap is a captured copy of the deployed Worker, WASM and browser assets. Previously created rooms without a release ID are assigned that baseline without rebuilding their state. Pre-v4 rooms retain their original engine binaries and legacy client. This protection starts with this rollout; releases before it did not have per-build IDs.

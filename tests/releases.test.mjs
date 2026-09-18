@@ -24,8 +24,27 @@ function rules(version) {
   async alarm(){this.room.tick+=version;this.save();}
  };
 }
-const releases={[A]:{Room:rules(1),files:['index.html','app.js','legacy/index.html'],headers:{}},[B]:{Room:rules(20),files:['index.html','app.js'],headers:{}}};
+const releases={[A]:{load:async()=>({Room:rules(1)}),files:['index.html','app.js','legacy/index.html'],headers:{}},[B]:{load:async()=>({Room:rules(20)}),files:['index.html','app.js'],headers:{}}};
 const init=id=>new Request('https://game.test/init',{method:'POST',headers:{'X-Meridian-Release':id}});
+
+test('only the pinned release loads, and cold-start socket events await its initialization',async()=>{
+ let loads=0,finish;
+ const pending=new Promise(resolve=>finish=resolve);
+ const lazy={[A]:{load:async()=>{loads++;await pending;return {Room:rules(1)};}},[B]:{load:()=>{throw Error('Unrelated archive was initialized');}}};
+ const ctx=context(), Room=pinnedRoomClass(Base,lazy,A),room=new Room(ctx,{});
+ await room.ready;assert.equal(loads,0);
+ const creation=room.fetch(init(A));await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(loads,1);assert.equal(room.game,undefined);finish();await creation;
+ const restored=new Room(ctx,{}),messages=[];
+ await restored.webSocketMessage(messages);assert.deepEqual(messages,[1]);assert.equal(loads,2);
+ assert.equal(restored.release,A);
+});
+
+test('failed release loading never pins a new room or falls back to another version',async()=>{
+ const ctx=context(),Room=pinnedRoomClass(Base,{[A]:{load:async()=>{throw Error('Load failed');}},[B]:releases[B]},B);
+ const room=new Room(ctx,{});await assert.rejects(room.fetch(init(A)),/Load failed/);
+ assert.equal(room.game,undefined);assert.deepEqual([...ctx.storage.sql.exec('SELECT release FROM deployment')],[]);
+});
 
 test('room rules, commands, alarms and reconnects stay pinned after a deployment and cold start',async()=>{
  const ctx=context(), Old=pinnedRoomClass(Base,{[A]:releases[A]},A);
