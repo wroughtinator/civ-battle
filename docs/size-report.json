@@ -2,13 +2,18 @@
   "files": [
     {
       "file": "app.js",
-      "bytes": 33374,
-      "brotli_bytes": 9751
+      "bytes": 33888,
+      "brotli_bytes": 9902
     },
     {
       "file": "assets/archer.mesh",
       "bytes": 16992,
       "brotli_bytes": 2622
+    },
+    {
+      "file": "assets/archer.rig",
+      "bytes": 349548,
+      "brotli_bytes": 93011
     },
     {
       "file": "assets/artillery.mesh",
@@ -56,6 +61,11 @@
       "brotli_bytes": 1644
     },
     {
+      "file": "assets/guard.rig",
+      "bytes": 421108,
+      "brotli_bytes": 103467
+    },
+    {
       "file": "assets/launcher.mesh",
       "bytes": 21408,
       "brotli_bytes": 2490
@@ -96,6 +106,11 @@
       "brotli_bytes": 1522
     },
     {
+      "file": "assets/scout.rig",
+      "bytes": 294948,
+      "brotli_bytes": 78788
+    },
+    {
       "file": "assets/settler.mesh",
       "bytes": 19968,
       "brotli_bytes": 2507
@@ -111,24 +126,39 @@
       "brotli_bytes": 7708
     },
     {
+      "file": "assets/woodland.mesh",
+      "bytes": 39660,
+      "brotli_bytes": 8422
+    },
+    {
+      "file": "assets/woodland.webp",
+      "bytes": 37950,
+      "brotli_bytes": 37954
+    },
+    {
       "file": "audio.js",
-      "bytes": 4761,
-      "brotli_bytes": 1756
+      "bytes": 4734,
+      "brotli_bytes": 1755
+    },
+    {
+      "file": "combat-visuals.js",
+      "bytes": 4877,
+      "brotli_bytes": 1603
     },
     {
       "file": "controls.js",
-      "bytes": 6656,
-      "brotli_bytes": 1963
+      "bytes": 6564,
+      "brotli_bytes": 1946
     },
     {
       "file": "engine.wasm",
-      "bytes": 408327,
-      "brotli_bytes": 106443
+      "bytes": 419414,
+      "brotli_bytes": 108391
     },
     {
       "file": "favicon.svg",
-      "bytes": 278,
-      "brotli_bytes": 210
+      "bytes": 277,
+      "brotli_bytes": 208
     },
     {
       "file": "feedback.js",
@@ -137,28 +167,28 @@
     },
     {
       "file": "globe.js",
-      "bytes": 38951,
-      "brotli_bytes": 12260
+      "bytes": 43871,
+      "brotli_bytes": 13589
     },
     {
       "file": "icons.js",
-      "bytes": 8799,
-      "brotli_bytes": 3154
+      "bytes": 8710,
+      "brotli_bytes": 3129
     },
     {
       "file": "index.html",
-      "bytes": 2482,
-      "brotli_bytes": 777
+      "bytes": 2472,
+      "brotli_bytes": 774
     },
     {
       "file": "legacy/app.js",
-      "bytes": 39012,
-      "brotli_bytes": 11066
+      "bytes": 38793,
+      "brotli_bytes": 11046
     },
     {
       "file": "legacy/audio.js",
-      "bytes": 4650,
-      "brotli_bytes": 1716
+      "bytes": 4623,
+      "brotli_bytes": 1718
     },
     {
       "file": "legacy/engine.wasm",
@@ -167,57 +197,72 @@
     },
     {
       "file": "legacy/globe.js",
-      "bytes": 32590,
-      "brotli_bytes": 10354
+      "bytes": 32367,
+      "brotli_bytes": 10324
     },
     {
       "file": "legacy/icons.js",
-      "bytes": 7311,
-      "brotli_bytes": 2622
+      "bytes": 7238,
+      "brotli_bytes": 2607
     },
     {
       "file": "legacy/index.html",
-      "bytes": 2397,
-      "brotli_bytes": 754
+      "bytes": 2380,
+      "brotli_bytes": 747
     },
     {
       "file": "legacy/planning.js",
-      "bytes": 885,
-      "brotli_bytes": 434
+      "bytes": 884,
+      "brotli_bytes": 424
     },
     {
       "file": "legacy/style.css",
-      "bytes": 23805,
-      "brotli_bytes": 5069
+      "bytes": 23777,
+      "brotli_bytes": 5065
     },
     {
       "file": "manual-data.js",
-      "bytes": 20027,
-      "brotli_bytes": 6566
+      "bytes": 21077,
+      "brotli_bytes": 6862
     },
     {
       "file": "manual.js",
-      "bytes": 5387,
-      "brotli_bytes": 1554
+      "bytes": 5351,
+      "brotli_bytes": 1549
+    },
+    {
+      "file": "model-assets.js",
+      "bytes": 4538,
+      "brotli_bytes": 1567
+    },
+    {
+      "file": "movement.js",
+      "bytes": 952,
+      "brotli_bytes": 437
     },
     {
       "file": "planning.js",
-      "bytes": 5766,
-      "brotli_bytes": 2011
+      "bytes": 5820,
+      "brotli_bytes": 2026
     },
     {
       "file": "style.css",
-      "bytes": 23805,
-      "brotli_bytes": 5069
+      "bytes": 23777,
+      "brotli_bytes": 5065
     },
     {
       "file": "tactics.css",
-      "bytes": 15574,
-      "brotli_bytes": 3831
+      "bytes": 16800,
+      "brotli_bytes": 4161
+    },
+    {
+      "file": "terrain.js",
+      "bytes": 815,
+      "brotli_bytes": 398
     }
   ],
-  "total_bytes": 3016957,
-  "estimated_brotli_bytes": 1911944,
+  "total_bytes": 4189333,
+  "estimated_brotli_bytes": 2241519,
   "audio_lazy_bytes": 473732,
   "note": "Brotli figures are local compression measurements, not a claim about negotiated CDN content encoding. Audio loads after interaction. No physical mobile GPU benchmark has been made."
 }
