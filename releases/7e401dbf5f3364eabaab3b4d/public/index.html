@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a151a">
+<meta name="description" content="">
+<meta property="og:type" content="website">
+<meta property="og:title" content="&#9673;">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://meridian-globe.camerons-nonsense.workers.dev/releases/7e401dbf5f3364eabaab3b4d/assets/globe-share.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:image:alt" content="A globe with oceans, mountains and clouds">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="&#9673;">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="https://meridian-globe.camerons-nonsense.workers.dev/releases/7e401dbf5f3364eabaab3b4d/assets/globe-share.jpg">
+<meta name="twitter:image:alt" content="A globe with oceans, mountains and clouds">
+<title>Meridian</title><link rel="icon" type="image/svg+xml" href="/releases/7e401dbf5f3364eabaab3b4d/favicon.svg"><link rel="stylesheet" href="/releases/7e401dbf5f3364eabaab3b4d/style.css"><link rel="stylesheet" href="/releases/7e401dbf5f3364eabaab3b4d/tactics.css"><style>
+#loading-screen{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#18383d 0%,#09171d 65%);color:#eee9d9;font-family:system-ui,sans-serif;opacity:1;transition:opacity .45s ease;touch-action:none}
+#loading-screen.leaving{opacity:0}.loading-content{width:min(340px,calc(100vw - 64px));text-align:center}.loading-emblem{width:76px;height:76px;color:#e6b85b;margin-bottom:28px;filter:drop-shadow(0 0 22px #e6b85b25)}#loading-title{font-size:22px;font-weight:500;letter-spacing:.02em;margin:0 0 28px}#loading-progress{display:block;width:100%;height:5px;border:0;border-radius:10px;overflow:hidden;background:#ffffff16;accent-color:#e6b85b}#loading-progress::-webkit-progress-bar{background:#ffffff16}#loading-progress::-webkit-progress-value{background:#e6b85b;transition:width .2s}#loading-progress::-moz-progress-bar{background:#e6b85b}.loading-meta{display:flex;justify-content:space-between;gap:12px;margin-top:14px;font-size:12px;color:#a1b6b7}#loading-percent{font-variant-numeric:tabular-nums;color:#e6b85b}#loading-retry{margin:24px auto 0;padding:12px 24px;border:1px solid #e6b85b;border-radius:6px;background:transparent;color:#e6b85b;font:inherit;cursor:pointer}#loading-retry[hidden]{display:none}@media(prefers-reduced-motion:reduce){#loading-screen,#loading-progress::-webkit-progress-value{transition:none}}
+</style></head>
+<body aria-busy="true">
+ <section id="loading-screen" aria-label="Game loading">
+  <div class="loading-content">
+   <svg class="loading-emblem" viewBox="0 0 60 60" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="30" cy="30" r="23"/><ellipse cx="30" cy="30" rx="11" ry="23"/><path d="M7 30h46M11 17h38M11 43h38"/></svg>
+   <h1 id="loading-title" role="status">Downloading game…</h1>
+   <progress id="loading-progress" max="100" value="0" aria-label="Estimated game download progress"></progress>
+   <div class="loading-meta"><span id="loading-detail">Estimating time remaining…</span><span id="loading-percent">0%</span></div>
+   <button id="loading-retry" hidden>Try again</button>
+   <noscript><p>Enable JavaScript to load the game.</p></noscript>
+  </div>
+ </section>
+ <div id="stars" aria-hidden="true"></div><div class="aura" aria-hidden="true"></div>
+ <canvas id="globe" aria-label="Interactive globe. Drag to rotate, scroll or pinch to zoom, select a unit, choose the movement action, then tap a destination."></canvas>
+ <div id="markers"></div>
+ <section id="title-screen" class="hidden" aria-label="Meridian title screen"><h1>MERIDIAN</h1><button id="host-game" class="primary" disabled>Host a game</button></section>
+ <header id="topbar" class="hidden"><div id="navigation"></div><div id="resources"></div><nav id="top-actions" aria-label="Game controls"></nav><div id="clock" hidden></div><div id="connection" hidden></div></header>
+ <main id="lobby" class="panel hidden"><h2 class="lobby-title">Lobby</h2><div id="bonus" class="bonus"></div><div class="divider"></div><div id="seats" class="seats"></div><div id="config" class="config"></div><div class="divider"></div><div id="victory-hint" class="victory-hint"></div><div class="launch-row"><button id="invite" class="secondary" aria-label="Create lobby and copy invitation link"></button><button id="start" class="primary" aria-label="Start match"></button></div><div id="seed" class="seed"></div></main>
+ <dialog id="scoreboard" class="panel" aria-labelledby="scoreboard-title"><div class="scoreboard-head"><h2 id="scoreboard-title">Scoreboard</h2><button id="close-scoreboard" autofocus aria-label="Close scoreboard">Close</button></div><table class="scoreboard-table"><thead><tr><th scope="col">Color</th><th scope="col">Name</th><th scope="col">Points</th></tr></thead><tbody id="scoreboard-players"></tbody></table></dialog>
+ <section id="province" class="panel hidden" aria-label="Selected tile, unit or city details"></section>
+ <section id="research" class="panel hidden" aria-label="Technology tree"></section>
+ <section id="guide" class="panel hidden" aria-label="Icon manual"></section>
+ <dialog id="leave-confirm" class="panel" aria-labelledby="leave-title"><h2 id="leave-title">Are you sure you want to leave?</h2><div class="leave-actions"><button id="stay">Stay</button><button id="confirm-leave">Leave</button></div></dialog>
+ <dialog id="ending" class="panel" aria-labelledby="victory-title"></dialog>
+ <div id="toast" role="status"></div><div id="march-hint" class="hidden"></div>
+ <footer id="dock" class="hidden"></footer>
+ <script type="module" data-game-boot src="/releases/7e401dbf5f3364eabaab3b4d/loading.js"></script>
+</body></html>
