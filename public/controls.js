@@ -51,6 +51,8 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
  }
  const u=state.squads.find(u=>u.id===from&&u.owner===slot);
  if(!u)return blocked('Select your unit');
+ if(kind==='auto')return value===0||value===1?null:blocked('Choose manual or automatic control');
+ if(u.automated)return blocked('Turn off robot control to issue manual orders','bot');
  if(kind==='ability'&&[0,3].includes(u.kind))return blocked('Digs in automatically after holding position','shield');
  if(u.boarded_on!=null)return blocked('Aboard a carrier: disembark from its action panel','disembark');
  if(u.refit>=0)return blocked('Refitting','clock',u.work);

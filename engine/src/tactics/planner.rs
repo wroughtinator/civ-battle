@@ -80,7 +80,7 @@ impl Game {
                 if (u.kind==11||u.kind==8) && u.ability_ready<=self.tick
                     && !own.iter().any(|f|f.tile==e.tile||(u.kind==11&&self.tiles[e.tile].near.contains(&f.tile)))
                     && self.command(p,"ability",u.id,e.tile,if u.kind==8{2}else{0}).is_ok(){return;}
-                if spec(u.kind).damage>0. && u.focus!=Some(e.id)
+                if spec(u.kind).damage>0. && !u.automated
                     && self.command(p,"attack",u.id,e.tile,0).is_ok(){return;}
                 if u.kind==11 && u.path.len()<=1 && self.distances(u.tile)[e.tile]>9 {
                     let from=self.distances(u.tile);let target=self.distances(e.tile);
@@ -231,8 +231,7 @@ impl Game {
         }
 
         let depth = if policy == 0 { self.difficulty + 1 } else { 1 };
-        // Standing units already repeat their attacks. Spend an order only to
-        // improve focus or commit an ability, not to keep ordinary weapons firing.
+        // Manual units need one order per shot; robot units handle their own fire.
         for u in &own {
             if u.left > 0 || u.locked_until > self.tick || spec(u.kind).damage == 0. || u.refit >= 0
             {
@@ -262,7 +261,7 @@ impl Game {
                 {
                     return;
                 }
-                if u.focus != Some(e.id) && self.command(p, "attack", u.id, e.tile, 0).is_ok() {
+                if !u.automated && self.command(p, "attack", u.id, e.tile, 0).is_ok() {
                     return;
                 }
             }

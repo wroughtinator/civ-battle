@@ -698,11 +698,12 @@ fn injected_engineer_still_requires_orbital_research() {
 }
 
 #[test]
-fn normal_focus_repeats_and_spamming_cannot_accelerate_it() {
+fn robot_repeats_and_manual_command_spam_cannot_accelerate_it() {
     let(mut a,_,target)=arena();
     a.squads[1].kind=13;a.squads[1].hp=10000.;
     let id=a.squads[0].id;
     a.command(0,"attack",id,target,0).unwrap();
+    a.command(0,"auto",id,0,1).unwrap();
     let mut b=a.clone();
     for _ in 0..50 {
         let _=b.command(0,"attack",id,target,0);
@@ -711,7 +712,7 @@ fn normal_focus_repeats_and_spamming_cannot_accelerate_it() {
     assert!(a.squads[1].hp<10000.-spec(0).damage*2.);
     assert_eq!(a.squads[1].hp,b.squads[1].hp);
     assert_eq!(a.squads[0].fire_at,b.squads[0].fire_at);
-    assert_eq!(a.squads[0].focus,Some(a.squads[1].id));
+    assert!(a.squads[0].automated);
 }
 
 #[test]
@@ -744,8 +745,9 @@ fn concealed_world_changes_do_not_change_the_bot_order() {
 }
 
 #[test]
-fn standing_units_defend_without_repeated_player_orders() {
+fn robot_units_defend_without_repeated_player_orders() {
     let (mut g, _, _) = arena();
+    g.squads[0].automated=true;
     let enemy=g.squads[1].id;
     g.step(40);
     assert!(g.squads.iter().find(|u|u.id==enemy).is_none_or(|u|u.hp<85.));
@@ -1129,6 +1131,50 @@ fn chest_gold_varies_and_matches_feedback() {
 }
 
 #[test]
+fn manual_units_wait_and_each_attack_is_one_shot() {
+    let (mut g, _, target)=arena();
+    assert!(g.squads.iter().all(|u|!u.automated));
+    g.step(40);
+    assert_eq!(g.squads[1].hp,85.);
+    assert_eq!(g.squads[0].locked_until,0);
+    let id=g.squads[0].id;
+    g.command(0,"attack",id,target,0).unwrap();g.step(2);
+    let hp=g.squads[1].hp;assert!(hp<85.);
+    g.step(40);assert_eq!(g.squads[1].hp,hp);
+    assert!(g.squads[0].locked_until<=g.tick);
+}
+
+#[test]
+fn robot_toggle_is_owned_idempotent_and_available_during_commitment() {
+    let (mut g, start, target)=arena();let id=g.squads[0].id;
+    assert_eq!(g.command(1,"auto",id,0,1),Err(3));
+    g.command(0,"auto",id,0,1).unwrap();g.step(3);
+    let lock=g.squads[0].locked_until;let fire=g.squads[0].fire_at;
+    assert!(lock>g.tick);assert!(fire>g.tick);
+    for kind in ["move","attack","ability","stop","disband","face","explore","disembark"] {
+        assert_eq!(g.command(0,kind,id,target,0),Err(6));
+    }
+    g.command(0,"auto",id,0,0).unwrap();g.command(0,"auto",id,0,0).unwrap();
+    assert_eq!(g.squads[0].locked_until,lock);assert_eq!(g.squads[0].fire_at,fire);
+    g.step(2);let hp=g.squads[1].hp;g.step(40);assert_eq!(g.squads[1].hp,hp);
+    let to=*g.tiles[start].near.iter().find(|&&t|t!=target).unwrap();
+    g.command(0,"move",id,to,0).unwrap();let left=g.squads[0].left;
+    g.command(0,"auto",id,0,1).unwrap();g.command(0,"auto",id,0,0).unwrap();
+    assert_eq!(g.squads[0].left,left);assert_eq!(g.squads[0].path,vec![to]);
+    let mut saved=serde_json::to_value(&g).unwrap();
+    saved["squads"][0].as_object_mut().unwrap().remove("automated");
+    let restored:Game=serde_json::from_value(saved).unwrap();assert!(!restored.squads[0].automated);
+}
+
+#[test]
+fn robot_moves_to_and_conquers_an_unoccupied_city() {
+    let (mut g,_,_)=arena();g.squads.clear();
+    let target=g.cities[1].tile;let start=g.tiles[target].near[0];g.spawn(0,0,start);
+    let id=g.squads[0].id;g.command(0,"auto",id,0,1).unwrap();g.step(40);
+    assert_eq!(g.cities[1].owner,0);
+}
+
+#[test]
 fn launch_broadcasts_only_its_pad_and_bot_interrupts_the_engineer() {
     let mut g=quiet();g.squads.clear();g.discoveries.clear();g.tick=100;
     let tile=g.cities[1].tile;
@@ -1146,7 +1192,7 @@ fn launch_broadcasts_only_its_pad_and_bot_interrupts_the_engineer() {
     let archer=g.squads[1].id;g.players[1].launch=100;
     g.bot_policy(0,0);
     assert_eq!(g.last_order.as_ref().map(|o|(&o.0,o.1,o.2)),Some((&"attack".to_string(),archer,tile)));
-    g.step(70);
+    for _ in 0..70 {g.tick_one(false);g.bot_policy(0,0);}
     assert!(!g.squads.iter().any(|u|u.id==engineer),"focused fire must kill the exposed engineer");
     assert!(g.players[1].launch<100,"destroying support must roll the launch back");
 }

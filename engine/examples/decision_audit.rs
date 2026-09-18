@@ -52,7 +52,9 @@ fn combat_value(g:&Game,p:usize)->f64 {
 }
 fn orders(g:&Game,p:usize)->Vec<Order> {
     let mut out=vec![Order::new("wait",0,0,0)];let v=g.vision(p);
-    for u in g.squads.iter().filter(|u|u.owner==p&&u.left==0&&u.locked_until<=g.tick) {
+    for u in g.squads.iter().filter(|u|u.owner==p) {
+        out.push(Order::new("auto",u.id,0,if u.automated {0}else{1}));
+        if u.automated || u.left>0 || u.locked_until>g.tick {continue;}
         for &t in &g.tiles[u.tile].near {if g.can_enter(u.kind,t)&&g.occupant(t).is_none()&&!g.guard_blocks(u,u.tile,t,Some(&v)) {out.push(Order::new("move",u.id,t,0));}}
         if definition(u.kind).directional {for &t in &g.tiles[u.tile].near {if Some(t)!=u.facing{out.push(Order::new("face",u.id,t,0));}}}
         for e in g.squads.iter().filter(|e|e.owner!=p&&g.detected(p,e,&v)) {

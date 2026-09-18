@@ -33,6 +33,12 @@ pub fn act(g: &mut Game, p: usize, policy: usize) {
     }
     // The native expansion policy now has its own four-city target and full
     // research/transport support. Endless extra settlers would starve its goals.
+    // The guards portfolio exercises explicit per-unit robot control.
+    if policy == 1 {
+        if let Some(u) = g.squads.iter().find(|u|u.owner==p && !u.automated && spec(u.kind).damage>0.) {
+            let id=u.id; let _=g.command(p,"auto",id,0,1); return;
+        }
+    }
     // Military policies can plan one replacement while a city is busy. This
     // exercises persistent queues under the unchanged input-frequency gates.
     if (1..=5).contains(&policy) {
@@ -62,6 +68,7 @@ pub fn fresh(seed: u32, players: usize) -> Game {
 
 fn unit(id: usize, owner: usize, kind: u8, tile: usize) -> Unit {
     Unit {
+        automated: false,
         facing:None,
         id,
         owner,

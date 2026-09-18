@@ -101,6 +101,8 @@ pub struct Unit {
     #[serde(default)]
     pub focus: Option<usize>,
     #[serde(default)]
+    pub automated: bool,
+    #[serde(default)]
     pub salvo: u8,
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -279,6 +281,7 @@ impl Game {
             fire_at: 0,
             aim: tile,
             focus: None,
+            automated: false,
             salvo: 0,
         });
         self.next_unit += 1;
@@ -642,13 +645,26 @@ impl Game {
                     }
                 }
             }
-            "move" | "stop" | "ability" | "explore" | "attack" | "disband" | "disembark" | "face" => {
+            "auto" | "move" | "stop" | "ability" | "explore" | "attack" | "disband" | "disembark" | "face" => {
                 let index = self
                     .squads
                     .iter()
                     .position(|u| u.id == from && u.owner == p)
                     .ok_or(3)?;
                 let u = self.squads[index].clone();
+                if kind == "auto" {
+                    if value > 1 { return Err(6); }
+                    let s = &mut self.squads[index];
+                    if s.automated != (value == 1) {
+                        s.automated = value == 1;
+                        s.path = vec![s.tile];
+                        s.to = s.tile;
+                        s.focus = None;
+                    }
+                    self.last_order = Some((kind.into(), from, to, value));
+                    return Ok(());
+                }
+                if u.automated { return Err(6); }
                 if u.locked_until > self.tick && !matches!(kind, "move" | "stop") {
                     return Err(2);
                 }
@@ -909,6 +925,7 @@ impl Game {
         self.encounters();
         self.movement();
         self.combat();
+        self.automated_movement();
         self.support_units();
         self.development();
         self.victory();
@@ -1071,7 +1088,8 @@ impl Game {
         let mut visions: Vec<Option<Vec<bool>>> = vec![None;self.players.len()];
         for i in 0..self.squads.len() {
             let u = self.squads[i].clone();
-            if u.boarded_on.is_some() || u.refit >= 0
+            if !(u.automated || u.owner == 8 || self.players.get(u.owner).is_some_and(|p|p.bot))
+                || u.boarded_on.is_some() || u.refit >= 0
                 || u.founding
                 || u.left > 0
                 || u.locked_until > self.tick
@@ -1582,6 +1600,7 @@ mod utility;
 mod era_tests;
 mod transport;
 mod actions;
+mod automation;
 mod discoveries;
 mod feedback;
 mod planner;
