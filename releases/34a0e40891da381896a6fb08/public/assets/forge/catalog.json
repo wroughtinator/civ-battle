@@ -1,0 +1,417 @@
+{
+  "version": 1,
+  "materials": "sources/materials.png",
+  "terrain": "sources/terrain.png",
+  "models": [
+    {
+      "name": "guard",
+      "category": "unit",
+      "parts": 12,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "archer",
+      "category": "unit",
+      "parts": 15,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "scout",
+      "category": "unit",
+      "parts": 11,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "engineer",
+      "category": "unit",
+      "parts": 13,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "recon",
+      "category": "unit",
+      "parts": 12,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "tank",
+      "category": "unit",
+      "parts": 12,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "artillery",
+      "category": "unit",
+      "parts": 8,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "launcher",
+      "category": "unit",
+      "parts": 13,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "cavalry",
+      "category": "unit",
+      "parts": 15,
+      "clips": [
+        "walk",
+        "attack",
+        "idle"
+      ]
+    },
+    {
+      "name": "settler",
+      "category": "unit",
+      "parts": 10,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "fleet",
+      "category": "unit",
+      "parts": 11,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "carrier",
+      "category": "unit",
+      "parts": 12,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "submarine",
+      "category": "unit",
+      "parts": 6,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "drone",
+      "category": "unit",
+      "parts": 6,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "aircraft",
+      "category": "projectile",
+      "parts": 6,
+      "clips": [
+        "idle",
+        "walk",
+        "attack"
+      ]
+    },
+    {
+      "name": "missile",
+      "category": "projectile",
+      "parts": 6,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "nuke",
+      "category": "projectile",
+      "parts": 6,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "rocket",
+      "category": "projectile",
+      "parts": 6,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "torpedo",
+      "category": "projectile",
+      "parts": 6,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "bomb",
+      "category": "projectile",
+      "parts": 6,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "shell",
+      "category": "projectile",
+      "parts": 2,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "mortar",
+      "category": "projectile",
+      "parts": 2,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "bullet",
+      "category": "projectile",
+      "parts": 2,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "arrow",
+      "category": "projectile",
+      "parts": 6,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "satellite",
+      "category": "orbital",
+      "parts": 4,
+      "clips": [
+        "idle"
+      ]
+    },
+    {
+      "name": "tree-oak",
+      "category": "tree",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "tree-pine",
+      "category": "tree",
+      "parts": 4,
+      "clips": []
+    },
+    {
+      "name": "tree-birch",
+      "category": "tree",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "capital-0",
+      "category": "prop",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "capital-1",
+      "category": "prop",
+      "parts": 2,
+      "clips": []
+    },
+    {
+      "name": "capital-2",
+      "category": "prop",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "capital-3",
+      "category": "prop",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "capital-4",
+      "category": "prop",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "capital-5",
+      "category": "prop",
+      "parts": 3,
+      "clips": []
+    },
+    {
+      "name": "capital-6",
+      "category": "prop",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "capital-7",
+      "category": "prop",
+      "parts": 7,
+      "clips": []
+    },
+    {
+      "name": "building-1",
+      "category": "prop",
+      "parts": 5,
+      "clips": []
+    },
+    {
+      "name": "building-2",
+      "category": "prop",
+      "parts": 3,
+      "clips": []
+    },
+    {
+      "name": "building-3",
+      "category": "prop",
+      "parts": 4,
+      "clips": []
+    },
+    {
+      "name": "building-4",
+      "category": "prop",
+      "parts": 6,
+      "clips": []
+    },
+    {
+      "name": "building-5",
+      "category": "prop",
+      "parts": 3,
+      "clips": []
+    },
+    {
+      "name": "building-6",
+      "category": "prop",
+      "parts": 4,
+      "clips": []
+    },
+    {
+      "name": "building-7",
+      "category": "prop",
+      "parts": 5,
+      "clips": []
+    },
+    {
+      "name": "farm",
+      "category": "prop",
+      "parts": 8,
+      "clips": []
+    },
+    {
+      "name": "site",
+      "category": "prop",
+      "parts": 4,
+      "clips": []
+    },
+    {
+      "name": "discovery-0",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-1",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-2",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-3",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-4",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-5",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-6",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-7",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-8",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    },
+    {
+      "name": "discovery-9",
+      "category": "prop",
+      "parts": 9,
+      "clips": []
+    }
+  ]
+}
