@@ -33,6 +33,19 @@ pub fn act(g: &mut Game, p: usize, policy: usize) {
     }
     // The native expansion policy now has its own four-city target and full
     // research/transport support. Endless extra settlers would starve its goals.
+    // Military policies can plan one replacement while a city is busy. This
+    // exercises persistent queues under the unchanged input-frequency gates.
+    if (1..=5).contains(&policy) {
+        let reserved = g.squads.iter().filter(|u|u.owner==p).count()
+            + g.cities.iter().filter(|c|c.owner==p).map(|c|usize::from(c.training>=0)+c.queue.len()).sum::<usize>();
+        if reserved < g.cap(p) {
+            if let Some(c)=g.cities.iter().find(|c|c.owner==p&&c.training>=0&&c.queue.is_empty()
+                &&spec(c.training as u8).damage>0.&&g.players[p].gold>=spec(c.training as u8).cost as f32) {
+                let (tile,k)=(c.tile,c.training as u8);
+                if g.command(p,"enqueue",tile,0,k).is_ok() {return;}
+            }
+        }
+    }
     g.bot_policy(p, policy as u8);
 }
 
@@ -109,6 +122,7 @@ pub fn belief(g: &Game, p: usize, sample: u32) -> Game {
     for c in &mut b.cities {
         if c.owner != p {
             c.training = -1;
+            c.queue.clear();
             c.left = 0;
             c.total = 0;
             if !v[c.tile] {
