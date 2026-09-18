@@ -78,3 +78,12 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 @media(prefers-reduced-motion:reduce){.pickup-reward{animation:none}}
 /* Terrain benefits use the same symbols as upgrades and unit capacity. */
 .terrain-status,.terrain-status>span{display:inline-flex;align-items:center;gap:4px}.terrain-status{margin-left:8px;color:#a9f3c6;font:11px ui-monospace,monospace}.terrain-status .icon{width:15px;height:15px}.cover-badge{position:absolute;right:-7px;top:-7px;width:19px;height:21px;display:flex;align-items:center;justify-content:center;background:#163a2e;border:1px solid #a9f3c6;border-radius:5px;color:#baf2be;pointer-events:none}.unit-marker .cover-badge .icon{width:13px;height:13px}.city-upgrades .order-action{min-height:140px}
+/* Compact terrain inspection also remains available on unoccupied hexes. */
+.tile-inspector-head,.tile-terrain-heading,.tile-effects,.tile-effect{display:flex;align-items:center;gap:8px}
+.tile-inspector-head{font-size:12px;color:#b8ccc6}.tile-inspector-head>button{min-width:44px;min-height:44px}
+.tile-terrain{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.tile-terrain-heading{flex-wrap:wrap;font-size:12px}.tile-terrain-heading>.icon{width:20px;height:20px}.tile-terrain-heading small{margin-left:auto;font-size:10px;color:#a6bdb6}
+.tile-effects{flex-wrap:wrap;gap:6px;margin-top:8px}
+#province .tile-effect{min-width:52px;min-height:44px;padding:7px 10px;border:1px solid #8ca79e55;border-radius:7px;font:12px ui-monospace,monospace;background:#14292d}
+#province .tile-effect .icon{width:19px;height:19px}#province .tile-effect.good{color:#a9f3c6}#province .tile-effect.bad{color:#ffc08a}#province .tile-effect.neutral{color:#b9dce8}
+#province .tile-effect:hover,#province .tile-effect:focus-visible{background:#30494d;border-color:currentColor}

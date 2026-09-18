@@ -5,7 +5,7 @@ import {passengers,boardingCapacity,boardingTarget,branches,unitIcons,unitNames,
 import {orderBlock,targetTiles,refitChoices,abilityCost} from './controls.js';
 import {Manual} from './manual.js';
 import {FeedbackLayer} from './feedback.js';
-import {terrainIcons,inForestCover,rate,incomeBenefit} from './terrain.js';
+import {terrainIcons,terrainSummary,inForestCover,rate,incomeBenefit} from './terrain.js';
 const $=id=>document.getElementById(id),show=(id,yes)=>$(id).classList.toggle('hidden',!yes);
 const btn=(id,symbol,label,body='',extra='')=>`<button ${id?`id="${id}"`:''} aria-label="${label}" ${extra}>${icon(symbol)}${body}</button>`;
 const num=n=>Math.floor(n??0),time=n=>`${Math.floor(n/60).toString().padStart(2,'0')}:${Math.floor(n%60).toString().padStart(2,'0')}`;
@@ -158,7 +158,7 @@ function select(tile){
 function renderProvince(){
  const aboard=state.squads.find(u=>u.id===activeUnit)?.boarded_on;if(aboard!=null){activeUnit=aboard;globe.routeUnit=aboard;}
  const u=state.squads.find(u=>u.id===activeUnit),city=state.cities.find(c=>c.tile===(u?u.tile:selected));
- if(state.phase!=='running'||techOpen||!u&&!city){show('province',false);return;}show('province',true);
+ if(state.phase!=='running'||techOpen||!world[u?u.tile:selected]){show('province',false);return;}show('province',true);
  if(u&&selected!==u.tile){selected=u.tile;globe.choose(u.tile);}
  if(u){
   const own=u.owner===slot&&!state.spectator,sp=state.rules.specs[u.kind];
@@ -202,7 +202,12 @@ function renderProvince(){
    ${city.capture?`<div class="training">${icon('swords')}${city.capture}/12</div>`:''}`;
   $('close-piece').onclick=closeSelection;if(unit)$('select-occupant').onclick=()=>selectUnit(unit.id);
   if(own){$('radius-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:0});$('production-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:1});units.forEach(k=>$(`train-${k}`).onclick=()=>command('train',{from:city.tile,value:k}));}
+ }else{
+  $('province').innerHTML=`<div class="tile-inspector-head">${icon('territory')}<span>Tile terrain</span><span class="spacer"></span>${btn('close-piece','close','Close selection')}</div>`;
+  $('close-piece').onclick=closeSelection;
  }
+ $('province').insertAdjacentHTML('beforeend',terrainSummary(icon,world[u?u.tile:selected].terrain));
+ $('province').querySelectorAll('[data-terrain-help]').forEach(b=>b.onclick=()=>manual.open(b.dataset.terrainHelp,b.getAttribute('aria-label')));
 }
 function closeSelection(){activeUnit=-1;selected=-1;clearRoute();globe.choose(-1);globe.routeUnit=-1;show('province',false);}
 function toggleResearch(){if(state?.spectator)return;techOpen=!techOpen;clearRoute();renderResearch();renderProvince();}
