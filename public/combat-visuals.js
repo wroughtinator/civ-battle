@@ -32,15 +32,18 @@ export function drawAttack(event,now,ctx){
  if(f>1)return; // Authoritative hit events supply the impact; never invent early damage.
  const flash=1-Math.min(1,f*5),tip=add(origin,mul(forward,.055));
  if(flash>0&&!['torpedo','slash','stab','charge','bash','sortie','pulse'].includes(style.type)){
-  const r=.017*flash;triangle(add(tip,mul(forward,r*2)),add(tip,mul(side,r)),add(tip,mul(side,-r)),[1,.97,.77]);
+  const r=.024*flash;triangle(add(tip,mul(forward,r*2)),add(tip,mul(side,r)),add(tip,mul(side,-r)),[1,.64,.18]);
+  ribbon(tip,add(tip,mul(forward,r*2.3)),r*.22,[1,.98,.81]);
+  ring(a,.012+f*.065,.005*flash,[1,.66,.22],base(event.from)+.006);
  }
  if(['slash','stab','charge','bash'].includes(style.type)){
   if(style.type==='slash'){
    const up=norm(b),east=norm(cross(Math.abs(up[1])>.98?[1,0,0]:[0,1,0],up)),north=cross(up,east);
    const at=(angle,r)=>add(target,add(mul(east,Math.cos(angle)*r),mul(north,Math.sin(angle)*r)));
-   for(let j=0;j<7;j++){const angle=-1.9+f*3.8-j*.12;triangle(at(angle,.064),at(angle+.17,.064),at(angle+.17,.042),color);}
+   for(let j=0;j<10;j++){const angle=-1.9+f*3.8-j*.12,outer=.067-j*.001;triangle(at(angle,outer),at(angle+.17,outer),at(angle+.17,outer-.021*(1-j/11)),color.map(v=>v*(1-j*.055)));}
+   const edge=-1.9+f*3.8;ribbon(at(edge,.043),at(edge,.071),.003,[1,1,.9]);
   }else if(style.type==='charge'){
-   for(const lane of [-1,0,1]){const offset=mul(side,lane*.012),p=add(mul(norm(mix(a,b,f)),base(event.to)),offset);ribbon(add(p,mul(forward,-.06)),p,.004,color);}
+   for(const lane of [-1,0,1]){const offset=mul(side,lane*.015),p=add(mul(norm(mix(a,b,f)),base(event.to)),offset);ribbon(add(p,mul(forward,-.07)),p,.004,color);ribbon(add(p,mul(forward,-.028)),p,.0015,[1,.98,.83]);}
   }else if(style.type==='stab'){
    const p=mix(origin,target,Math.sin(f*Math.PI));ribbon(add(p,mul(forward,-.045)),p,.004,color);triangle(add(p,mul(forward,.015)),add(p,mul(side,.009)),add(p,mul(side,-.009)),[1,1,.9]);
   }else ring(b,.016+Math.sin(f*Math.PI)*.035,.010,color,base(event.to));
@@ -56,7 +59,8 @@ export function drawAttack(event,now,ctx){
   const p=add(mul(up,height),mul(side,(j-(count-1)/2)*.008)),tail=add(p,mul(forward,style.type==='burst'?-.075:-.032));
   const projectile=({arrow:'arrow',shell:'shell',mortar:'mortar',burst:'bullet',bomb:'bomb',broadside:'shell',torpedo:'torpedo',rocket:'rocket',sortie:'aircraft'})[style.type];
   if(model&&projectile){const tangent=add(forward,mul(up,Math.cos(t*Math.PI)*arc*3));model(projectile,p,tangent,style.type==='sortie'?.043:style.type==='torpedo'?.037:style.type==='arrow'?.030:style.type==='burst'?.015:.026);}
-  ribbon(tail,p,style.type==='torpedo'?.004:style.type==='mortar'?.005:.0028,color);
+  ribbon(tail,p,style.type==='torpedo'?.004:style.type==='mortar'?.005:.0035,color);
+  if(style.type!=='arrow'&&style.type!=='torpedo')ribbon(mix(tail,p,.25),p,.0012,[1,.98,.83]);
   if(style.type==='arrow'&&!model){
    triangle(add(p,mul(forward,.013)),add(p,mul(side,.008)),add(p,mul(side,-.008)),[1,.94,.70]);
    const feather=add(tail,mul(forward,.012));triangle(add(tail,mul(side,.007)),feather,add(tail,mul(side,-.007)),[.94,.96,.91]);
@@ -69,9 +73,10 @@ export function drawAttack(event,now,ctx){
   }else if(style.type==='bomb'&&!model){
    ring(up,.009,.006,[.18,.20,.23],height);
   }
-  if(['shell','mortar','broadside','rocket'].includes(style.type))for(let k=1;k<5;k++){
-   const q=Math.max(0,t-k*.025),trail=norm(mix(a,b,q)),h=base(event.from)*(1-q)+base(event.to)*q+Math.sin(q*Math.PI)*arc;
-   ring(trail,.003+k*.001,.003,[.65,.62,.53].map(v=>v*(1-k*.12)),h);
+  if(['arrow','shell','mortar','broadside','rocket','sortie'].includes(style.type))for(let k=0;k<7;k++){
+   const at=q=>add(mul(norm(mix(a,b,q)),base(event.from)*(1-q)+base(event.to)*q+Math.sin(q*Math.PI)*arc),mul(side,(j-(count-1)/2)*.008));
+   const q=Math.max(0,t-k*.035),prev=Math.max(0,t-(k+1)*.035),smoke=style.type==='rocket'||style.type==='mortar';
+   ribbon(at(prev),at(q),(smoke?.0038:.0018)*(1-k/8),smoke?[.54-k*.025,.49-k*.025,.40-k*.02]:color.map(v=>v*(.8-k*.065)));
   }
  }
 }

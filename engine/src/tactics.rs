@@ -6,7 +6,7 @@ use std::cmp::Reverse;
 use std::collections::{BinaryHeap, VecDeque};
 
 pub const INFLUENCE_GOAL: u16 = 540;
-pub const SPACE_GOAL: u16 = 180;
+pub const SPACE_GOAL: u16 = 360;
 /// Standing orders keep working while the player considers their next choice.
 pub const ORDER_INTERVAL: u32 = 0;
 pub const SETTLER: u8 = 13;
@@ -331,6 +331,11 @@ impl Game {
     }
     pub fn vision(&self, p: usize) -> Vec<bool> {
         let mut v = vec![false; self.tiles.len()];
+        // A launch broadcasts its pad, not the surrounding army or territory.
+        // Humans and every controller receive the same actionable warning.
+        for a in self.players.iter().filter(|a|a.alive) {
+            if let Some(tile)=a.launch_tile {if tile<v.len(){v[tile]=true;}}
+        }
         for c in self.cities.iter().filter(|c| c.owner == p) {
             for (i, d) in self.distances(c.tile).iter().enumerate() {
                 if *d <= c.radius as u16 + 1 {
@@ -492,13 +497,12 @@ impl Game {
     }
 
     pub fn cap(&self, p: usize) -> usize {
-        (5 + self
+        5 + self
             .cities
             .iter()
             .filter(|c| c.owner == p)
             .map(|c| c.radius as usize + 1)
-            .sum::<usize>())
-        .min(16)
+            .sum::<usize>()
     }
     pub fn foundable(&self, tile: usize) -> bool {
         tile < self.tiles.len()
@@ -1132,6 +1136,8 @@ impl Game {
             fired.push((i, target));
         }
         for (i, t) in fired {
+            let source = self.squads[i].clone();
+            self.feedback("impact", &source, t, source.salvo, 0., 2);
             if self.squads[i].kind==21 {hits[i]+=self.squads[i].hp;}
             self.squads[i].fire_at = 0;
             // Keep the focus between shots. Move/Stop/abilities replace it.
@@ -1180,7 +1186,7 @@ impl Game {
                     hits[i] += (if s.kind == 2 { 140. } else { 75. }) * self.cover(u);
                 }
             }
-            self.event(2, s.owner, s.to);
+            self.event(if s.kind == 2 { 9 } else { 8 }, s.owner, s.to);
         }
         self.strikes.retain(|s| s.left > 0);
         for i in 0..self.squads.len() {
@@ -1411,7 +1417,7 @@ impl Game {
         let sources = self.territory_sources();
         let farms = self.farm_counts(&sources);
         let tiles:Vec<_>=self.tiles.iter().enumerate().map(|(i,t)|json!({"owner":if v[i]{t.owner}else{-2},"city":sources[i].filter(|&n| v[i] && (spectator || self.cities[n].owner == p || v[self.cities[n].tile])).map(|n|self.cities[n].tile),"building":if v[i]{t.building}else{0},"visible":v[i],"storm":self.storm(i)})).collect();
-        let players:Vec<_>=self.players.iter().enumerate().map(|(i,a)|if i==p{serde_json::to_value(a).unwrap()}else{json!({"civ":a.civ,"tag":a.tag,"name":a.name,"bot":a.bot,"alive":a.alive,"score":a.score,"mandate":a.mandate,"launch":a.launch,"domination":a.domination})}).collect();
+        let players:Vec<_>=self.players.iter().enumerate().map(|(i,a)|if i==p{serde_json::to_value(a).unwrap()}else{json!({"civ":a.civ,"tag":a.tag,"name":a.name,"bot":a.bot,"alive":a.alive,"score":a.score,"mandate":a.mandate,"launch":a.launch,"launch_tile":a.launch_tile,"domination":a.domination})}).collect();
         let squads: Vec<_> = self
             .squads
             .iter()
@@ -1487,7 +1493,7 @@ impl Game {
             .filter(|e| e.player == p || v[e.tile])
             .collect();
         let feedback: Vec<_> = self.feedback.iter()
-            .filter(|e| (spectator && matches!(e.action.as_str(), "shot" | "hit" | "heal" | "ability")) || e.audience & (1 << p) != 0)
+            .filter(|e| (spectator && matches!(e.action.as_str(), "shot" | "hit" | "heal" | "ability" | "impact")) || e.audience & (1 << p) != 0)
             .map(|e| json!({"id":format!("{}:{}:{}", e.tick, e.action, e.unit),"tick":e.tick,"action":e.action,"owner":e.owner,
                 "unit":e.unit,"kind":e.kind,"from":e.from,"to":e.to,"value":e.value,
                 "amount":e.amount,"duration":e.duration})).collect();

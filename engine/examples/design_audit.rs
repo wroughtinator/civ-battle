@@ -1,6 +1,8 @@
 //! Bounded offline game-design experiments. See docs/DESIGN_AUDIT.md.
 #[path = "design_audit/search.rs"]
 mod search;
+#[path = "design_audit/outcomes.rs"]
+mod outcomes;
 use meridian_engine::tactics::{Game, SPACE_GOAL};
 use search::{act, fresh, mix, search, value, ACTIONS, NAMES};
 use serde::Serialize;
@@ -73,6 +75,13 @@ fn play(
     deadline: Instant,
     snapshots: &mut Vec<Game>,
 ) -> Match {
+    play_until(seed,controllers,horizon,deadline,snapshots,2200)
+}
+
+fn play_until(
+    seed:u32, controllers:&[Controller], horizon:u32, deadline:Instant,
+    snapshots:&mut Vec<Game>, max_ticks:u32,
+) -> Match {
     let start = Instant::now();
     let mut g = fresh(seed, controllers.len());
     let mut stats: Vec<_> = controllers.iter().map(|_| Stats::default()).collect();
@@ -87,7 +96,7 @@ fn play(
     let mut captures = 0;
     let mut previous: Vec<_> = g.cities.iter().map(|c| c.owner).collect();
     let mut stop = "tick_cap";
-    'game: while g.winner < 0 && g.tick < 2200 {
+    'game: while g.winner < 0 && g.tick < max_ticks {
         if Instant::now() >= deadline {
             stop = "deadline";
             break;
@@ -295,6 +304,7 @@ fn batch(
 fn main() {
     // Invoked by scripts/design-audit.mjs after compilation.
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).is_some_and(|s|s=="--outcomes") {outcomes::run(&args);return;}
     let seconds: f64 = args.get(1).expect("seconds").parse().unwrap();
     let seed: u32 = args.get(2).expect("seed").parse().unwrap();
     let dir = PathBuf::from(args.get(3).expect("output directory"));

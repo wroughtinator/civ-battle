@@ -120,8 +120,11 @@ function showShowcase(){
  globe.setState(showcase,0);globe.showcasePose=(u,now)=>showcasePosition(u,world,now);
 }
 function renderScoreboard(){
+ $('scoreboard-title').innerHTML=icon('crown');$('scoreboard-title').setAttribute('aria-label','Scoreboard');
+ $('close-scoreboard').innerHTML=icon('close');
  $('scoreboard').querySelector('thead tr').innerHTML=`<th scope="col" aria-label="Player color">${icon('person')}</th><th scope="col" aria-label="Player name">${icon('person')}</th><th scope="col" aria-label="Surviving cities">${icon('city')}</th><th scope="col" aria-label="Space launch progress">${icon('rocket')}</th>`;
- $('scoreboard-players').innerHTML=state.players.map((p,i)=>`<tr class="${i===slot?'me':''}"><td><i class="player-color" style="--faction:${colors[i]}" role="img" aria-label="Player color ${colors[i]}"></i></td><th scope="row">${html(p.name)}</th><td>${state.cities.filter(c=>c.owner===i).length}</td><td>${num(p.launch)}/${state.rules.space_goal}</td></tr>`).join('');
+ $('scoreboard-players').onclick=e=>{const button=e.target.closest('[data-launch]');if(button){$('scoreboard').close();selectCity(Number(button.dataset.launch));}};
+ $('scoreboard-players').innerHTML=state.players.map((p,i)=>`<tr class="${i===slot?'me':''}"><td><i class="player-color" style="--faction:${colors[i]}" role="img" aria-label="Player color ${colors[i]}"></i></td><th scope="row">${html(p.name)}</th><td>${state.cities.filter(c=>c.owner===i).length}</td><td>${p.launch_tile!=null?`<button data-launch="${p.launch_tile}" aria-label="Locate active launch">${icon('rocket')}${num(p.launch)}/${state.rules.space_goal}</button>`:`${num(p.launch)}/${state.rules.space_goal}`}</td></tr>`).join('');
 }
 const price=n=>`<span class="price">${icon('coin')}${n}</span>`;
 const stat=(symbol,n)=>`<span class="stat">${icon(symbol)}${n}</span>`;
@@ -214,7 +217,7 @@ function renderProvince(){
   const recruitScroll=$('province').querySelector('.recruit-row')?.scrollTop||0;
   const own=city.owner===slot&&!state.spectator,p=state.players[slot],unit=state.squads.find(u=>u.tile===city.tile),units=own?[...p.unlocked].sort((a,b)=>unitRoster[a].era-unitRoster[b].era||a-b):[];
   const block=(kind,value)=>availability(kind,{from:city.tile,value});
-  const capacityGain=state.rules.unit_cap<16?1:0;
+  const capacityGain=1;
   const landBenefits=city.radius<3?`<span class="radius-change">${city.radius}${icon('arrow')}${city.radius+1}</span><span class="upgrade-benefit">${icon('shield')}+${capacityGain}</span>${incomeBenefit(icon,city.expansion_income??0)}${price([0,80,140][city.radius])}`:'';
   const productionBenefits=city.production<3?`<span class="upgrade-benefit">${icon('coin')}+0.8<span class="upgrade-per">/${icon('clock')}1</span></span><span class="upgrade-benefit">${icon('hourglass')}−${city.production===1?'20':'16.7'}%</span>${price([0,110,180][city.production])}`:'';
   $('province').innerHTML=`<div class="piece-head"><span class="piece-portrait" style="color:${colors[city.owner]}">${icon(city.capital>=0?'crown':'city')}</span><div><span class="owner-name">${html(state.players[city.owner].name)}</span><div class="unit-stats">${stat('territory',city.radius)}${stat('factory',city.production)}${own?stat('wheat',city.farms??0)+stat('coin',rate(city.income??(4+city.production*4)))+stat('clock',5):''}</div></div><span class="spacer"></span>${unit?btn('select-occupant',unitIcons[unit.kind],'Select occupying unit'):''}${btn('close-piece','close','Close selection')}</div>
@@ -278,7 +281,7 @@ function renderEnding(){
 }
 function rebuildMarkers(){
  $('markers').innerHTML='';markerNodes=[];const preview=state.phase==='preview'||state.phase==='lobby';if(preview)return;
- for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
+ for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;if(state.players[c.owner].launch_tile===c.tile){el.innerHTML=icon('rocket');el.classList.add('launch-marker');}el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
  if(!preview)for(const u of state.squads){if(u.boarded_on!=null)continue;const el=document.createElement('button');el.className=`marker unit-marker ${u.founding?'founding':''} ${u.mode===1?'concealed':''}`;el.style.setProperty('--faction',colors[u.owner]);el.setAttribute('aria-label',`${(state.players[u.owner]?.name||'')}, ${unitNames[u.kind]} ${u.id}, health ${num(u.hp)}`);el.onclick=()=>{if(abilityTarget)select(u.tile);else selectUnit(u.id);};$('markers').append(el);markerNodes.push({el,p:world[u.tile].p,i:-1,u});}
 }
 function updateMarkers(now){if(!globe)return;if(globe.state?.showcase){showcaseFeedback(showcase,world,now);globe.effects.accept(showcase,now);}

@@ -97,7 +97,7 @@ test('Stop remains available during order recovery and preserves step cooldown',
 test('all 36 client unit specs match WASM and only 33 belong to the research tree',()=>{
  const state=fixture();assert.deepEqual(view(state).rules.specs,units.map(u=>u.spec));
  assert.equal(units.filter(u=>u.researchable).length,33);
- assert.equal(view(state).rules.order_interval,0);assert.equal(view(state).rules.space_goal,180);
+ assert.equal(view(state).rules.order_interval,0);assert.equal(view(state).rules.space_goal,360);
 });
 
 test('research goals queue locked prerequisites without an up-front payment and hide enemy plans',()=>{
