@@ -1,7 +1,7 @@
 import { Globe } from './globe.js';
 import { icon, colors, civs, civNames, buildings, techs } from './icons.js';
 import { Soundscape } from './audio.js';
-import {passengers,boardingCapacity,boardingTarget,branches,unitIcons,unitNames,counters,prerequisites,researchCost,researchGate,distances,route,abilities,canEnter} from './planning.js';
+import {passengers,boardingCapacity,boardingTarget,branches,unitIcons,unitNames,counters,researchCost,distances,route,abilities,canEnter} from './planning.js';
 import {orderBlock,targetTiles,refitChoices,abilityCost} from './controls.js';
 import {Manual} from './manual.js';
 import {FeedbackLayer} from './feedback.js';
@@ -211,8 +211,7 @@ function toggleResearch(){if(state?.spectator)return;techOpen=!techOpen;clearRou
 function renderResearch(){
  show('research',techOpen);if(!techOpen)return;const p=state.players[slot];
  const node=k=>{const done=p.unlocked.includes(k),busy=p.research===k,blocked=availability('research',{value:k});return `<button data-tech="${k}" aria-label="Research ${unitNames[k]}, ${researchCost(k)} coins${blocked?`. Unavailable: ${blocked.reason}`:''}" ${blocked?'disabled aria-disabled="true"':'aria-disabled="false"'} class="tree-node ${selectedTech===k?'selected':''} ${done?'done':''} ${busy?'studying':''} ${!done&&blocked?'locked':''}">${icon(unitIcons[k])}<span>${done?icon('check'):busy?stat('clock',p.research_left):price(researchCost(k))}</span></button>`;};
- const k=selectedTech,done=p.unlocked.includes(k),prereq=prerequisites(k),gate=researchGate(k);
- $('research').innerHTML=`<div class="panel-head">${icon('flask')}${stat('coin',num(p.gold))}${btn('close-tech','close','Close research tree')}</div><div class="tree-scroll"><div class="connected-tree"><svg class="tree-links" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true"><path d="M50 45V245M150 45V245M250 45V245M50 145L90 350M150 145L90 350M150 245L210 350M150 145L210 350"/></svg>${[0,1,2].map(row=>`<div class="tree-row">${branches.map(b=>node(b[row])).join('')}</div>`).join('')}<div class="tree-row final-nodes">${node(10)}${node(11)}</div></div><div class="tech-detail"><div class="tech-unit">${icon(unitIcons[k])}${unitStats(k)}</div>${unitCounters(k)}<div class="ability-preview">${abilities(k).map(a=>icon(a.icon)).join('')}</div><div class="prereq">${prereq.map(i=>icon(unitIcons[i])).join('')}${prereq.length?icon('arrow'):''}${icon(unitIcons[k])}${state.tick<gate?stat('clock',time(gate)):''}</div></div></div>`;
+ $('research').innerHTML=`<div class="panel-head">${icon('flask')}${btn('close-tech','close','Close research tree')}</div><div class="tree-scroll"><div class="connected-tree"><svg class="tree-links" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true"><path d="M50 45V245M150 45V245M250 45V245M50 145L90 350M150 145L90 350M150 245L210 350M150 145L210 350"/></svg>${[0,1,2].map(row=>`<div class="tree-row">${branches.map(b=>node(b[row])).join('')}</div>`).join('')}<div class="tree-row final-nodes">${node(10)}${node(11)}</div></div></div>`;
  $('close-tech').onclick=toggleResearch;$('research').querySelectorAll('[data-tech]').forEach(b=>b.onclick=()=>{selectedTech=Number(b.dataset.tech);command('research',{value:selectedTech});renderResearch();});
 }
 function openGuide(){manual.open();}
