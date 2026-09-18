@@ -71,21 +71,11 @@ const paths = {
  lock:'<rect x="7" y="14" width="18" height="15" rx="3"/><path d="M11 14V8a5 5 0 0 1 10 0v6M16 20v4"/>',
  network:'<path d="M3 11q13-12 26 0M7 16q9-8 18 0M12 21q4-4 8 0"/><circle cx="16" cy="27" r="1.5" fill="currentColor"/>',
  warning:'<path d="m16 3 14 25H2ZM16 12v7M16 23v1"/>',
- laurel:'<path d="M12 28C-2 20 3 6 9 3M20 28C34 20 29 6 23 3M6 9l6 2-3-6M5 16l7 1-5-6M8 23l6-1-6-5M26 9l-6 2 3-6M27 16l-7 1 5-6M24 23l-6-1 6-5"/>',
- ankh:'<path d="M16 15c-14-4-6-18 0-10 6-8 14 6 0 10ZM16 15v15M7 19h18"/>',
- owl:'<path d="m5 5 11 5L27 5v15c0 12-22 12-22 0ZM14 19l2 4 2-4"/><circle cx="10" cy="15" r="4"/><circle cx="22" cy="15" r="4"/>',
- amphora:'<path d="M11 3h10M13 3v7C-2 23 9 29 16 29s18-6 3-19V3M9 12C0 7 0 22 9 21M23 12c9-5 9 10 0 9M9 23h14"/>',
- dragon:'<path d="M5 7 13 3l7 6-6 4 9 3 4 7-7 6-13-5 6-7M5 7l4 6 5-1M9 25l-5 4M22 25l6 3M19 9l6-4"/><circle cx="12" cy="8" r="1"/>',
- sun:'<circle cx="16" cy="16" r="7"/><path d="M16 1v5M16 26v5M1 16h5M26 16h5M5 5l4 4M23 23l4 4M5 27l4-4M23 9l4-4"/><circle cx="16" cy="16" r="2"/>',
- torii:'<path d="M3 5q13 5 26 0M5 11h22M9 7 7 29M23 7l2 22M7 18h18M16 9v9"/>',
- axe:'<path d="M8 29 22 3M16 8C3 3 1 15 10 17M22 11c11 9 13-4 6-7Z"/>',
  trophy:'<path d="M9 4h14v9c0 10-14 10-14 0ZM9 7H3v5q0 6 7 6M23 7h6v5q0 6-7 6M16 21v7M9 29h14"/>',
  hourglass:'<path d="M7 3h18M7 29h18M10 3v5l12 16v5M22 3v5L10 24v5M12 7h8M12 25h8"/>'
 };
 export const iconNames=Object.keys(paths);
 export const icon = (name, cls='') => `<svg data-icon="${Object.hasOwn(paths,name)?name:'globe'}" class="icon ${cls}" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.globe}</svg>`;
 export const colors=['#e6b85b','#ef806d','#65c5c7','#b2a0ef','#8bbb7b','#e8a6ce','#87b5ea','#d7d3bc','#c87652'];
-export const civs=['laurel','ankh','owl','amphora','dragon','sun','torii','axe'];
-export const civNames=['Laurel','Ankh','Owl','Amphora','Dragon','Sun','Torii','Axe'];
 export const buildings=['city','wheat','coin','temple','fort','sail','rocket','factory'];
 export const techs=[['swords','gear','cannon','logistics'],['scroll','telescope','factory','rocket'],['wheat','sail','coin','heart']];

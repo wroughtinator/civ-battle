@@ -87,3 +87,9 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 #province .tile-effect{min-width:52px;min-height:44px;padding:7px 10px;border:1px solid #8ca79e55;border-radius:7px;font:12px ui-monospace,monospace;background:#14292d}
 #province .tile-effect .icon{width:19px;height:19px}#province .tile-effect.good{color:#a9f3c6}#province .tile-effect.bad{color:#ffc08a}#province .tile-effect.neutral{color:#b9dce8}
 #province .tile-effect:hover,#province .tile-effect:focus-visible{background:#30494d;border-color:currentColor}
+
+#config{grid-template-columns:1fr}#config .difficulty{justify-self:stretch;flex-wrap:nowrap;justify-content:center;padding:8px 12px;min-height:48px}.difficulty-change{width:auto;margin-left:auto}#config .difficulty-icons{margin-right:2px}#lobby .lobby-emblem{height:45px;margin-bottom:8px}#lobby .lobby-emblem .icon{width:42px;height:42px}#lobby .rule-line{margin-bottom:10px}
+
+#navigation,#top-actions{pointer-events:auto}
+
+.lobby-title{grid-column:1/-1;font-size:25px;font-weight:400;margin:0 0 16px;color:var(--cream)}.player-color{display:inline-block;width:8px;height:8px;min-width:8px;border-radius:50%;background:var(--seat,var(--faction));box-shadow:0 0 8px color-mix(in srgb,var(--seat,var(--faction)) 30%,transparent)}.seat small{color:var(--seat)}#lobby .seat{gap:8px}
