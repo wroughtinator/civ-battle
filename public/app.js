@@ -1,6 +1,8 @@
 import {roster,units as unitRoster} from './roster.js';
+import {createShowcase, showcasePosition, showcaseFeedback} from './showcase.js';
+import {assetBytes,assetsReady,finishLoading,loadingFailed,loadingStage} from './loading.js';
 import { Globe } from './globe.js';
-import { icon, colors, civs, civNames, buildings, techs } from './icons.js';
+import { icon, colors } from './icons.js';
 import { Soundscape } from './audio.js';
 import {passengers,boardingCapacity,boardingTarget,branches,unitIcons,unitNames,counters,researchCost,distances,route,abilities,canEnter} from './planning.js';
 import {orderBlock,targetTiles,abilityCost} from './controls.js';
@@ -14,6 +16,8 @@ const html=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 let state=null,world=[],slot=0,room=null,token=null,ws=null,seq=0,inflight=null,connected=false,stopped=false;
 let selected=-1,marchFrom=-1,marchRatio=0,previewEngine=null,previewState=null,count=8,difficulty=1,seed=crypto.getRandomValues(new Uint32Array(1))[0],civ=0;
 let techOpen=false,lastTick=0,lastStateAt=performance.now(),sound=false,audio=null,markerNodes=[],marchNodes=[],hasStarted=false,retry=0,reconnectTimer,toastTimer;
+let displayedClock=null;
+function renderClock(tick){const value=time(tick);if(value===displayedClock)return;displayedClock=value;const clock=$('clock');if(!clock.firstElementChild)clock.innerHTML=icon('clock')+'<span></span>';clock.lastElementChild.textContent=value;}
 let leaving=false,creating=null,readyResolve=null,pointerHeld=false,pendingRender=false;
 const heldPointers=new Set();
 document.addEventListener('pointerdown',e=>{heldPointers.add(e.pointerId);pointerHeld=true;},true);
@@ -32,11 +36,11 @@ async function syncProfile(){while(profileDirty&&connected&&state?.phase==='lobb
 function queueProfile(){profileDirty=true;clearTimeout(profileTimer);profileTimer=setTimeout(()=>{profilePromise=profilePromise.catch(()=>{}).then(syncProfile).catch(()=>{});},350);}
 async function flushProfile(){clearTimeout(profileTimer);await profilePromise;profileDirty=true;await syncProfile();}
 let selectedTech=1,abilityTarget=null;
-let globe;
+let globe,showcase=null;
 const soundscape=new Soundscape();sound=soundscape.enabled;
 document.addEventListener('pointerdown',()=>soundscape.unlock(),{passive:true});
 document.addEventListener('click',e=>{if(e.target.closest('button')&&!e.target.closest('#sound'))soundscape.play('click',.12);});
-function toast(symbol,value='',error=false){$('toast').innerHTML=icon(symbol)+`<span>${value}</span>`;$('toast').className=`show ${error?'error':''}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').className='',3500);beep(error?160:510);}
+function toast(symbol,value='',error=false){$('toast').style.color='';$('toast').innerHTML=(symbol?icon(symbol):'')+`<span>${value}</span>`;$('toast').className=`show ${error?'error':''}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').className='',3500);beep(error?160:510);}
 function beep(freq=480){soundscape.play(freq<200?'warning':'click',freq<200?.22:.14);}
 function setConnected(value){connected=value;$('connection').classList.toggle('offline',!value);$('connection').innerHTML=icon(value?'network':'refresh');renderControls();}
 async function api(path,body){const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let data;try{data=await r.json();}catch{throw Error('503');}if(!r.ok)throw Error(String(data.error||r.status));return data;}
@@ -55,6 +59,7 @@ function connect(){
  ws=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/api/rooms/${room}/ws`,['meridian',token]);
  ws.onmessage=e=>{
   const msg=JSON.parse(e.data);
+  if(msg.reload){location.replace(msg.reload);return;}
   if(msg.type==='welcome'){ws.send(JSON.stringify({type:'presence',active:!document.hidden}));slot=msg.slot;seq=Math.max(seq,msg.seq);world=msg.world;globe.setWorld(world);if(inflight)ws.send(JSON.stringify(inflight.message));}
   if(msg.type==='world'){world=msg.world;globe.setWorld(world);}
   if(msg.type==='state'){
@@ -62,11 +67,11 @@ function connect(){
    if(state?.revision>msg.revision&&state.phase!=='preview')return;
    const previous=state;state=msg;seed=msg.seed;count=msg.players.length;difficulty=msg.difficulty;if(!profileDirty)civ=msg.players[slot].civ;
    callsign=msg.players[slot].tag;if(!profileDirty&&document.activeElement?.id!=='username'){username=msg.players[slot].name||username;rememberIdentity();}else msg.players[slot].name=username;
-   if(!connected){setConnected(true);retry=0;}lastTick=msg.tick;lastStateAt=performance.now();globe.setState(msg,slot);feedbackLayer.accept(msg);
+   if(!connected){setConnected(true);retry=0;}lastTick=msg.tick;lastStateAt=performance.now();if(msg.phase==='lobby')showShowcase();else globe.setState(msg,slot);feedbackLayer.accept(msg);
    if(msg.phase==='lobby'&&previous?.phase!=='lobby'){hasStarted=false;encountered.clear();closeSelection();techOpen=false;show('research',false);}
    if(msg.phase==='running'&&!hasStarted){hasStarted=true;home();}
    soundscape.events(msg,previous,world,globe,slot);
-   if(msg.phase==='running'){for(const t of msg.tiles)if(t.visible&&t.owner>=0&&t.owner!==slot&&!encountered.has(t.owner)){encountered.add(t.owner);toast(civs[msg.players[t.owner].civ],html(msg.players[t.owner].name));break;}}
+   if(msg.phase==='running'){for(const t of msg.tiles)if(t.visible&&t.owner>=0&&t.owner!==slot&&!encountered.has(t.owner)){encountered.add(t.owner);toast('',html(msg.players[t.owner].name));$('toast').style.color=colors[t.owner];break;}}
    if(pointerHeld&&!msg.result&&msg.phase!=='ended')pendingRender=true;else{render();rebuildMarkers();}if(readyResolve){readyResolve();readyResolve=null;}
   }
   if(msg.type==='ack'&&inflight?.message.seq===msg.seq){const pending=inflight;inflight=null;if(!msg.error&&pending.message.type==='command')state.players[slot].cooldown=Math.max(state.players[slot].cooldown,state.tick+2);renderControls();if(msg.error){toast(['','warning','bolt','shield','sail','coin','lock'][msg.error]||'warning',msg.error,true);pending.reject(Error(String(msg.error)));}else{soundscape.command(pending.message.kind||pending.message.type,pending.message.value);pending.resolve();}}
@@ -85,35 +90,37 @@ function send(type,payload={}){
 }
 const command=(kind,data={})=>send('command',{kind,...data}).catch(()=>{});
 setInterval(()=>{if(connected&&ws?.readyState===1)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));},10000);
-function renderControls(){if(!state)return;if($('ending').open)$('back-lobby').disabled=!connected||!!inflight;if(state.phase==='running'){if(pointerHeld)pendingRender=true;else{renderProvince();renderResearch();}}const lobby=state.phase==='lobby'||state.phase==='preview';$('start').disabled=!!inflight||!!creating||lobby&&state.phase!=='preview'&&(!connected||!state.host||state.awaitingResults);$('invite').disabled=!!creating;if(lobby){const locked=!!inflight||!!creating||state.phase!=='preview'&&(!connected||!state.host);$('fewer-players').disabled=locked||count<=(state.minCount||2);$('more-players').disabled=locked||count>=8;for(const id of ['difficulty','regenerate'])$(id).disabled=locked;}}
+function renderControls(updatePanels=true){if(!state)return;if($('ending').open)$('back-lobby').disabled=!connected||!!inflight;if(updatePanels&&state.phase==='running'){if(pointerHeld)pendingRender=true;else{renderProvince();renderResearch();}}const lobby=state.phase==='lobby'||state.phase==='preview';$('start').disabled=!!inflight||!!creating||lobby&&state.phase!=='preview'&&(!connected||!state.host||state.awaitingResults);$('invite').disabled=!!creating;if(lobby){const locked=!!inflight||!!creating||state.phase!=='preview'&&(!connected||!state.host);$('fewer-players').disabled=locked||count<=(state.minCount||2);$('more-players').disabled=locked||count>=8;$('difficulty').disabled=locked;}}
 function render(){
- const lobby=state.phase==='lobby'||state.phase==='preview';document.body.classList.toggle('in-lobby',lobby);show('lobby',lobby);show('roster',!lobby);show('dock',!lobby);$('resources').innerHTML=lobby?'':resources();
- $('clock').innerHTML=icon('clock')+`<span>${time(state.tick)}</span>`;
- if(lobby)renderLobby();else{renderRoster();renderProvince();renderResearch();}
- $('tech-toggle').disabled=!!state.spectator;renderControls();if(state.spectator){clearRoute();techOpen=false;show('research',false);}show('leave-room',!!room);$('new-lobby').disabled=!!creating;if(state.result||state.phase==='ended')renderEnding();else if($('ending').open)$('ending').close();
+ const title=state.phase==='preview',lobby=state.phase==='lobby'||title;show('title-screen',title);show('topbar',!title);document.body.classList.toggle('on-title',title);document.body.classList.toggle('in-lobby',lobby);show('lobby',lobby&&!title);show('show-scoreboard',!lobby);if(lobby&&$('scoreboard').open)$('scoreboard').close();show('dock',!lobby);$('resources').innerHTML=lobby?'':resources();
+ renderClock(state.tick);
+ if(lobby)renderLobby();else{if($('scoreboard').open)renderScoreboard();renderProvince();renderResearch();}
+ $('tech-toggle').disabled=!!state.spectator;$('home-toggle').disabled=!!state.spectator||!state.cities.some(c=>c.owner===slot);renderControls(false);if(state.spectator){clearRoute();techOpen=false;show('research',false);}$('leave-room').setAttribute('aria-label',lobby?'Back to title':'Leave game');if(state.result||state.phase==='ended')renderEnding();else if($('ending').open)$('ending').close();
 }
-function resources(){if(state.spectator)return `<div class="resource spectator" aria-label="Spectating: all your cities have fallen">${icon('spectate')}</div>`;const p=state.players[slot];return `<div class="resource gold" aria-label="Treasury">${icon('coin')}<span>${num(p.gold)}</span></div><div class="resource pieces" aria-label="Unit capacity">${icon('shield')}<span>${state.squads.filter(u=>u.owner===slot).length}/${state.rules.unit_cap}</span></div>`;}
+function resources(){if(state.spectator)return `<div class="resource spectator" aria-label="Spectating">${icon('spectate')}</div>`;return `<div class="resource gold" aria-label="Treasury">${icon('coin')}<span>${num(state.players[slot].gold)}</span></div>`;}
+
 function renderLobby(){
- $('emblem').innerHTML=icon(civs[civ]);$('era').innerHTML=icon('temple')+icon('arrow')+icon('rocket');
- $('civilizations').innerHTML=civs.map((s,i)=>btn(`civ-${i}`,s,civNames[i],'',`class="${civ===i?'active':''}" aria-pressed="${civ===i}"`)).join('');
  if(document.activeElement?.id!=='username')$('bonus').innerHTML=icon('person')+`<input id="username" type="text" autocomplete="off" spellcheck="false" aria-label="Your player name, up to 32 characters" value="${html(username)}"><small>${Array.from(username).length}/32</small>`;
  $('bonus').querySelector('small').textContent=`${Array.from(username).length}/32`;
  $('username').oninput=()=>{username=Array.from($('username').value.replace(/[\u0000-\u001f\u007f]/g,'')).slice(0,32).join('');$('username').value=username;rememberIdentity();state.players[slot].name=username;if(state.phase==='preview')previewState.players[0].name=username;else queueProfile();renderLobby();};
- $('seats').innerHTML=state.players.map((p,i)=>`<span class="seat ${!p.bot?'human':''}" style="--seat:${colors[i]}" aria-label="${html(p.name)}, ${civNames[p.civ]}">${icon(p.bot?'bot':civs[p.civ])}<small>${html(p.name)}</small></span>`).join('');
+ $('seats').innerHTML=state.players.map((p,i)=>`<span class="seat ${!p.bot?'human':''}" style="--seat:${colors[i]}" aria-label="${html(p.name)}${p.bot?', bot':''}"><i class="player-color" aria-hidden="true"></i><small>${html(p.name)}</small></span>`).join('');
  const host=state.phase==='preview'||state.host,humans=state.humans||1;
- $('config').innerHTML=`<div class="player-count">${btn('fewer-players','minus','Remove a player slot','',!host||count<=(state.minCount||2)?'disabled':'')}<div class="config-group" aria-label="${humans} human players, ${count-humans} bot seats, ${count} total">${icon('person')}<span>${humans}/${count}</span><span class="bot-seats">${icon('bot')}${count-humans}</span></div>${btn('more-players','plus','Add a player slot','',!host||count>=8?'disabled':'')}</div><button id="difficulty" class="difficulty" aria-label="${['Easy','Medium','Hard'][difficulty]} bots" ${!host?'disabled':''}>${Array.from({length:difficulty+1},()=>icon('bot')).join('')}</button>${btn('regenerate','refresh','Generate a new world','',!host?'disabled':'')}`;
+ show('config',!!host);$('config').innerHTML=`<div class="player-count">${btn('fewer-players','minus','Remove a bot','',!host||count<=(state.minCount||2)?'disabled':'')}<div class="config-group" aria-label="${humans} human players, ${count-humans} bot seats, ${count} total">${icon('person')}${icon('bot')}<span>${count-humans}</span></div>${btn('more-players','plus','Add a bot','',!host||count>=8?'disabled':'')}</div><button id="difficulty" class="difficulty" aria-label="${['Easy','Medium','Hard'][difficulty]} bots" ${!host?'disabled':''}><span class="difficulty-icons">${Array.from({length:difficulty+1},()=>icon('bot')).join('')}</span></button>`;
  $('victory-hint').innerHTML=`<em aria-label="Conquest: eliminate every other civilization">${icon('crown')}</em><span></span><em aria-label="Space: complete every technology and launch">${icon('rocket')}</em>`;
  $('seed').innerHTML=icon('globe')+`<span>${seed.toString().padStart(10,'0')}</span>`;
  $('start').innerHTML=icon(state.phase==='lobby'&&(!state.host||state.awaitingResults)?'hourglass':'play');$('start').setAttribute('aria-label',state.awaitingResults?'Waiting for players to return from the victory screen':'Start match');$('invite').innerHTML=icon('link');
- civs.forEach((_,i)=>$(`civ-${i}`).onclick=()=>{civ=i;rememberIdentity();if(state.phase==='preview'){previewState.players[0].civ=i;state.players[0].civ=i;globe.setState(state,slot);renderLobby();}else queueProfile();});
  $('fewer-players').onclick=()=>configure({count:count-1});$('more-players').onclick=()=>configure({count:count+1});
- $('regenerate').onclick=()=>configure({seed:crypto.getRandomValues(new Uint32Array(1))[0]});$('difficulty').onclick=()=>configure({difficulty:(difficulty+1)%3});
+ $('difficulty').onclick=()=>configure({difficulty:(difficulty+1)%3});
 }
 async function configure(changes){if(state.phase==='preview'){count=changes.count??count;seed=changes.seed??seed;difficulty=changes.difficulty??difficulty;makePreview();}else await send('configure',{count,seed,difficulty,...changes}).catch(()=>{});}
-function makePreview(){previewState=previewEngine({op:'new',seed,count,difficulty}).state;previewState.players[0].civ=civ;previewState.players[0].tag=callsign;previewState.players[0].name=username;world=previewState.tiles.map(t=>({p:t.p,poly:t.poly,near:t.near,terrain:t.terrain,capital:t.capital,site:t.site}));state={...previewState,...previewEngine({op:'view',state:previewState,player:0}).state,tiles:previewState.tiles.map(t=>({...t,visible:true})),phase:'preview',host:true,humans:1,revision:0};globe.setWorld(world);globe.setState(state,0);render();rebuildMarkers();}
-function renderRoster(){
- $('roster').innerHTML=state.players.map((p,i)=>`<button class="roster-item ${i===slot?'me':''} ${!p.alive?'dead':''}" style="--faction:${colors[i]}" aria-label="${html(p.name)}, ${!p.alive?'Spectating':p.bot?'AI control':'Human online'}, ${p.score} cities, launch ${p.launch} of ${state.rules.space_goal}" data-player="${i}">${!p.alive?icon('spectate'):p.bot?icon('bot','control-bot'):'<i class="control-human" data-help="person" aria-label="Human online"></i>'}<span class="roster-name">${html(p.name)}</span><span class="victory-count">${icon('city')}${p.score}</span><i class="launch-track" style="width:${Math.min(100,100*p.launch/state.rules.space_goal)}%"></i></button>`).join('');
- $('roster').querySelectorAll('button').forEach(b=>b.onclick=()=>{const c=state.cities.find(c=>c.capital===Number(b.dataset.player));if(c){globe.focus(c.tile);selectCity(c.tile);}});
+function makePreview(){previewState=previewEngine({op:'new',seed,count,difficulty}).state;previewState.players[0].civ=civ;previewState.players[0].tag=callsign;previewState.players[0].name=username;world=previewState.tiles.map(t=>({p:t.p,poly:t.poly,near:t.near,terrain:t.terrain,capital:t.capital,site:t.site}));state={...previewState,...previewEngine({op:'view',state:previewState,player:0}).state,tiles:previewState.tiles.map(t=>({...t,visible:true})),phase:'preview',host:true,humans:1,revision:0};globe.setWorld(world);showShowcase();render();rebuildMarkers();$('host-game').disabled=false;}
+function showShowcase(){
+ if(!showcase||showcase.seed!==seed)showcase=createShowcase(world,state.rules,seed);
+ globe.setState(showcase,0);globe.showcasePose=(u,now)=>showcasePosition(u,world,now);
+}
+function renderScoreboard(){
+ $('scoreboard').querySelector('thead tr').innerHTML=`<th scope="col" aria-label="Player color">${icon('person')}</th><th scope="col" aria-label="Player name">${icon('person')}</th><th scope="col" aria-label="Surviving cities">${icon('city')}</th><th scope="col" aria-label="Space launch progress">${icon('rocket')}</th>`;
+ $('scoreboard-players').innerHTML=state.players.map((p,i)=>`<tr class="${i===slot?'me':''}"><td><i class="player-color" style="--faction:${colors[i]}" role="img" aria-label="Player color ${colors[i]}"></i></td><th scope="row">${html(p.name)}</th><td>${state.cities.filter(c=>c.owner===i).length}</td><td>${num(p.launch)}/${state.rules.space_goal}</td></tr>`).join('');
 }
 const price=n=>`<span class="price">${icon('coin')}${n}</span>`;
 const stat=(symbol,n)=>`<span class="stat">${icon(symbol)}${n}</span>`;
@@ -163,7 +170,7 @@ function select(tile){
   command(kind,data).finally(()=>{if(activeUnit===u.id&&!abilityTarget)globe.previewPath=[];});
   renderProvince();return;
  }
- // A hex tap inspects its city. A unit's moving marker always selects that unit.
+ // Invisible model hit targets keep individual units selectable on city tiles.
  if(state.cities.some(c=>c.tile===tile)){selectCity(tile);return;}
  const on=state.squads.find(u=>u.tile===tile&&u.boarded_on==null);
  if(on){selectUnit(on.id);return;}
@@ -244,53 +251,78 @@ function renderResearch(){
 
 function openGuide(){manual.open();}
 function home(){clearRoute();activeUnit=-1;const c=state.cities.find(c=>c.owner===slot&&c.capital===slot)||state.cities.find(c=>c.owner===slot);if(c){globe.targetDistance=1.65;globe.focus(c.tile);selectCity(c.tile);}}
-async function leaveRoom(newLobby=false){
+function panHome(){if(!state||state.spectator)return;const c=state.cities.find(c=>c.owner===slot&&c.capital===slot)||state.cities.find(c=>c.owner===slot);if(c)globe.focus(c.tile);}
+async function leaveRoom(){
  if(leaving)return;leaving=true;
  try{
   if(creating)await creating;
-  const next=newLobby?await api('/api/rooms',{seed:crypto.getRandomValues(new Uint32Array(1))[0],count,difficulty,civ,name:username,tag:callsign}):null;
   if(room&&connected){if(inflight)await inflight.promise.catch(()=>{});await send('leave');}
   stopped=true;clearTimeout(reconnectTimer);clearTimeout(profileTimer);
   if(room)try{localStorage.removeItem(`meridian:${room}`);}catch{}
   if(ws){ws.onclose=null;ws.onmessage=null;ws.close();}
-  if(next)try{localStorage.setItem(`meridian:${next.room}`,JSON.stringify({token:next.token,slot:next.slot}));}catch{}
-  location.assign(next?`/?room=${next.room}`:'/');
+  location.assign('/');
  }catch(e){leaving=false;toast('warning',Number(e.message)||503,true);}
 }
 function renderEnding(){
  const result=state.result||{winner:state.winner,victory:state.victory,tick:state.tick,player:state.players[state.winner]},p=result.player;
  const dialog=$('ending');
  if(!dialog.open){
-  manual.close();clearRoute();techOpen=false;show('research',false);show('province',false);
-  dialog.innerHTML=`<div class="winner-icon">${icon(result.victory===2?'rocket':'crown')}</div><h1 id="victory-title">${result.winner===slot?'Victory!':'Match complete'}</h1><div class="end-emblem" style="color:${colors[result.winner]}">${icon(civs[p.civ])}<span>${html(p.name)} wins!</span></div><p>${result.victory===2?'Space victory':'Conquest victory'} · ${time(result.tick)}</p><div class="result-actions">${btn('back-lobby','home','Back to lobby','Back to lobby')}${btn('leave-result','close','Leave game','Leave')}</div>`;
+  manual.close();if($('scoreboard').open)$('scoreboard').close();clearRoute();techOpen=false;show('research',false);show('province',false);
+  dialog.innerHTML=`<div class="winner-icon">${icon(result.victory===2?'rocket':'crown')}</div><h1 id="victory-title">${result.winner===slot?'Victory!':'Match complete'}</h1><div class="end-emblem" style="color:${colors[result.winner]}"><span>${html(p.name)} wins!</span></div><p>${result.victory===2?'Space victory':'Conquest victory'} · ${time(result.tick)}</p><div class="result-actions">${btn('back-lobby','home','Back to lobby','Back to lobby')}${btn('leave-result','close','Leave game','Leave')}</div>`;
   $('back-lobby').onclick=async()=>{try{await send('lobby');}catch{}};
-  $('leave-result').onclick=()=>leaveRoom();
+  $('leave-result').onclick=confirmLeave;
   dialog.showModal();
  }
  $('back-lobby').disabled=!connected||!!inflight;
 }
 function rebuildMarkers(){
- $('markers').innerHTML='';markerNodes=[];const preview=state.phase==='preview'||state.phase==='lobby';
- for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.innerHTML=`<span class="marker-name">${html(state.players[c.owner].name)}</span>${icon(c.capital>=0?'crown':'city')}${c.capture?`<span>${c.capture}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
- if(!preview)for(const u of state.squads){if(u.boarded_on!=null)continue;const el=document.createElement('button');el.className=`marker unit-marker ${u.founding?'founding':''} ${u.mode===1?'concealed':''}`;el.style.setProperty('--faction',colors[u.owner]);el.setAttribute('aria-label',`${(state.players[u.owner]?.name||'')}, ${unitNames[u.kind]} ${u.id}, health ${num(u.hp)}`);el.innerHTML=icon(unitIcons[u.kind])+(inForestCover(world,u)?`<span class="cover-badge" aria-label="Forest cover">${icon('shield')}</span>`:'')+`<i class="piece-health" style="width:${100*u.hp/state.rules.specs[u.kind].hp}%"></i>${u.founding?`<span class="work-count">${u.work}</span>`:u.locked_until>state.tick?`<span class="work-count">${u.locked_until-state.tick}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(u.tile);else selectUnit(u.id);};$('markers').append(el);markerNodes.push({el,p:world[u.tile].p,i:-1,u});}
+ $('markers').innerHTML='';markerNodes=[];const preview=state.phase==='preview'||state.phase==='lobby';if(preview)return;
+ for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
+ if(!preview)for(const u of state.squads){if(u.boarded_on!=null)continue;const el=document.createElement('button');el.className=`marker unit-marker ${u.founding?'founding':''} ${u.mode===1?'concealed':''}`;el.style.setProperty('--faction',colors[u.owner]);el.setAttribute('aria-label',`${(state.players[u.owner]?.name||'')}, ${unitNames[u.kind]} ${u.id}, health ${num(u.hp)}`);el.onclick=()=>{if(abilityTarget)select(u.tile);else selectUnit(u.id);};$('markers').append(el);markerNodes.push({el,p:world[u.tile].p,i:-1,u});}
 }
-function updateMarkers(now){if(!globe)return;for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y+(u?22:-34)}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
- if(state?.phase==='running')$('clock').innerHTML=icon('clock')+`<span>${time(lastTick+Math.min(2,Math.floor((now-lastStateAt)/1000)))}</span>`;feedbackLayer.update(now,globe);soundscape.mix(globe,state,now);
+function updateMarkers(now){if(!globe)return;if(globe.state?.showcase){showcaseFeedback(showcase,world,now);globe.effects.accept(showcase,now);}
+ const hurt=new Set(feedbackLayer.timeline.items.filter(e=>e.action==='hit'&&now-e.start<1200).map(e=>e.unit));
+ for(const n of markerNodes){
+  const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p,p=globe.project(pos);
+  if(n.visible!==p.visible){n.el.style.display=p.visible?'flex':'none';n.visible=p.visible;}
+  if(!p.visible)continue;
+  const transform=`translate(${p.x}px,${p.y-10}px) translate(-50%,-50%)`;
+  if(n.transform!==transform){n.el.style.transform=transform;n.transform=transform;}
+  const selectedNow=u?u.id===activeUnit:n.i===selected,hurtNow=!!u&&hurt.has(u.id);
+  if(n.selected!==selectedNow){n.el.classList.toggle('selected',selectedNow);n.selected=selectedNow;}
+  if(n.hurt!==hurtNow){n.el.classList.toggle('hurt',hurtNow);n.hurt=hurtNow;}
+ }
+
+ if(state?.phase==='running')renderClock(lastTick+Math.min(2,Math.floor((now-lastStateAt)/1000))); feedbackLayer.update(now,globe);soundscape.mix(globe,state,now);
 }
-$('tools').innerHTML=btn('home','home','Focus your capital')+btn('zoom-in','plus','Zoom in')+btn('zoom-out','minus','Zoom out')+btn('sound','mute','Toggle sound')+btn('help','book','Open icon manual')+btn('new-lobby','plus','Create new lobby')+btn('leave-room','close','Leave game or lobby');
-$('new-lobby').onclick=()=>leaveRoom(true);$('leave-room').onclick=()=>leaveRoom();$('ending').addEventListener('cancel',e=>e.preventDefault());
+$('navigation').innerHTML=btn('leave-room','arrow','Back to title')+btn('show-scoreboard','crown','Show scoreboard','','aria-haspopup="dialog" aria-controls="scoreboard"');
+$('show-scoreboard').onclick=()=>{renderScoreboard();if(!$('scoreboard').open)$('scoreboard').showModal();};
+$('close-scoreboard').onclick=()=>$('scoreboard').close();
+$('scoreboard').addEventListener('click',e=>{if(e.target!==$('scoreboard'))return;const r=$('scoreboard').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('scoreboard').close();});
+$('top-actions').innerHTML=btn('sound','mute','Toggle sound')+btn('help','book','Open icon manual');
+function confirmLeave(){if(!$('leave-confirm').open)$('leave-confirm').showModal();}
+$('leave-room').onclick=()=>state.phase==='lobby'?leaveRoom():confirmLeave();
+$('stay').onclick=()=>$('leave-confirm').close();
+$('confirm-leave').onclick=async()=>{$('confirm-leave').disabled=true;await leaveRoom();$('confirm-leave').disabled=false;};
+$('host-game').onclick=async()=>{try{$('host-game').disabled=true;await createRoom();}catch(e){toast('warning',Number(e.message)||503,true);}finally{$('host-game').disabled=false;}};
+$('ending').addEventListener('cancel',e=>e.preventDefault());
 const manual=new Manual($('guide'),()=>({state,slot}));
 const feedbackLayer=new FeedbackLayer(soundscape);
-$('dock').innerHTML=btn('tech-toggle','flask','Open technology tree');
-$('home').onclick=home;$('zoom-in').onclick=()=>globe.targetDistance=Math.max(1.12,globe.targetDistance-.25);$('zoom-out').onclick=()=>globe.targetDistance=Math.min(4.8,globe.targetDistance+.3);$('sound').innerHTML=icon(sound?'sound':'mute');$('sound').onclick=()=>{sound=soundscape.toggle();$('sound').innerHTML=icon(sound?'sound':'mute');};$('help').onclick=openGuide;$('tech-toggle').onclick=toggleResearch;
+$('dock').innerHTML=btn('tech-toggle','flask','Open technology tree')+btn('home-toggle','home','Pan to your home base');
+$('home-toggle').onclick=panHome;
+function renderSound(){$('sound').innerHTML=icon(sound?'sound':'mute');$('sound').setAttribute('aria-pressed',String(sound));}renderSound();$('sound').onclick=()=>{sound=soundscape.toggle();renderSound();};$('help').onclick=openGuide;$('tech-toggle').onclick=toggleResearch;
 $('invite').onclick=async()=>{try{await createRoom();const url=`${location.origin}/?room=${room}`;try{await navigator.clipboard.writeText(url);toast('check');}catch{if(navigator.share)await navigator.share({url});else toast('link');}}catch(e){toast('warning',Number(e.message)||503,true);}};
 $('start').onclick=async()=>{try{$('lobby').classList.add('busy');if(state.phase==='preview')await createRoom();await flushProfile();await send('start');}catch(e){toast('warning',Number(e.message)||503,true);}finally{$('lobby').classList.remove('busy');}};
 window.addEventListener('resize',()=>{const u=state?.squads.find(u=>u.id===activeUnit);if(u)globe.focus(u.tile);});
-document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||manual.opened)return;if(e.key==='Escape'){closeSelection();techOpen=false;show('research',false);manual.close();}if(e.key.toLowerCase()==='h')home();if(e.key.toLowerCase()==='t'&&state?.phase==='running')toggleResearch();});
+document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||manual.opened||$('scoreboard').open)return;if(e.key==='Escape'){closeSelection();techOpen=false;show('research',false);manual.close();}if(e.key.toLowerCase()==='h'&&state?.phase==='running')home();if(e.key.toLowerCase()==='t'&&state?.phase==='running')toggleResearch();});
 document.addEventListener('visibilitychange',()=>{if(ws?.readyState===1){ws.send(JSON.stringify({type:'presence',active:!document.hidden}));if(!document.hidden)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));}});
 try{
  globe=new Globe($('globe'),select);globe.onFrame=updateMarkers;
- const module=await WebAssembly.compileStreaming(fetch('/engine.wasm'));const e=new WebAssembly.Instance(module,{}).exports,enc=new TextEncoder(),dec=new TextDecoder();
+ const module=await WebAssembly.compile(await assetBytes('/engine.wasm'));const e=new WebAssembly.Instance(module,{}).exports,enc=new TextEncoder(),dec=new TextDecoder();
  previewEngine=request=>{const bytes=enc.encode(JSON.stringify(request)),p=e.alloc(bytes.length);new Uint8Array(e.memory.buffer,p,bytes.length).set(bytes);e.run(p,bytes.length);return JSON.parse(dec.decode(new Uint8Array(e.memory.buffer,e.output_ptr(),e.output_len())));};
- makePreview();const id=new URL(location.href).searchParams.get('room');if(id){if(!/^[a-f0-9]{20}$/.test(id))throw Error('404');await joinRoom(id);}else $('connection').innerHTML=icon('globe');
-}catch(e){console.error(e);toast('warning',Number(e.message)||503,true);$('start').disabled=true;}
+ makePreview();const id=new URL(location.href).searchParams.get('room');if(id){if(!/^[a-f0-9]{20}$/.test(id))throw Error('404');loadingStage('Joining your game…');await joinRoom(id);}else $('connection').innerHTML=icon('globe');
+ await assetsReady();
+ // Let the renderer upload and draw the completed scene before revealing it.
+ await new Promise(resolve=>{globe.onFrame=now=>{updateMarkers(now);globe.onFrame=updateMarkers;resolve();};});
+ await finishLoading();
+}catch(e){console.error(e);loadingFailed(e);$('start').disabled=true;}

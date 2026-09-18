@@ -3,6 +3,7 @@ import {existsSync, openSync, closeSync, unlinkSync, readFileSync, writeFileSync
 import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {captureRelease,verifyArchives,stageReleases,retainPublished,sha} from './releases.mjs';
+import {syncReleaseArchives,pushReleaseArchives} from './release-git.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));process.chdir(root);
 const args=process.argv.slice(2), dryRun=args.includes('--dry-run'), releaseIndex=args.indexOf('--release');
@@ -21,6 +22,7 @@ const run=(command,args)=>execFileSync(command,args,{cwd:root,stdio:'inherit'});
 const wrangler=args=>execFileSync(process.execPath,['node_modules/wrangler/bin/wrangler.js',...args],{cwd:root,stdio:'inherit',env:{...process.env,MERIDIAN_RELEASE_DEPLOY:'1'}});
 const base='https://meridian-globe.camerons-nonsense.workers.dev';
 try {
+  const archiveBase=syncReleaseArchives(root);
   let catalog=verifyArchives(root);
   if(selected) {
     if(!catalog.releases[selected])throw Error(`Unknown archived release ${selected}`);
@@ -31,7 +33,7 @@ try {
     captureRelease(root,root);
   }
   catalog=stageReleases(root);
-  run(process.execPath,['--test','tests/releases.test.mjs']);
+  run(process.execPath,['--test','tests/releases.test.mjs','tests/release-git.test.mjs','tests/loading.test.mjs']);
   const response=await fetch(base+'/api/releases');
   if(response.ok)retainPublished(catalog,await response.json());
   else if(response.status!==404)throw Error(`Cannot verify retained production releases: HTTP ${response.status}`);
@@ -44,6 +46,7 @@ try {
     }
   }
   console.log(`Release ${catalog.current}; retaining ${Object.keys(catalog.releases).length} immutable releases.`);
+  if(!dryRun)pushReleaseArchives(root,archiveBase);
   wrangler(['deploy',...(dryRun?['--dry-run']:[])]);
   if(!dryRun) {
     let health;

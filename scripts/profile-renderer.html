@@ -1,0 +1,61 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Renderer benchmark</title>
+<style>body{margin:0;background:#091316;color:#fff;font:12px monospace}canvas{width:393px;height:852px;max-height:100vh}pre{position:absolute;top:0;left:410px;white-space:pre-wrap;max-width:650px}button{position:absolute;left:410px;bottom:20px}@media(max-width:760px){pre{left:0;top:auto;bottom:0;max-height:160px;overflow:auto;background:#091316dd}button{left:220px;bottom:175px}}</style>
+<canvas id="globe"></canvas><pre id="results">Loading deterministic six-player, 100-unit scene…</pre><button id="run">Run benchmark</button>
+<script type="module">
+const params=new URLSearchParams(location.search),base=params.has('baseline')?'/baseline/':'/';
+const {Globe}=await import(base+'globe.js'),{assetsReady}=await import(base+'loading.js');
+const times={},counts={};let collecting=false;
+const frame=Globe.prototype.frame;
+Globe.prototype.frame=function(now){const start=performance.now();frame.call(this,now);if(collecting)(times.frameCPU??=[]).push(performance.now()-start);};
+const state=await (await fetch('/fixture.json')).json(),world=state.tiles;
+state.phase='running';state.tiles=world.map(t=>({...t,visible:true,explored:true}));
+const {createShowcase}=await import(base+'showcase.js');
+const {canEnter}=await import(base+'planning.js');
+let seed=42;const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
+const template=createShowcase(world,state.rules,state.seed,random).squads;
+const occupied=new Set();
+state.squads=Array.from({length:100},(_,i)=>{
+ const u={...template[i%template.length],id:i,owner:i%6,founding:false};
+ const candidates=world.flatMap((_,tile)=>canEnter(world,u.kind,tile)&&!occupied.has(tile)?[tile]:[]);
+ u.tile=candidates[Math.floor(random()*candidates.length)];occupied.add(u.tile);return u;
+});
+const globe=new Globe(document.querySelector('canvas'),()=>{});
+globe.setWorld(world);globe.setState(state,0);globe.distance=globe.targetDistance=3.8;globe.offset=globe.targetOffset=0;
+await assetsReady();
+for(const method of ['setState','rebuild','rebuildTerritory','updateUnits','updateEffects','drawModels','updateRoutes']){
+ const original=globe[method];globe[method]=function(...args){const start=performance.now();const result=original.apply(this,args);if(collecting)(times[method]??=[]).push(performance.now()-start);return result;};
+}
+for(const method of ['bufferData','bufferSubData','drawArrays','drawArraysInstanced']){
+ const original=globe.gl[method].bind(globe.gl);globe.gl[method]=(...args)=>{if(collecting)counts[method]=(counts[method]||0)+1;return original(...args);};
+}
+const summarize=values=>{const a=[...values].sort((a,b)=>a-b);return {mean:+(a.reduce((a,b)=>a+b,0)/a.length).toFixed(3),p95:+a[Math.min(a.length-1,Math.floor(a.length*.95))].toFixed(3)};};
+let running=false;
+async function run(){
+ if(running)return;running=true;document.querySelector('#results').textContent='Warming up…';
+ for(const key of Object.keys(times))delete times[key];for(const key of Object.keys(counts))delete counts[key];
+ const frames=[];let started,previous,framesDone=0;
+ const tick=setInterval(()=>{
+  state.tick++;
+  if(params.has('moving')){
+   for(const u of state.squads.slice(0,20)){
+    const next=world[u.tile].near.find(tile=>canEnter(world,u.kind,tile)&&!occupied.has(tile));
+    if(next!==undefined){occupied.delete(u.tile);occupied.add(next);u.tile=next;}
+   }
+   // Exercise fog and territory changes as units explore.
+   for(let i=0;i<12;i++)state.tiles[(state.tick*7+i)%world.length].visible=state.tick%2===0;
+  }
+  globe.setState(state,0);
+ },1000);
+ globe.onFrame=now=>{
+  started??=now;if(now-started<3000)return;
+  if(!collecting){collecting=true;previous=now;return;}
+  frames.push(now-previous);previous=now;framesDone++;
+  if(now-started<15000)return;
+  collecting=false;clearInterval(tick);globe.onFrame=null;running=false;
+  const result={version:params.has('baseline')?'baseline':'current',units:100,canvas:[globe.canvas.width,globe.canvas.height],frames:framesDone,frameIntervalMs:summarize(frames),methods:Object.fromEntries(Object.entries(times).map(([k,v])=>[k,{calls:v.length,...summarize(v)}])),callsPerFrame:Object.fromEntries(Object.entries(counts).map(([k,v])=>[k,+(v/framesDone).toFixed(2)])),triangles:globe.land.count/3};
+  document.querySelector('#results').textContent=JSON.stringify(result,null,2);console.log('RENDERER_BENCHMARK',JSON.stringify(result));
+ };
+}
+document.querySelector('#run').onclick=run;run();
+</script>

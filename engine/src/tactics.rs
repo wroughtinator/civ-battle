@@ -321,13 +321,6 @@ impl Game {
             .collect()
     }
     pub fn storm(&self, i: usize) -> f32 {
-        if self
-            .discoveries
-            .iter()
-            .any(|d| d.kind == 8 && d.used && dot(self.tiles[d.tile].p, self.tiles[i].p) > 0.96)
-        {
-            return 0.;
-        }
         self.weather()
             .iter()
             .map(|w| ((dot(self.tiles[i].p, [w[0], w[1], w[2]]) - w[3]) / 0.09).clamp(0., 1.))
@@ -350,17 +343,6 @@ impl Game {
             };
             for (i, d) in self.distances(u.tile).iter().enumerate() {
                 if *d <= r {
-                    v[i] = true;
-                }
-            }
-        }
-        for site in self
-            .discoveries
-            .iter()
-            .filter(|s| s.kind == 5 && s.owner == p as i8 && s.until > self.tick)
-        {
-            for (i, d) in self.distances(site.tile).iter().enumerate() {
-                if *d <= 5 {
                     v[i] = true;
                 }
             }

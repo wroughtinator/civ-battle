@@ -17,6 +17,11 @@
   Read `docs/PLANNING_AUDIT.md`: its focused skirmish and peaceful-space PASS
   supplements, and never replaces, the full-game audit verdict.
 
+## Interface
+
+- Keep visible UI text limited to numbers and usernames outside the manual. Use icons for labels and actions; keep explanations and rule details in the manual. Preserve accessible names for screen readers.
+- Tile inspectors use the same tappable terrain icons as the manual. Show a single concise effect value rather than multiple conditional values; explain exceptions in the manual.
+
 ## Deployment rules
 
 - Deploy with `bash deploy.sh` or `npm run deploy`. Use `--dry-run` to validate without publishing. Do not bypass the Wrangler deployment guard.

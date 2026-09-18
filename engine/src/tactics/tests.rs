@@ -577,19 +577,19 @@ fn discoveries_are_secret_single_use_and_do_not_stack() {
         .unwrap()
         .iter()
         .all(|d| v[d["tile"].as_u64().unwrap() as usize]));
-    let n = g.discoveries.iter().position(|d| d.kind == 2).unwrap();
+    let n = g.discoveries.iter().position(|d| d.kind == 1).unwrap();
     let tile = g.discoveries[n].tile;
     g.squads.clear();
     g.spawn(p, 0, tile);
     let id = g.squads[0].id;
     g.command(p, "explore", id, 0, 0).unwrap();
-    assert_eq!(g.squads.len(), 2);
-    assert_ne!(g.squads[0].tile, g.squads[1].tile);
+    assert_eq!(g.squads.len(), 1);
+    assert_eq!(g.feedback.iter().find(|e| e.action == "pickup").unwrap().value, 1);
     g.step(ORDER_INTERVAL);
     assert_eq!(g.command(p, "explore", id, 0, 0), Err(6));
 }
 #[test]
-fn encounter_distribution_has_ten_types_and_quarter_density() {
+fn encounter_distribution_has_only_gold_and_twelfth_density() {
     let mut counts = [0; 10];
     let mut eligible = 0;
     for seed in 1..25 {
@@ -605,9 +605,9 @@ fn encounter_distribution_has_ten_types_and_quarter_density() {
         }
     }
     let total: usize = counts.iter().sum();
-    assert!((0.21..0.29).contains(&(total as f32 / eligible as f32)));
-    assert!(counts.iter().all(|&n| n > 0));
-    assert!(counts[0] > counts[9] * 3);
+    assert!((0.06..0.11).contains(&(total as f32 / eligible as f32)));
+    assert_eq!(counts[1], total);
+    assert!(total > 0);
 }
 
 #[test]
@@ -1074,20 +1074,15 @@ fn walking_collects_every_chest_once_without_spending_or_stopping() {
         assert!(g.squads[0].left > 0);
         assert!(g.discoveries[0].used, "kind {kind}");
         let reward = g.feedback.iter().find(|e| e.action == "pickup").unwrap();
-        assert_eq!(reward.value, kind);
+        assert_eq!(reward.value, 1);
         assert_eq!(reward.audience, 1);
         assert_eq!(reward.to, to);
-        match kind {
-            0 => assert_eq!(g.players[0].gold, 45.),
-            1 => assert_eq!(g.players[0].gold, 35.),
-            4 => assert_eq!(g.players[0].gold, 55.),
-            2 | 3 | 9 => { assert_eq!(g.squads.len(), 2); assert_eq!(g.players[0].gold, 0.); }
-            5 => assert_eq!(g.discoveries[0].until, g.tick + 90),
-            6 => assert_eq!(g.squads[0].hp, 75.),
-            7 => { assert_eq!(g.squads[0].hp, 50.); assert_eq!(g.squads[0].ability_ready, g.tick); }
-            8 => assert_eq!(g.storm(to), 0.),
-            _ => unreachable!(),
-        }
+        assert_eq!(g.players[0].gold, 25.);
+        assert_eq!(reward.amount, 25.);
+        assert_eq!(g.squads.len(), 1);
+        assert_eq!(g.squads[0].hp, 30.);
+        assert_eq!(g.squads[0].ability_ready, g.tick + 100);
+        assert_eq!(g.discoveries[0].until, 0);
         let gold = g.players[0].gold;
         assert_eq!(g.claim(0), Err(6));
         assert_eq!(g.players[0].gold, gold);
@@ -1095,7 +1090,7 @@ fn walking_collects_every_chest_once_without_spending_or_stopping() {
     }
 }
 #[test]
-fn blocked_reinforcement_and_full_health_chests_pay_coins() {
+fn chests_pay_gold_even_when_surrounded() {
     for kind in [2, 3, 6, 9] {
         let (mut g, from, to) = arena();
         g.squads.retain(|u| u.owner == 0);
@@ -1107,9 +1102,24 @@ fn blocked_reinforcement_and_full_health_chests_pay_coins() {
         // Collect in place to fill every neighbouring hex, including the old position.
         g.spawn(0, 0, to);
         g.claim(g.squads.len()-1).unwrap();
-        assert_eq!(g.players[0].gold, 35.);
+        assert_eq!(g.players[0].gold, 25.);
         let e = g.feedback.last().unwrap();
         assert_eq!(e.value, 1);
-        assert_eq!(e.amount, 35.);
+        assert_eq!(e.amount, 25.);
+    }
+}
+
+#[test]
+fn chest_gold_varies_and_matches_feedback() {
+    for variant in [0, 77, 125, 126, u32::MAX] {
+        let (mut g, tile, _) = arena();
+        g.discoveries.clear();
+        g.discoveries.push(Discovery {tile,kind:1,variant,used:false,owner:-1,seen:0,known_used:0,until:0});
+        let before = g.players[0].gold;
+        g.claim(0).unwrap();
+        let amount = g.feedback.last().unwrap().amount;
+        assert!((25. ..=150.).contains(&amount));
+        assert_eq!(amount, (25 + variant % 126) as f32);
+        assert_eq!(g.players[0].gold - before, amount);
     }
 }

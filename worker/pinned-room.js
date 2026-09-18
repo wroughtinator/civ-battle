@@ -16,15 +16,16 @@ export function pinnedRoomClass(Base, releases, bootstrap) {
         if (pin || row) {
           // Rooms predating release IDs get the captured production build, never latest.
           const id = pin?.release ?? bootstrap;
-          this.attach(id, row ? JSON.parse(row.data) : null);
+          await this.attach(id, row ? JSON.parse(row.data) : null);
           if (!pin) this.persistPin(id);
         }
       });
     }
-    attach(id, room) {
+    async attach(id, room) {
       if (!releases[id]) throw Error(`Missing immutable room release: ${id}`);
+      const {Room} = await releases[id].load();
       this.release = id;
-      this.game = new releases[id].Room(this.ctx, this.env, {room});
+      this.game = new Room(this.ctx, this.env, {room});
     }
     persistPin(id) {
       this.ctx.storage.sql.exec('INSERT INTO deployment(id,release) VALUES(1,?)', id);
@@ -41,7 +42,7 @@ export function pinnedRoomClass(Base, releases, bootstrap) {
           if (this.game) return json({error:409},409);
           const id = request.headers.get('X-Meridian-Release');
           if (!releases[id]) return json({error:400},400);
-          this.attach(id, null);
+          await this.attach(id, null);
           const response = await this.game.fetch(request);
           if (response.ok) this.persistPin(id);
           else this.game = null;

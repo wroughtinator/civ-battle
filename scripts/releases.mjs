@@ -82,16 +82,17 @@ export function captureRelease(root, source, {bootstrap=false}={}) {
 }
 
 export function stageReleases(root) {
-  const catalog=verifyArchives(root), imports=[], entries=[];
+  const catalog=verifyArchives(root), entries=[];
   for(const id of Object.keys(catalog.releases)) {
     const manifest=read(join(root,'releases',id,'release.json'));
-    imports.push(`import {Room as R${id}} from '../releases/${id}/worker/index.js';`);
-    entries.push(`${JSON.stringify(id)}:{Room:R${id},files:${JSON.stringify(manifest.publicFiles)},headers:${JSON.stringify(manifest.headers)}}`);
+    // Static-path dynamic imports let the bundler defer each archive's WASM
+    // instantiation until a room actually needs that immutable release.
+    entries.push(`${JSON.stringify(id)}:{load:()=>import('../releases/${id}/worker/index.js'),files:${JSON.stringify(manifest.publicFiles)},headers:${JSON.stringify(manifest.headers)}}`);
     for(const file of manifest.publicFiles)if(!file.startsWith('_')) {
       const target=join(root,'.deploy/public/releases',id,file);mkdirSync(dirname(target),{recursive:true});
       copyFileSync(join(root,'releases',id,'public',file),target);
     }
   }
-  write(join(root,'.deploy/registry.js'),`${imports.join('\n')}\nexport const releases=Object.freeze({${entries.join(',')}});\nexport const current=${JSON.stringify(catalog.current)},bootstrap=${JSON.stringify(catalog.bootstrap)};\nexport const catalog=${JSON.stringify(catalog)};\n`);
+  write(join(root,'.deploy/registry.js'),`export const releases=Object.freeze({${entries.join(',')}});\nexport const current=${JSON.stringify(catalog.current)},bootstrap=${JSON.stringify(catalog.bootstrap)};\nexport const catalog=${JSON.stringify(catalog)};\n`);
   return catalog;
 }

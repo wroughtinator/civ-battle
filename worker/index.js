@@ -57,7 +57,17 @@ export class Room extends DurableObject {
     else await this.ctx.storage.setAlarm(Date.now() + 86400000);
   }
   seatFor(hash) { return this.room.seats.findIndex(s => s?.hash === hash); }
-  hostSlot() { return this.room.seats.findIndex(s => !s.left); }
+  hostSlot() {
+    if(this.room.hostSlot!=null&&this.room.seats[this.room.hostSlot]&&!this.room.seats[this.room.hostSlot].left)return this.room.hostSlot;
+    this.room.hostSlot=this.room.seats.findIndex(s=>!s.left);
+    return this.room.hostSlot;
+  }
+  transferHost() {
+    const remaining=this.room.seats.flatMap((s,i)=>s.left?[]:[i]);
+    const online=remaining.filter(i=>!this.room.seats[i].disconnectedAt);
+    const pool=online.length?online:remaining;
+    this.room.hostSlot=pool.length?pool[crypto.getRandomValues(new Uint32Array(1))[0]%pool.length]:-1;
+  }
   resetLobby() {
     const old=this.room.game;
     this.room.game=this.simulate({op:'new',hidden_rolls:Array.from(crypto.getRandomValues(new Uint32Array(642))),seed:old.seed,count:old.players.length,difficulty:old.difficulty}).state;
@@ -192,7 +202,7 @@ export class Room extends DurableObject {
       if(msg.seq!==seat.seq+1){ws.send(JSON.stringify({type:'resync',seq:seat.seq}));return;}
       this.advance();let error=0;
       if(msg.type==='leave') {
-        seat.left=true;seat.hash=null;seat.result=null;seat.disconnectedAt=now;this.room.game.players[a.slot].bot=true;
+        const wasHost=a.slot===this.hostSlot();seat.left=true;seat.hash=null;seat.result=null;seat.disconnectedAt=now;this.room.game.players[a.slot].bot=true;if(wasHost)this.transferHost();
       }else if(msg.type==='lobby') {
         if(!seat.result&&this.room.phase!=='ended')error=1;
         else {seat.result=null;if(this.room.phase==='ended')this.resetLobby();}
@@ -223,7 +233,7 @@ export class Room extends DurableObject {
         else {const result=this.simulate({op:'command',state:this.room.game,player:a.slot,kind:msg.kind,from:msg.from||0,to:msg.to||0,value:msg.value||0});this.room.game=result.state;error=result.error;}
       }else error=6;
       const ack={type:'ack',seq:msg.seq,error};seat.seq=msg.seq;seat.acks.push(ack);seat.acks=seat.acks.slice(-32);
-      this.room.revision++;this.save();await this.schedule();ws.send(JSON.stringify(ack));this.broadcast();
+      this.hostSlot();this.room.revision++;this.save();await this.schedule();ws.send(JSON.stringify(ack));this.broadcast();
       if(msg.type==='leave'&&!error)ws.close(1000,'Left room');
     });
   }
@@ -233,7 +243,11 @@ export class Room extends DurableObject {
     if(this.room.seats[a.slot]?.left||a.hash&&a.hash!==this.room.seats[a.slot]?.hash)return;
     // A replaced socket closing must never mark its replacement disconnected.
     const replacement=this.ctx.getWebSockets().some(w=>w!==ws&&w.deserializeAttachment()?.slot===a.slot&&w.readyState===1);
-    if(!replacement){this.room.seats[a.slot].disconnectedAt=Date.now();this.room.game.players[a.slot].bot=true;this.room.revision++;this.save();this.broadcast();}
+    if(!replacement){
+      const wasHost=a.slot===this.hostSlot();this.room.seats[a.slot].disconnectedAt=Date.now();this.room.game.players[a.slot].bot=true;
+      if(wasHost&&this.room.phase==='lobby'&&this.room.seats.some((s,i)=>i!==a.slot&&!s.left&&!s.disconnectedAt))this.transferHost();
+      this.room.revision++;this.save();this.broadcast();
+    }
     try{ws.close(code===1005?1000:code,'');}catch{}
   }
   async webSocketError(ws) {await this.webSocketClose(ws,1011);}

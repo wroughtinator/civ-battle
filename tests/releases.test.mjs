@@ -24,8 +24,27 @@ function rules(version) {
   async alarm(){this.room.tick+=version;this.save();}
  };
 }
-const releases={[A]:{Room:rules(1),files:['index.html','app.js','legacy/index.html'],headers:{}},[B]:{Room:rules(20),files:['index.html','app.js'],headers:{}}};
+const releases={[A]:{load:async()=>({Room:rules(1)}),files:['index.html','app.js','legacy/index.html'],headers:{}},[B]:{load:async()=>({Room:rules(20)}),files:['index.html','app.js'],headers:{}}};
 const init=id=>new Request('https://game.test/init',{method:'POST',headers:{'X-Meridian-Release':id}});
+
+test('only the pinned release loads, and cold-start socket events await its initialization',async()=>{
+ let loads=0,finish;
+ const pending=new Promise(resolve=>finish=resolve);
+ const lazy={[A]:{load:async()=>{loads++;await pending;return {Room:rules(1)};}},[B]:{load:()=>{throw Error('Unrelated archive was initialized');}}};
+ const ctx=context(), Room=pinnedRoomClass(Base,lazy,A),room=new Room(ctx,{});
+ await room.ready;assert.equal(loads,0);
+ const creation=room.fetch(init(A));await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(loads,1);assert.equal(room.game,undefined);finish();await creation;
+ const restored=new Room(ctx,{}),messages=[];
+ await restored.webSocketMessage(messages);assert.deepEqual(messages,[1]);assert.equal(loads,2);
+ assert.equal(restored.release,A);
+});
+
+test('failed release loading never pins a new room or falls back to another version',async()=>{
+ const ctx=context(),Room=pinnedRoomClass(Base,{[A]:{load:async()=>{throw Error('Load failed');}},[B]:releases[B]},B);
+ const room=new Room(ctx,{});await assert.rejects(room.fetch(init(A)),/Load failed/);
+ assert.equal(room.game,undefined);assert.deepEqual([...ctx.storage.sql.exec('SELECT release FROM deployment')],[]);
+});
 
 test('room rules, commands, alarms and reconnects stay pinned after a deployment and cold start',async()=>{
  const ctx=context(), Old=pinnedRoomClass(Base,{[A]:releases[A]},A);
@@ -80,7 +99,7 @@ test('refresh and invitation URLs resolve the pinned client; new homepages choos
 test('packaging is deterministic, freezes all client URLs, shares engines, and rejects archive loss or tampering',t=>{
  const root=mkdtempSync(join(tmpdir(),'meridian-release-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
  for(const dir of ['public','worker'])mkdirSync(join(root,dir));
- writeFileSync(join(root,'public/_headers'),"/*\n  X-Content-Type-Options: nosniff\n");
+ writeFileSync(join(root,'public/_headers'),readFileSync(new URL('../public/_headers',import.meta.url)));
  writeFileSync(join(root,'public/index.html'),'<script type="module" src="/app.js"></script>');
  writeFileSync(join(root,'public/app.js'),"import './globe.js';fetch('/engine.wasm');fetch(`/api/rooms`);const ws=`${location.host}/api/rooms/id/ws`;location.assign('/');");
  writeFileSync(join(root,'public/globe.js'),"fetch('/assets/tank.mesh')");
@@ -94,6 +113,12 @@ test('packaging is deterministic, freezes all client URLs, shares engines, and r
  writeFileSync(join(root,'public/app.js'),"fetch('/api/rooms'); // changed client");
  const second=captureRelease(root,root);assert.notEqual(second,first);
  const catalog=stageReleases(root);assert.equal(catalog.current,second);assert.equal(catalog.bootstrap,first);
+ // Streamed textures become data images; the packaged policy must permit them.
+ const headers=JSON.parse(readFileSync(join(root,'releases',second,'release.json'))).headers;
+ const policy=headers['Content-Security-Policy'];
+ const directive=name=>policy.split(';').map(s=>s.trim().split(/\s+/)).find(parts=>parts[0]===name).slice(1);
+ assert.ok(directive('img-src').includes('data:'),'startup textures require data: images');
+ assert.ok(!directive('script-src').includes('data:'),'data access stays limited to images and styles');
  retainPublished(catalog,{...catalog,releases:{[first]:catalog.releases[first]}});
  assert.throws(()=>retainPublished({...catalog,releases:{[second]:catalog.releases[second]}},catalog),/Refusing to remove/);
  writeFileSync(join(root,'releases',first,'public/app.js'),'tampered');
