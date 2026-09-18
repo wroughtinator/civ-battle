@@ -2,8 +2,8 @@
   "files": [
     {
       "file": "app.js",
-      "bytes": 33888,
-      "brotli_bytes": 9902
+      "bytes": 35383,
+      "brotli_bytes": 10318
     },
     {
       "file": "assets/archer.mesh",
@@ -54,6 +54,11 @@
       "file": "assets/fleet.mesh",
       "bytes": 14976,
       "brotli_bytes": 2073
+    },
+    {
+      "file": "assets/globe-share.jpg",
+      "bytes": 70369,
+      "brotli_bytes": 65468
     },
     {
       "file": "assets/guard.mesh",
@@ -152,8 +157,8 @@
     },
     {
       "file": "engine.wasm",
-      "bytes": 419414,
-      "brotli_bytes": 108391
+      "bytes": 423255,
+      "brotli_bytes": 109322
     },
     {
       "file": "favicon.svg",
@@ -167,8 +172,8 @@
     },
     {
       "file": "globe.js",
-      "bytes": 43871,
-      "brotli_bytes": 13589
+      "bytes": 45234,
+      "brotli_bytes": 13843
     },
     {
       "file": "icons.js",
@@ -177,8 +182,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 2472,
-      "brotli_bytes": 774
+      "bytes": 3187,
+      "brotli_bytes": 876
     },
     {
       "file": "legacy/app.js",
@@ -207,8 +212,8 @@
     },
     {
       "file": "legacy/index.html",
-      "bytes": 2380,
-      "brotli_bytes": 747
+      "bytes": 3102,
+      "brotli_bytes": 859
     },
     {
       "file": "legacy/planning.js",
@@ -222,8 +227,8 @@
     },
     {
       "file": "manual-data.js",
-      "bytes": 21077,
-      "brotli_bytes": 6862
+      "bytes": 21897,
+      "brotli_bytes": 7104
     },
     {
       "file": "manual.js",
@@ -252,17 +257,17 @@
     },
     {
       "file": "tactics.css",
-      "bytes": 16800,
-      "brotli_bytes": 4161
+      "bytes": 17853,
+      "brotli_bytes": 4353
     },
     {
       "file": "terrain.js",
-      "bytes": 815,
-      "brotli_bytes": 398
+      "bytes": 1408,
+      "brotli_bytes": 636
     }
   ],
-  "total_bytes": 4189333,
-  "estimated_brotli_bytes": 2241519,
+  "total_bytes": 4270304,
+  "estimated_brotli_bytes": 2309474,
   "audio_lazy_bytes": 473732,
   "note": "Brotli figures are local compression measurements, not a claim about negotiated CDN content encoding. Audio loads after interaction. No physical mobile GPU benchmark has been made."
 }
