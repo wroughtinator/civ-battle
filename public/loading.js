@@ -20,9 +20,11 @@ export async function assetBytes(url){
  const bytes=new Uint8Array(item.loaded);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}return bytes.buffer;
 }
 export async function assetImage(url){
- const blob=new Blob([await assetBytes(url)]),src=URL.createObjectURL(blob),img=new Image();
- try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error(`Texture unavailable: ${url}`));img.src=src;});return img;}
- finally{URL.revokeObjectURL(src);}
+ // The site's image policy allows data URLs, not blob URLs. Keep counted bytes
+ // in memory without making a second network request for the image.
+ const blob=new Blob([await assetBytes(url)]),reader=new FileReader(),img=new Image();
+ const src=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(blob);});
+ await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error(`Texture unavailable: ${url}`));img.src=src;});return img;
 }
 export async function assetsReady(){
  discovered=true;
