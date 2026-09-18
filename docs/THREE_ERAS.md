@@ -4,7 +4,9 @@ Implemented in mutable source and verified before landing. The audit results bel
 
 ## What changed
 
-Researchable units increased from **11 to 33**; the three starting types (guard, scout, settler) make **36 total unit types**. Eleven aligned branches run through three colored columns. Early units stay relevant through cost, special jobs and counters; research never converts an existing piece.
+Researchable units increased from **11 to 33**; the three starting types (guard, scout, settler) make **36 total unit types**. A branching prerequisite graph spans three historical eras. Early units stay relevant through cost, special jobs and counters; research never converts an existing piece.
+
+The table groups units by era; the arrows in the live tree determine prerequisites.
 
 | Stone & Bronze | Industry & Sail | Modern & Space |
 |---|---|---|
@@ -20,7 +22,7 @@ Researchable units increased from **11 to 33**; the three starting types (guard,
 | Fireboat | Ironclad | Radar truck |
 | Supply cart | Chain boom | Orbital engineer |
 
-Orbital engineer is the exception to the row arrows: it requires **all 32 other technologies**, including the nuclear launcher. The source of unit statistics, roles, icons, models and prerequisites is `data/units.json`.
+Orbital engineer uses the normal prerequisite arrows: it requires **Rocket Battery and Radar Truck**. Other branches, including naval and nuclear technology, can be skipped. The source of unit statistics, roles, icons, models and prerequisites is `data/units.json`.
 
 ## Added roles
 
@@ -137,6 +139,6 @@ Implementation checks passed: **60 current-rules Rust tests**, **nine native aud
 
 ## Reusing the tools
 
-Use **Meridian Strategy Audit** (`npm run analyze:design`) for full matches, strategy matchups, compute scaling, input frequency, blind repetition, consequences, pacing and coverage warnings. Use **Meridian Planning Audit** (`npm run analyze:planning`) for controlled combat breadth/foresight and peaceful full-tree development. Each defaults to **120 seconds of analysis**, with compilation separately measured. Keep both verdicts; a focused PASS cannot override a full-game FAIL or INCONCLUSIVE.
+Use **Meridian Strategy Audit** (`npm run analyze:design`) for full matches, strategy matchups, compute scaling, input frequency, blind repetition, consequences, pacing and coverage warnings. Use **Meridian Planning Audit** (`npm run analyze:planning`) for controlled combat breadth/foresight and peaceful orbital-path development. Each defaults to **120 seconds of analysis**, with compilation separately measured. Keep both verdicts; a focused PASS cannot override a full-game FAIL or INCONCLUSIVE.
 
 Before a future unit change, save both baselines. Update `data/units.json`, the Rust unit-count/branch declarations and roster validation when changing the catalog size, model authoring in `tools/asset-forge`, icons, abilities/manual entries, and policy/action coverage. Run `npm run assets` and `npm run build`, inspect actual animations, then repeat both audits with identical configurations and a separate holdout seed. Never relax thresholds to obtain PASS. Recruitment coverage means an action was exercised, not that the bot mastered it.

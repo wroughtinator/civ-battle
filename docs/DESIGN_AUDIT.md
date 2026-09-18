@@ -1,5 +1,7 @@
 # Meridian Strategy Audit
 
+Current research UI and removal of the shared order timer: [Research tree](RESEARCH_TREE.md). Historical results below retain their original rules.
+
 Run from the repository root:
 
 ```sh

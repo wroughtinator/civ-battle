@@ -7,7 +7,7 @@ impl Game {
     }
     // Policies 1..6 are deliberately narrow audit opponents, with the same economy.
     pub fn bot_policy(&mut self, p: usize, policy: u8) {
-        if !self.players[p].alive || self.players[p].cooldown > self.tick {return;}
+        if !self.players[p].alive {return;}
         let visible = self.vision(p);
         let mut observed = self.clone();
         observed.squads.retain(|u| self.detected(p, u, &visible));
@@ -30,7 +30,7 @@ impl Game {
         }
     }
     fn bot_plan(&mut self, p: usize, policy: u8) {
-        if !self.players[p].alive || self.players[p].cooldown > self.tick {
+        if !self.players[p].alive {
             return;
         }
         let vision = self.vision(p);
@@ -553,7 +553,7 @@ impl Game {
         }
         let emergency=policy!=6&&a.gold<250.&&enemies.iter().any(|u|u.owner<self.players.len()&&cities.iter().any(|c|self.distances(c.tile)[u.tile]<=3))
             && own.iter().filter(|u|spec(u.kind).damage>0.&&u.hp>spec(u.kind).hp*0.5).count()<4;
-        if !emergency && a.research_queue.is_empty() && !self.space_ready(p) {
+        if !emergency && a.research < 0 && a.research_queue.is_empty() && !self.space_ready(p) {
             if policy==5&&!a.unlocked.contains(&2)&&a.research!=2 {
                 // A navy still needs an inexpensive land escort to hold its ports.
                 if self.command(p,"plan",0,0,2).is_ok(){return true;}

@@ -26,7 +26,6 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
  if(kind==='refit')return blocked('Units cannot change type; recruit in a city');
  const p=state.players[slot];
  if(!p?.alive||state.winner>=0)return blocked('Player cannot issue orders');
- if(kind!=='stop'&&p.cooldown>state.tick)return blocked('Order recovering','clock',p.cooldown-state.tick);
  if(kind==='plan')return value===255||units[value]?.researchable?null:blocked('Choose a technology');
  if(kind==='research'){
   if(p.unlocked.includes(value))return blocked('Already researched','check');
@@ -89,7 +88,7 @@ export function orderBlock(world,state,slot,kind,{from=0,to=null,value=0}={}){
    return canFound(world,state,u.tile)?null:blocked('Requires four hexes from cities','territory',4);
   }
   if(k===10){
-   if(!p.unlocked.includes(10)||!prerequisites(10).every(k=>p.unlocked.includes(k)))return blocked('Requires every technology, including orbital research','flask');
+   if(!p.unlocked.includes(10))return blocked('Requires orbital research','flask');
    if(p.launch_tile!=null)return blocked('Launch already in progress','rocket');
    return state.cities.some(c=>c.tile===u.tile&&c.owner===slot&&c.production===3)?null:blocked('Requires your production-three city','factory');
   }

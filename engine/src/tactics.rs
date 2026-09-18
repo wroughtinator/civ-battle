@@ -1,4 +1,4 @@
-//! Current rules: conquest or complete-tree spaceflight, persistent combat and guarded approaches.
+//! Current rules: conquest or orbital spaceflight, persistent combat and guarded approaches.
 use super::{dot, hash, norm, Event, Tile};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -8,7 +8,7 @@ use std::collections::{BinaryHeap, VecDeque};
 pub const INFLUENCE_GOAL: u16 = 540;
 pub const SPACE_GOAL: u16 = 180;
 /// Standing orders keep working while the player considers their next choice.
-pub const ORDER_INTERVAL: u32 = 6;
+pub const ORDER_INTERVAL: u32 = 0;
 pub const SETTLER: u8 = 13;
 pub const BRANCHES: [[u8; 3]; 11] = [[1,24,3],[2,23,5],[14,25,35],[15,4,11],[16,26,32],[17,27,34],[18,28,6],[19,31,9],[20,7,8],[21,29,33],[22,30,10]];
 pub mod roster;
@@ -430,7 +430,7 @@ impl Game {
     }
 
     pub fn space_ready(&self, p: usize) -> bool {
-        technologies().all(|k| self.players[p].unlocked.contains(&k))
+        self.players[p].unlocked.contains(&10)
     }
     pub fn path(&self, u: &Unit, to: usize) -> Option<Vec<usize>> {
         if u.boarded_on.is_some() || (!self.can_enter(u.kind, to) && self.boarding_target(u, to).is_none()) {
@@ -521,9 +521,6 @@ impl Game {
             return Err(1);
         }
         if kind == "refit" { return Err(6); }
-        if kind != "stop" && self.players[p].cooldown > self.tick {
-            return Err(2);
-        }
         let actor = self
             .squads
             .iter()
@@ -531,12 +528,17 @@ impl Game {
             .cloned();
         match kind {
             "plan" => {
-                if value==255 {self.players[p].research_queue.clear();}
-                else {
-                    if value>=UNIT_COUNT || !definition(value).researchable {return Err(6);}
-                    let mut queue=vec![];
-                    self.research_path(p,value,&mut queue);
-                    self.players[p].research_queue=queue;
+                if value != 255 && (value >= UNIT_COUNT || !definition(value).researchable) {return Err(6);}
+                let a = &mut self.players[p];
+                if a.research >= 0 {a.gold += definition(a.research as u8).research_cost as f32;}
+                a.research = -1;
+                a.research_left = 0;
+                a.research_queue.clear();
+                if value != 255 {
+                    let mut queue = vec![];
+                    self.research_path(p, value, &mut queue);
+                    self.players[p].research_queue = queue;
+                    Self::advance_research(&mut self.players[p]);
                 }
             }
             "research" => {
@@ -702,7 +704,7 @@ impl Game {
                 self.feedback(kind, &u, target, value, 0., 2);
             }
         }
-        self.players[p].cooldown = self.tick + ORDER_INTERVAL;
+
         self.last_order = Some((kind.to_owned(), from, to, value));
         Ok(())
     }
@@ -1177,6 +1179,19 @@ impl Game {
         }
         self.sync_passengers();
     }
+    fn advance_research(p: &mut Player) {
+        if p.alive && p.research < 0 {
+            if let Some(&k) = p.research_queue.first() {
+                let d = definition(k);
+                if p.gold >= d.research_cost as f32 && d.prerequisites.iter().all(|k|p.unlocked.contains(k)) {
+                    p.gold -= d.research_cost as f32;
+                    p.research = k as i8;
+                    p.research_left = d.research_seconds;
+                    p.research_queue.remove(0);
+                }
+            }
+        }
+    }
     fn development(&mut self) {
         let mut changed = false;
         let farms = self.farm_counts(&self.territory_sources());
@@ -1189,16 +1204,7 @@ impl Game {
                 }
             }
             p.research_queue.retain(|k|!p.unlocked.contains(k)&&p.research!=*k as i8);
-            if p.alive && p.research<0 {
-                if let Some(&k)=p.research_queue.first() {
-                    let d=definition(k);
-                    if p.gold>=d.research_cost as f32 && d.prerequisites.iter().all(|k|p.unlocked.contains(k)) {
-                        p.gold-=d.research_cost as f32;
-                        p.research=k as i8;p.research_left=d.research_seconds;
-                        p.research_queue.remove(0);
-                    }
-                }
-            }
+            Self::advance_research(p);
         }
         for i in 0..self.cities.len() {
             let c = self.cities[i].clone();

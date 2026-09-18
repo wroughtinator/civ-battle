@@ -92,13 +92,6 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 .passive-rule{display:flex;align-items:center;gap:8px;padding:8px 0;color:#9ab0b8;font:12px ui-monospace,monospace}.passive-rule .icon{width:22px;height:22px}.passive-rule.active{color:#8fcfff}
 
 .terrain-help{margin-left:auto;min-width:44px;min-height:44px;border:1px solid #8ca79e55;border-radius:7px;background:#14292d;color:#cbb577}.terrain-help .icon{width:20px;height:20px}
-.era-tree{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:46vh;overflow:auto;padding:8px;align-items:start}
-.tech-era{border:1px solid var(--era);background:color-mix(in srgb,var(--era) 27%,#111d25);border-radius:14px;padding:10px}
-.era-heading{display:flex;align-items:center;gap:8px;color:#fff;margin-bottom:8px}.era-heading .icon{width:30px;height:30px}
-.era-nodes{display:grid;grid-template-columns:1fr;gap:8px}.era-nodes .tree-node{width:100%;min-height:62px;margin:0;position:relative}.era-heading{position:sticky;top:-8px;z-index:2;background:var(--era);border-radius:6px;padding:5px}
-.tree-node.queued{outline:2px dashed #e8c979}.tree-node.selected{box-shadow:0 0 0 3px #fff}.tech-inspector{padding:10px;border-top:1px solid #53616c}
-.tech-preview{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.tech-preview>.icon{width:40px;height:40px}
-.tech-parents{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:8px 0}.tech-parents .icon{width:20px;height:20px}.tech-parents span{opacity:.4}.tech-parents .done{opacity:1;color:#94d5ab}
 .recruit-row{max-height:180px;overflow:auto}.tech-inspector .action-row{margin-top:6px}
 
 .unit-rules{display:flex;gap:10px;flex-wrap:wrap;padding:8px 0;color:#a5d7d5}.unit-rules>span{display:flex;align-items:center;gap:3px;font:12px ui-monospace,monospace}.unit-rules .icon{width:21px;height:21px}
@@ -121,3 +114,27 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 .damage-number{text-shadow:none;-webkit-text-stroke:3px var(--player-outline);paint-order:stroke fill}
 .pickup-reward{font:bold 28px system-ui,sans-serif;white-space:nowrap}
 .pickup-reward .icon:first-child{width:30px;height:30px;color:#ffd36e}
+
+/* A continuous, pannable timeline with branching discoveries inside every era. */
+#research{left:24px;right:84px;top:76px;bottom:24px;width:auto;padding:14px;background:#0c1822f5;overflow:hidden}
+#research .panel-head{margin-bottom:4px;flex-shrink:0}
+#research .tree-scroll{overflow:auto;touch-action:pan-x pan-y;padding:0;flex:1;min-height:0;max-height:none;overscroll-behavior:contain}
+.research-map{position:relative;width:1430px;height:770px;isolation:isolate}
+.research-era{position:absolute;top:0;bottom:0;width:456px;border-left:1px solid color-mix(in srgb,var(--era) 65%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--era) 22%,transparent),transparent 85%);pointer-events:none}
+.research-era:last-of-type{width:518px}
+.research-era-heading{display:flex;align-items:center;gap:12px;padding:18px 32px;color:color-mix(in srgb,var(--era) 45%,white);font-size:20px}
+.research-era-heading .icon{width:32px;height:32px}
+.research-links{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:#73848f88;stroke-width:2;pointer-events:none}
+.research-links .planned{stroke:#55aaff;filter:drop-shadow(0 0 4px #278bff)}
+.research-links .complete{stroke:#c3ab70}
+.research-map .tree-node{position:absolute;width:76px;height:68px;border-radius:16px;background:linear-gradient(145deg,#273a49,#14222f);border:1px solid #8194a45c;box-shadow:0 5px 16px #0005;color:#d4dfe5;overflow:hidden}
+.research-map .tree-node:hover,.research-map .tree-node:focus-visible{border-color:#fff;transform:translateY(-2px);outline:2px solid #ffffff66;outline-offset:3px}
+.research-map .tree-node.done{color:#e5c984;border-color:#b39757;background:linear-gradient(145deg,#45432c,#202c2b)}
+.research-map .tree-node.queued{color:#a1d3ff;border-color:#58adff;outline:none;background:#153d62;box-shadow:0 0 19px #268cff70,inset 0 0 12px #4ca6ff25}
+.research-map .tree-node.studying{color:#fff1c3;border:2px solid #ffdc82;background:#4a3c21;box-shadow:0 0 22px #efbb5066;animation:research-breathe 2s ease-in-out infinite}
+.research-progress{position:absolute;left:0;bottom:0;height:4px;width:var(--progress);background:#ffe2a0}
+@keyframes research-breathe{50%{box-shadow:0 0 28px #efbb5099}}
+@media(prefers-reduced-motion:reduce){.research-map .tree-node.studying{animation:none}}
+@media(max-width:600px){#research{left:8px;right:64px;top:136px;bottom:12px;padding:8px}}
+
+@media(max-width:600px){.research-map{zoom:.8}}

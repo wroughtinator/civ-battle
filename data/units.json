@@ -117,7 +117,10 @@
       "model": "cavalry",
       "era": 0,
       "researchable": true,
-      "prerequisites": [],
+      "prerequisites": [
+        2,
+        15
+      ],
       "research_cost": 18,
       "research_seconds": 8,
       "domain": "land",
@@ -146,7 +149,11 @@
         "train": 20,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        2,
+        1
+      ]
     },
     {
       "id": 2,
@@ -155,7 +162,9 @@
       "model": "archer",
       "era": 0,
       "researchable": true,
-      "prerequisites": [],
+      "prerequisites": [
+        14
+      ],
       "research_cost": 18,
       "research_seconds": 8,
       "domain": "land",
@@ -182,7 +191,11 @@
         "train": 19,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        1,
+        0
+      ]
     },
     {
       "id": 3,
@@ -192,7 +205,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        24
+        24,
+        26
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -222,7 +236,11 @@
         "train": 27,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        6,
+        1
+      ]
     },
     {
       "id": 4,
@@ -232,7 +250,7 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        15
+        25
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -261,7 +279,11 @@
         "train": 26,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        5,
+        2
+      ]
     },
     {
       "id": 5,
@@ -271,7 +293,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        23
+        23,
+        27
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -302,7 +325,11 @@
         "train": 24,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        6,
+        0
+      ]
     },
     {
       "id": 6,
@@ -312,7 +339,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        28
+        28,
+        33
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -341,7 +369,11 @@
         "train": 26,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        7,
+        4
+      ]
     },
     {
       "id": 7,
@@ -351,7 +383,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        20
+        20,
+        31
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -380,7 +413,11 @@
         "train": 21,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        4,
+        5
+      ]
     },
     {
       "id": 8,
@@ -390,7 +427,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        7
+        7,
+        30
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -419,7 +457,11 @@
         "train": 27,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        6,
+        6
+      ]
     },
     {
       "id": 9,
@@ -429,7 +471,9 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        31
+        29,
+        31,
+        33
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -457,7 +501,11 @@
         "train": 32,
         "sight": 4,
         "boarding_capacity": 3
-      }
+      },
+      "tree": [
+        7,
+        5
+      ]
     },
     {
       "id": 10,
@@ -467,38 +515,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        11,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35
+        35,
+        33
       ],
       "research_cost": 80,
       "research_seconds": 24,
@@ -510,7 +528,7 @@
       "directional": false,
       "setup": 0,
       "counters": [],
-      "role": "Complete the whole tree, then hold a developed city to launch.",
+      "role": "Research rocketry and radar, then hold a developed city to launch.",
       "style": 10,
       "spec": {
         "hp": 65,
@@ -523,7 +541,11 @@
         "train": 25,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        8,
+        3
+      ]
     },
     {
       "id": 11,
@@ -533,7 +555,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        4
+        4,
+        5
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -558,7 +581,11 @@
         "train": 35,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        7,
+        0
+      ]
     },
     {
       "id": 12,
@@ -661,7 +688,11 @@
         "train": 12,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        0,
+        0
+      ]
     },
     {
       "id": 15,
@@ -670,7 +701,9 @@
       "model": "pikeman",
       "era": 0,
       "researchable": true,
-      "prerequisites": [],
+      "prerequisites": [
+        16
+      ],
       "research_cost": 18,
       "research_seconds": 8,
       "domain": "land",
@@ -698,7 +731,11 @@
         "train": 17,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        1,
+        2
+      ]
     },
     {
       "id": 16,
@@ -731,7 +768,11 @@
         "train": 19,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        0,
+        2
+      ]
     },
     {
       "id": 17,
@@ -764,7 +805,11 @@
         "train": 17,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        0,
+        4
+      ]
     },
     {
       "id": 18,
@@ -773,7 +818,10 @@
       "model": "ram",
       "era": 0,
       "researchable": true,
-      "prerequisites": [],
+      "prerequisites": [
+        15,
+        22
+      ],
       "research_cost": 18,
       "research_seconds": 8,
       "domain": "land",
@@ -801,7 +849,11 @@
         "train": 21,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        2,
+        3
+      ]
     },
     {
       "id": 19,
@@ -836,7 +888,11 @@
         "train": 13,
         "sight": 3,
         "boarding_capacity": 1
-      }
+      },
+      "tree": [
+        0,
+        6
+      ]
     },
     {
       "id": 20,
@@ -845,7 +901,9 @@
       "model": "outrigger",
       "era": 0,
       "researchable": true,
-      "prerequisites": [],
+      "prerequisites": [
+        19
+      ],
       "research_cost": 18,
       "research_seconds": 8,
       "domain": "sea",
@@ -873,7 +931,11 @@
         "train": 17,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        1,
+        6
+      ]
     },
     {
       "id": 21,
@@ -882,7 +944,10 @@
       "model": "fireboat",
       "era": 0,
       "researchable": true,
-      "prerequisites": [],
+      "prerequisites": [
+        20,
+        22
+      ],
       "research_cost": 18,
       "research_seconds": 8,
       "domain": "sea",
@@ -910,7 +975,11 @@
         "train": 17,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        2,
+        5
+      ]
     },
     {
       "id": 22,
@@ -919,7 +988,9 @@
       "model": "supply-cart",
       "era": 0,
       "researchable": true,
-      "prerequisites": [],
+      "prerequisites": [
+        17
+      ],
       "research_cost": 18,
       "research_seconds": 8,
       "domain": "land",
@@ -943,7 +1014,11 @@
         "train": 17,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        1,
+        4
+      ]
     },
     {
       "id": 23,
@@ -981,7 +1056,11 @@
         "train": 19,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        3,
+        0
+      ]
     },
     {
       "id": 24,
@@ -991,7 +1070,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        1
+        1,
+        23
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1021,7 +1101,11 @@
         "train": 21,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        4,
+        1
+      ]
     },
     {
       "id": 25,
@@ -1031,7 +1115,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        14
+        18,
+        23
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1060,7 +1145,11 @@
         "train": 21,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        4,
+        2
+      ]
     },
     {
       "id": 26,
@@ -1070,7 +1159,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        16
+        16,
+        25
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1095,7 +1185,11 @@
         "train": 23,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        5,
+        3
+      ]
     },
     {
       "id": 27,
@@ -1105,7 +1199,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        17
+        17,
+        22
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1130,7 +1225,11 @@
         "train": 19,
         "sight": 2,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        3,
+        3
+      ]
     },
     {
       "id": 28,
@@ -1140,7 +1239,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        18
+        22,
+        27
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1165,7 +1265,11 @@
         "train": 18,
         "sight": 5,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        4,
+        4
+      ]
     },
     {
       "id": 29,
@@ -1175,7 +1279,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        21
+        21,
+        7
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1203,7 +1308,11 @@
         "train": 24,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        5,
+        5
+      ]
     },
     {
       "id": 30,
@@ -1213,7 +1322,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        22
+        16,
+        31
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1238,7 +1348,11 @@
         "train": 20,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        4,
+        6
+      ]
     },
     {
       "id": 31,
@@ -1248,7 +1362,8 @@
       "era": 1,
       "researchable": true,
       "prerequisites": [
-        19
+        19,
+        20
       ],
       "research_cost": 32,
       "research_seconds": 12,
@@ -1273,7 +1388,11 @@
         "train": 21,
         "sight": 3,
         "boarding_capacity": 4
-      }
+      },
+      "tree": [
+        3,
+        6
+      ]
     },
     {
       "id": 32,
@@ -1283,7 +1402,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        26
+        33,
+        34
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -1311,7 +1431,11 @@
         "train": 23,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        7,
+        3
+      ]
     },
     {
       "id": 33,
@@ -1321,7 +1445,7 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        29
+        28
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -1346,7 +1470,11 @@
         "train": 21,
         "sight": 6,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        6,
+        4
+      ]
     },
     {
       "id": 34,
@@ -1356,6 +1484,7 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
+        26,
         27
       ],
       "research_cost": 48,
@@ -1381,7 +1510,11 @@
         "train": 24,
         "sight": 3,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        6,
+        3
+      ]
     },
     {
       "id": 35,
@@ -1391,7 +1524,8 @@
       "era": 2,
       "researchable": true,
       "prerequisites": [
-        25
+        4,
+        3
       ],
       "research_cost": 48,
       "research_seconds": 16,
@@ -1421,7 +1555,11 @@
         "train": 26,
         "sight": 4,
         "boarding_capacity": 0
-      }
+      },
+      "tree": [
+        7,
+        2
+      ]
     }
   ]
 }

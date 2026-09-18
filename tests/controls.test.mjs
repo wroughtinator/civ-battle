@@ -17,13 +17,14 @@ const view=state=>({...run({op:'view',state,player:0}).state,tick:state.tick,win
 test('automatic defence has no action button and research has no elapsed-time gate',()=>{
  const state=fixture(),u=state.squads.find(u=>u.owner===0&&u.kind===0);state.tick=0;
  for(const k of [0,3]){u.kind=k;assert.deepEqual(abilities(k),[]);compare(state,'ability',{from:u.id,value:0},false);}
- state.players[0].unlocked=[0,1,24,12,13];compare(state,'research',{value:3},true);
+ state.players[0].unlocked=[0,1,24,26,12,13];compare(state,'research',{value:3},true);
 });
-test('launch requires every technology in both the controls and WASM',()=>{
+test('launch requires orbital research but permits skipping every unrelated technology',()=>{
  const state=fixture(),city=state.cities.find(c=>c.owner===0),u=state.squads.find(u=>u.owner===0&&u.tile===city.tile);
  city.production=3;u.kind=10;const data={from:u.id,value:0};
  compare(state,'ability',data,true);
- for(let k=1;k<36;k++){if([12,13].includes(k))continue;const missing=structuredClone(state);missing.players[0].unlocked=missing.players[0].unlocked.filter(x=>x!==k);compare(missing,'ability',data,false);}
+ state.players[0].unlocked=[0,12,13,10];compare(state,'ability',data,true);
+ state.players[0].unlocked=[0,12,13,35,33];compare(state,'ability',data,false);
 });
 function compare(state,kind,data,enabled){
  assert.equal(orderBlock(state.tiles,view(state),0,kind,data)===null,enabled);
@@ -96,13 +97,13 @@ test('Stop remains available during order recovery and preserves step cooldown',
 test('all 36 client unit specs match WASM and only 33 belong to the research tree',()=>{
  const state=fixture();assert.deepEqual(view(state).rules.specs,units.map(u=>u.spec));
  assert.equal(units.filter(u=>u.researchable).length,33);
- assert.equal(view(state).rules.order_interval,6);assert.equal(view(state).rules.space_goal,180);
+ assert.equal(view(state).rules.order_interval,0);assert.equal(view(state).rules.space_goal,180);
 });
 
 test('research goals queue locked prerequisites without an up-front payment and hide enemy plans',()=>{
  const state=fixture();state.players[0].unlocked=[0,12,13];state.players[0].gold=0;
  const planned=compare(state,'plan',{value:3},true).state;
- assert.deepEqual(planned.players[0].research_queue,[1,24,3]);assert.equal(planned.players[0].gold,0);
+ assert.deepEqual(planned.players[0].research_queue,[14,2,16,15,1,23,24,17,22,18,25,26,3]);assert.equal(planned.players[0].gold,0);
  assert.equal(run({op:'view',state:planned,player:1}).state.players[0].research_queue,undefined);
  for(const value of [0,12,13,36,254])compare(state,'plan',{value},false);
  compare(state,'plan',{value:255},true);

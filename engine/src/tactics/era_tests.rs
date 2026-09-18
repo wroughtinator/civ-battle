@@ -1,23 +1,42 @@
 use super::*;
 fn world()->Game {let mut g=Game::with_players(51000,2,2);g.cache_distances();for p in &mut g.players{p.bot=false;p.gold=10000.;}g.discoveries.clear();g}
 #[test]
-fn three_eras_have_33_research_units_and_an_acyclic_complete_space_tree(){
+fn three_eras_have_33_research_units_and_an_acyclic_optional_space_path(){
     let g=world();assert_eq!(technologies().count(),33);
     for era in 0..3{assert_eq!(technologies().filter(|&k|definition(k).era==era).count(),11);}
     let mut unlocked=vec![0,12,13];
     for _ in 0..33 {let k=technologies().find(|k|!unlocked.contains(k)&&definition(*k).prerequisites.iter().all(|p|unlocked.contains(p))).expect("acyclic graph");unlocked.push(k);}
-    assert_eq!(*unlocked.last().unwrap(),10);assert_eq!(definition(10).prerequisites.len(),32);
+    let mut path=vec![];g.research_path(0,10,&mut path);assert_eq!(path.len(),19);
     for k in technologies(){let (price,time,_,gate)=g.research_info(k).unwrap();assert!(price>0&&time>0);assert_eq!(gate,0);}
 }
 #[test]
-fn a_research_goal_queues_prerequisites_and_never_spends_unavailable_money(){
-    let mut g=world();g.players[0].gold=0.;g.command(0,"plan",0,0,3).unwrap();
-    assert_eq!(g.players[0].research_queue,vec![1,24,3]);g.tick_one(false);assert_eq!(g.players[0].research,-1);assert_eq!(g.players[0].gold,0.);
-    g.players[0].gold=200.;for _ in 0..45{g.tick_one(false);}
-    assert!(g.players[0].unlocked.contains(&3));assert!(g.players[0].research_queue.is_empty());
-    g.command(0,"plan",0,0,10).unwrap();for _ in 0..ORDER_INTERVAL{g.tick_one(false);}
-    let research=g.players[0].research;let gold=g.players[0].gold;g.command(0,"plan",0,0,255).unwrap();
-    assert_eq!(g.players[0].research,research);assert!(g.players[0].research_queue.is_empty());assert_eq!(g.players[0].gold,gold);
+fn research_plans_are_minimal_immediate_and_free_to_cancel() {
+    let mut g=world();g.players[0].gold=0.;
+    g.command(0,"plan",0,0,1).unwrap();
+    assert_eq!(g.players[0].research_queue,vec![14,2,16,15,1]);
+    assert_eq!(g.players[0].research,-1);
+    g.players[0].gold=10000.;g.command(0,"plan",0,0,1).unwrap();
+    assert_eq!(g.players[0].research,14);
+    assert_eq!(g.players[0].gold,9982.);
+    g.players[0].research_left=1;
+    g.command(0,"plan",0,0,19).unwrap();
+    assert_eq!(g.players[0].research,19);assert_eq!(g.players[0].gold,9982.);
+    assert!(g.players[0].research_queue.is_empty());
+    g.command(0,"plan",0,0,255).unwrap();
+    assert_eq!(g.players[0].research,-1);assert_eq!(g.players[0].research_left,0);
+    assert_eq!(g.players[0].gold,10000.);
+    g.command(0,"plan",0,0,255).unwrap();assert_eq!(g.players[0].gold,10000.);
+    g.command(0,"plan",0,0,10).unwrap();
+    let remaining=std::iter::once(g.players[0].research as u8).chain(g.players[0].research_queue.iter().copied()).collect::<Vec<_>>();
+    assert_eq!(remaining.len(),19);
+    for &k in &remaining{assert_eq!(remaining.iter().filter(|&&q|q==k).count(),1);}
+    for k in [5,6,7,8,9,11,19,20,21,29,30,31,32,34]{assert!(!remaining.contains(&k));}
+    let restored:Game=serde_json::from_str(&serde_json::to_string(&g).unwrap()).unwrap();
+    assert_eq!(restored.players[0].research_queue,g.players[0].research_queue);
+    for _ in 0..600 {g.tick_one(false);}
+    assert!(remaining.iter().all(|k|g.players[0].unlocked.contains(k)));
+    assert!(!g.players[0].unlocked.contains(&11));
+    g.command(0,"plan",0,0,10).unwrap();assert_eq!(g.players[0].research,-1);
 }
 #[test]
 fn directional_front_protects_and_blocks_crossings_but_rear_air_and_allies_bypass(){
@@ -56,15 +75,13 @@ fn settlers_wait_for_arrival_cooldown_then_found_instead_of_changing_sites(){
     assert!(g.cities.iter().any(|c|c.tile==tile&&c.owner==0));
 }
 #[test]
-fn shared_order_recovery_rejects_spam_without_stopping_the_research_goal(){
-    let mut g=world();g.command(0,"plan",0,0,3).unwrap();
-    for _ in 1..ORDER_INTERVAL {
-        g.tick_one(false);
-        assert_eq!(g.command(0,"plan",0,0,10),Err(2));
-        assert!(g.players[0].research>=0);
-    }
-    g.tick_one(false);g.command(0,"plan",0,0,10).unwrap();
-    assert_eq!(*g.players[0].research_queue.last().unwrap(),10);
+fn unrelated_orders_and_research_replacement_have_no_global_timer() {
+    let mut g=world();let tick=g.tick;
+    g.players[0].cooldown=tick+999; // Even a legacy saved cooldown cannot block commands.
+    for k in [3,10,19,255,1] {g.command(0,"plan",0,0,k).unwrap();}
+    let c=g.cities[0].tile;
+    g.command(0,"upgrade",c,0,0).unwrap();g.command(0,"upgrade",c,0,1).unwrap();
+    assert_eq!(g.tick,tick);
 }
 #[test]
 fn shield_trucks_protect_allies_from_the_front_without_stacking(){

@@ -104,7 +104,7 @@ fn holding_digs_in_without_orders_and_departure_removes_it() {
 
 #[test]
 fn research_depends_on_prerequisites_and_money_not_elapsed_match_time() {
-    let mut g=quiet();g.players[0].gold=1000.;g.players[0].unlocked.extend([1,24]);
+    let mut g=quiet();g.players[0].gold=1000.;g.players[0].unlocked.extend([1,24,26]);
     assert_eq!(g.tick,0);assert!(g.command(0,"research",0,0,3).is_ok());
     assert_eq!(g.players[0].research,3);
     for k in technologies() {assert_eq!(g.research_info(k).unwrap().3,0);}
@@ -401,15 +401,13 @@ fn one_treasury_and_unit_unlocks() {
     let mut g = quiet();
     let c = g.cities.iter().find(|c| c.owner == 0).unwrap().tile;
     assert_eq!(g.command(0, "train", c, 0, 3), Err(6));
-    g.command(0, "research", 0, 0, 1).unwrap();
+    g.command(0, "research", 0, 0, 14).unwrap();
     assert_eq!(g.players[0].gold, 152.);
-    assert_eq!(g.command(0, "train", c, 0, 0), Err(2));
-    g.step(ORDER_INTERVAL);
     g.players[0].gold=152.; // Isolate purchase cost from the income tick.
     g.command(0, "train", c, 0, 0).unwrap();
     assert_eq!(g.players[0].gold, 97.);
     g.step(24);
-    assert!(g.players[0].unlocked.contains(&1));
+    assert!(g.players[0].unlocked.contains(&14));
     assert!(!g.players[0].unlocked.contains(&3));
 }
 #[test]
@@ -666,16 +664,18 @@ fn launch_needs_an_occupied_production_city_and_can_be_disrupted() {
 }
 
 #[test]
-fn orbital_research_requires_every_other_technology_and_launch_is_the_only_non_conquest_win() {
-    let mut g=quiet();g.tick=900;g.squads.clear();
-    g.players[0].gold=10000.;
-    for missing in technologies().filter(|&k|k!=10) {
-        g.players[0].unlocked=(0..UNIT_COUNT).filter(|&k|k!=10&&k!=missing).collect();
+fn orbital_research_and_victory_need_only_the_orbital_path() {
+    let mut g=quiet();g.tick=900;g.squads.clear();g.players[0].gold=10000.;
+    for missing in [35,33] {
+        g.players[0].unlocked=vec![0,12,13,35,33];
+        g.players[0].unlocked.retain(|&k|k!=missing);
         assert_eq!(g.command(0,"research",0,0,10),Err(6));
     }
-    g.players[0].unlocked=(0..UNIT_COUNT).filter(|&k|k!=10).collect();
-    g.command(0,"research",0,0,10).unwrap();g.step(90);
-    assert!(g.space_ready(0));
+    g.players[0].unlocked=vec![0,12,13];
+    g.command(0,"plan",0,0,10).unwrap();g.step(600);
+    assert!(g.space_ready(0));assert!(!g.players[0].unlocked.contains(&11));
+    assert!(!g.players[0].unlocked.contains(&9));
+    assert_eq!(g.players[0].unlocked.iter().filter(|&&k|definition(k).researchable).count(),19);
     let tile=g.cities.iter_mut().find(|c|c.owner==0).map(|c|{c.production=3;c.tile}).unwrap();
     g.spawn(0,10,tile);let id=g.squads.last().unwrap().id;
     g.command(0,"ability",id,0,0).unwrap();g.step(SPACE_GOAL as u32-1);
@@ -685,7 +685,7 @@ fn orbital_research_requires_every_other_technology_and_launch_is_the_only_non_c
 }
 
 #[test]
-fn injected_engineer_cannot_bypass_full_tree_requirement() {
+fn injected_engineer_still_requires_orbital_research() {
     let mut g=quiet();g.squads.clear();g.players[0].gold=1000.;
     let tile=g.cities.iter_mut().find(|c|c.owner==0).map(|c|{c.production=3;c.tile}).unwrap();
     g.spawn(0,10,tile);let id=g.squads[0].id;

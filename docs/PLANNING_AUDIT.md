@@ -1,5 +1,7 @@
 # Meridian Planning Audit
 
+Current research UI and removal of the shared order timer: [Research tree](RESEARCH_TREE.md). Historical results below retain their original rules.
+
 Run `npm run analyze:planning` to check whether additional thinking helps in
 combat and peaceful space development. The analysis takes at most 120 seconds,
 plus separately reported Rust compilation and a three-second watchdog margin.
@@ -19,8 +21,8 @@ The summary includes the source fingerprint and actual analysis/build times.
 ## Current three-era rules and results
 
 The current roster has 33 researchable and three starting unit types. Automatic
-weapons, healing and research plans keep working between six-second shared orders.
-Space requires all 33 technologies and an occupied three-minute launch. The final
+weapons, healing and research plans keep working without a shared order timer.
+Space requires orbital technology and an occupied three-minute launch. The orbital path may skip unrelated technology. The final
 main/holdout results and full-game limitations are in [Three eras](THREE_ERAS.md).
 The summaries are preserved as `era-planning-after.json` and
 `era-planning-holdout.json`; `era-planning-before.json` preserves the baseline.

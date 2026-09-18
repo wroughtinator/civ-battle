@@ -4,7 +4,7 @@
 #[path="design_audit/search.rs"] mod shared;
 use meridian_engine::tactics::{Game,Unit,spec,SPACE_GOAL};
 use serde_json::json;
-use meridian_engine::tactics::roster::{technologies,definition,naval};
+use meridian_engine::tactics::roster::{definition,naval};
 use std::time::{Instant,Duration};
 
 #[derive(Clone,Debug)]
@@ -107,6 +107,11 @@ fn space_world(seed:u32)->Game {
     for p in &mut g.players {p.bot=false;}
     g
 }
+fn orbital_path(k:u8, path:&mut Vec<u8>) {
+    if path.contains(&k){return;}
+    for &parent in &definition(k).prerequisites {orbital_path(parent,path);}
+    path.push(k);
+}
 fn space_order(g:&mut Game,plan:SpacePlan) {
     let p=&g.players[0];if p.cooldown>g.tick{return;}
     let c=g.cities.iter().find(|c|c.owner==0).unwrap().clone();let count=p.unlocked.iter().filter(|&&k|definition(k).researchable).count();
@@ -118,7 +123,8 @@ fn space_order(g:&mut Game,plan:SpacePlan) {
     if c.production<3&&count>=plan.production[c.production as usize-1] {let _=g.command(0,"upgrade",c.tile,0,1);return;}
     if c.radius<3&&count>=plan.radius[c.radius as usize-1] {let _=g.command(0,"upgrade",c.tile,0,0);return;}
     if p.research<0 {
-        let mut tech:Vec<_>=technologies().filter(|k|!p.unlocked.contains(k)).filter(|&k|g.research_info(k).is_some_and(|info|info.2.iter().all(|k|p.unlocked.contains(k))&&g.tick>=info.3)).collect();
+        let mut path=vec![];orbital_path(10,&mut path);
+        let mut tech:Vec<_>=path.into_iter().filter(|k|!p.unlocked.contains(k)).filter(|&k|g.research_info(k).is_some_and(|info|info.2.iter().all(|k|p.unlocked.contains(k))&&g.tick>=info.3)).collect();
         tech.sort_by_key(|&k|shared::mix(plan.order ^ k as u32));
         for k in tech {if g.command(0,"research",0,0,k).is_ok(){break;}}
     }
@@ -148,8 +154,9 @@ mod tests {
         g.squads.clear();assert_eq!(combat_value(&g,0),0.);assert_eq!(combat_value(&g,1),0.);
     }
     #[test]
-    fn space_replay_is_a_real_full_tree_launch_and_deadlines_are_honoured() {
+    fn space_replay_uses_only_orbital_prerequisites_and_honours_deadlines() {
         let g=space_world(51000);let plan=program(51000,0);
+        let mut path=vec![];orbital_path(10,&mut path);assert_eq!(path.len(),19);assert!(!path.contains(&11));
         assert_eq!(launch(g.clone(),plan,Instant::now()),None);
         let end=Instant::now()+Duration::from_secs(5);let a=launch(g.clone(),plan,end).unwrap();let b=launch(g,plan,end).unwrap();assert_eq!(a,b);assert!(a<4000);
     }

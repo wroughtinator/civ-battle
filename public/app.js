@@ -5,6 +5,7 @@ import { Globe } from './globe.js';
 import { icon, colors } from './icons.js';
 import { Soundscape } from './audio.js';
 import {passengers,boardingCapacity,boardingTarget,branches,unitIcons,unitNames,counters,researchCost,distances,route,abilities,canEnter} from './planning.js';
+import {researchTreeMarkup} from './research-tree.js';
 import {orderBlock,targetTiles,abilityCost} from './controls.js';
 import {Manual} from './manual.js';
 import {FeedbackLayer} from './feedback.js';
@@ -35,7 +36,7 @@ rememberIdentity();
 async function syncProfile(){while(profileDirty&&connected&&state?.phase==='lobby'){if(inflight)await inflight.promise.catch(()=>{});const profile={civ,name:username,tag:callsign};await send('civ',profile);if(profile.name===username&&profile.civ===civ)profileDirty=false;}}
 function queueProfile(){profileDirty=true;clearTimeout(profileTimer);profileTimer=setTimeout(()=>{profilePromise=profilePromise.catch(()=>{}).then(syncProfile).catch(()=>{});},350);}
 async function flushProfile(){clearTimeout(profileTimer);await profilePromise;profileDirty=true;await syncProfile();}
-let selectedTech=1,abilityTarget=null;
+let abilityTarget=null;
 let globe,showcase=null;
 const soundscape=new Soundscape();sound=soundscape.enabled;
 document.addEventListener('pointerdown',()=>soundscape.unlock(),{passive:true});
@@ -74,7 +75,7 @@ function connect(){
    if(msg.phase==='running'){for(const t of msg.tiles)if(t.visible&&t.owner>=0&&t.owner!==slot&&!encountered.has(t.owner)){encountered.add(t.owner);toast('',html(msg.players[t.owner].name));$('toast').style.color=colors[t.owner];break;}}
    if(pointerHeld&&!msg.result&&msg.phase!=='ended')pendingRender=true;else{render();rebuildMarkers();}if(readyResolve){readyResolve();readyResolve=null;}
   }
-  if(msg.type==='ack'&&inflight?.message.seq===msg.seq){const pending=inflight;inflight=null;if(!msg.error&&pending.message.type==='command')state.players[slot].cooldown=Math.max(state.players[slot].cooldown,state.tick+2);renderControls();if(msg.error){toast(['','warning','bolt','shield','sail','coin','lock'][msg.error]||'warning',msg.error,true);pending.reject(Error(String(msg.error)));}else{soundscape.command(pending.message.kind||pending.message.type,pending.message.value);pending.resolve();}}
+  if(msg.type==='ack'&&inflight?.message.seq===msg.seq){const pending=inflight;inflight=null;renderControls();if(msg.error){toast(['','warning','bolt','shield','sail','coin','lock'][msg.error]||'warning',msg.error,true);pending.reject(Error(String(msg.error)));}else{soundscape.command(pending.message.kind||pending.message.type,pending.message.value);pending.resolve();}}
   if(msg.type==='resync'){seq=msg.seq;if(inflight){const pending=inflight;inflight=null;pending.reject(Error('409'));}toast('refresh',409,true);}
   if(msg.type==='pong'){$('connection').innerHTML=icon('network')+`<span>${Math.max(1,Date.now()-msg.time)}</span>`;}
   if(msg.type==='error')toast('warning',msg.code,true);
@@ -85,7 +86,7 @@ function connect(){
 }
 function send(type,payload={}){
  if(!connected||ws?.readyState!==1)return Promise.reject(Error('503'));
- if(inflight){toast('hourglass');return Promise.reject(Error('429'));}
+ if(inflight)return inflight.promise.catch(()=>{}).then(()=>send(type,payload));
  const request=new Promise((resolve,reject)=>{inflight={message:{type,...payload,seq:++seq},resolve,reject};ws.send(JSON.stringify(inflight.message));renderControls();});inflight.promise=request;return request;
 }
 const command=(kind,data={})=>send('command',{kind,...data}).catch(()=>{});
@@ -106,7 +107,7 @@ function renderLobby(){
  $('seats').innerHTML=state.players.map((p,i)=>`<span class="seat ${!p.bot?'human':''}" style="--seat:${colors[i]}" aria-label="${html(p.name)}${p.bot?', bot':''}"><i class="player-color" aria-hidden="true"></i><small>${html(p.name)}</small></span>`).join('');
  const host=state.phase==='preview'||state.host,humans=state.humans||1;
  show('config',!!host);$('config').innerHTML=`<div class="player-count">${btn('fewer-players','minus','Remove a bot','',!host||count<=(state.minCount||2)?'disabled':'')}<div class="config-group" aria-label="${humans} human players, ${count-humans} bot seats, ${count} total">${icon('person')}${icon('bot')}<span>${count-humans}</span></div>${btn('more-players','plus','Add a bot','',!host||count>=8?'disabled':'')}</div><button id="difficulty" class="difficulty" aria-label="${['Easy','Medium','Hard'][difficulty]} bots" ${!host?'disabled':''}><span class="difficulty-icons">${Array.from({length:difficulty+1},()=>icon('bot')).join('')}</span></button>`;
- $('victory-hint').innerHTML=`<em aria-label="Conquest: eliminate every other civilization">${icon('crown')}</em><span></span><em aria-label="Space: complete every technology and launch">${icon('rocket')}</em>`;
+ $('victory-hint').innerHTML=`<em aria-label="Conquest: eliminate every other civilization">${icon('crown')}</em><span></span><em aria-label="Space: research orbital technology and launch">${icon('rocket')}</em>`;
  $('seed').innerHTML=icon('globe')+`<span>${seed.toString().padStart(10,'0')}</span>`;
  $('start').innerHTML=icon(state.phase==='lobby'&&(!state.host||state.awaitingResults)?'hourglass':'play');$('start').setAttribute('aria-label',state.awaitingResults?'Waiting for players to return from the victory screen':'Start match');$('invite').innerHTML=icon('link');
  $('fewer-players').onclick=()=>configure({count:count-1});$('more-players').onclick=()=>configure({count:count+1});
@@ -142,7 +143,6 @@ function selectCity(tile){clearRoute();activeUnit=-1;globe.routeUnit=-1;selected
 function selectUnit(id){const u=state.squads.find(u=>u.id===id);if(!u)return;if(u.boarded_on!=null){selectUnit(u.boarded_on);return;}clearRoute();activeUnit=id;selected=u.tile;techOpen=false;show('research',false);globe.choose(u.tile);globe.routeUnit=id;globe.focus(u.tile);renderProvince();}
 function availability(kind,data={}){
  if(!connected)return {reason:'Reconnect to issue orders',icon:'network',count:0};
- if(inflight)return {reason:'Waiting for the current order',icon:'hourglass',count:0};
  return orderBlock(world,state,slot,kind,data);
 }
 function actionButton(id,symbol,label,body='',block=null,primary=false){
@@ -233,20 +233,19 @@ function renderProvince(){
 function closeSelection(){activeUnit=-1;selected=-1;clearRoute();globe.choose(-1);globe.routeUnit=-1;show('province',false);}
 function toggleResearch(){if(state?.spectator)return;techOpen=!techOpen;clearRoute();renderResearch();renderProvince();}
 function renderResearch(){
- show('research',techOpen);if(!techOpen)return;const p=state.players[slot];
- const scroll=$('research').querySelector('.tree-scroll')?.scrollTop||0;
- if(!unitRoster[selectedTech]?.researchable)selectedTech=1;
- const queued=p.research_queue||[],node=k=>{const done=p.unlocked.includes(k),busy=p.research===k;return `<button data-tech="${k}" aria-label="Inspect ${unitNames[k]}" class="tree-node ${selectedTech===k?'selected':''} ${done?'done':''} ${busy?'studying':''} ${queued.includes(k)?'queued':''}">${icon(unitIcons[k])}<span>${done?icon('check'):busy?stat('clock',p.research_left):queued.includes(k)?icon('hourglass'):price(researchCost(k))}</span></button>`;};
- const def=unitRoster[selectedTech],parents=def.prerequisites,needed=new Set();
- const visit=k=>{if(p.unlocked.includes(k)||p.research===k||needed.has(k))return;for(const parent of unitRoster[k].prerequisites)visit(parent);needed.add(k);};visit(selectedTech);
- const goalCost=[...needed].reduce((sum,k)=>sum+unitRoster[k].research_cost,0);
- $('research').innerHTML=`<div class="panel-head">${icon('flask')}<span>${p.unlocked.filter(k=>unitRoster[k].researchable).length}/33</span>${btn('close-tech','close','Close research tree')}</div><div class="tree-scroll era-tree">${roster.eras.map((era,e)=>`<section class="tech-era" style="--era:${era.color}" aria-label="${era.name}"><div class="era-heading">${icon(era.icon)}<b>${e+1}</b></div><div class="era-nodes">${branches.map(b=>node(b[e])).join('')}</div></section>`).join('')}</div><div class="tech-inspector"><div class="tech-preview">${icon(def.icon)}${unitStats(selectedTech)}${unitCounters(selectedTech)}${unitRules(selectedTech)}</div><div class="tech-parents" aria-label="Required technologies">${parents.map(k=>`<span class="${p.unlocked.includes(k)?'done':''}">${icon(unitIcons[k])}</span>`).join('')}${parents.length?icon('arrow'):''}${icon(def.icon)}</div><div class="action-row">${actionButton('plan-tech','flask',`Research toward ${def.name}; prerequisites queue automatically as funds become available`,`${icon('arrow')}${icon(def.icon)}${price(goalCost)}`,p.unlocked.includes(selectedTech)?{icon:'check',reason:'Already researched'}:availability('plan',{value:selectedTech}))}${queued.length?actionButton('pause-tech','hand','Stop the pending research plan; current paid research continues',queued.length,availability('plan',{value:255})):''}${btn('tech-help','book','Explain this unit')}</div></div>`;
+ show('research',techOpen);if(!techOpen)return;
+ const panel=$('research'),old=panel.querySelector('.tree-scroll');
+ const left=old?.scrollLeft||0,top=old?.scrollTop||0;
+ const focused=panel.contains(document.activeElement)?document.activeElement.dataset.tech:null;
+ panel.innerHTML=`<div class="panel-head">${icon('flask')}${btn('close-tech','close','Close research tree')}</div>${researchTreeMarkup(state.players[slot],icon)}`;
  $('close-tech').onclick=toggleResearch;
- $('research').querySelector('.tree-scroll').scrollTop=scroll;
- $('research').querySelectorAll('[data-tech]').forEach(b=>b.onclick=()=>{selectedTech=Number(b.dataset.tech);renderResearch();});
- $('plan-tech').onclick=()=>command('plan',{value:selectedTech});
- if($('pause-tech'))$('pause-tech').onclick=()=>command('plan',{value:255});
- $('tech-help').onclick=()=>manual.open(def.icon);
+ const scroll=panel.querySelector('.tree-scroll');scroll.scrollLeft=left;scroll.scrollTop=top;
+ scroll.onclick=e=>{
+  const tech=e.target.closest('[data-tech]');
+  const k=tech?Number(tech.dataset.tech):255;
+  command('plan',{value:state.players[slot].unlocked.includes(k)?255:k});
+ };
+ if(focused)panel.querySelector(`[data-tech="${focused}"]`)?.focus({preventScroll:true});
 }
 
 function openGuide(){manual.open();}

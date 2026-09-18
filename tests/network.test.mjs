@@ -43,7 +43,7 @@ test('reject cross-origin writes and malformed rooms',async()=>{
  assert.equal((await post('/api/rooms',null)).status,400);
 });
 
-test('research goals reach authority, respect six-second recovery and keep rival queues private',async t=>{
+test('research goals reach authority, allow immediate replacement and keep rival queues private',async t=>{
  const made=await post('/api/rooms',{seed:42,count:2});
  const joined=await post(`/api/rooms/${made.room}/join`);
  const host=client(made.room,made.token),guest=client(made.room,joined.token);
@@ -51,16 +51,15 @@ test('research goals reach authority, respect six-second recovery and keep rival
  await Promise.all([host.wait(m=>m.type==='welcome'),guest.wait(m=>m.type==='welcome')]);
  assert.equal((await host.send({type:'start',seq:1})).error,0);
  const running=await host.wait(m=>m.type==='state'&&m.phase==='running');
- assert.equal(running.rules.specs.length,36);assert.equal(running.rules.order_interval,6);
+ assert.equal(running.rules.specs.length,36);assert.equal(running.rules.order_interval,0);
  assert.equal((await host.send({type:'command',kind:'plan',value:3,seq:2})).error,0);
- assert.equal((await host.send({type:'command',kind:'plan',value:10,seq:3})).error,2);
+ assert.equal((await host.send({type:'command',kind:'plan',value:10,seq:3})).error,0);
  const planned=await host.wait(m=>m.type==='state'&&m.players[0].research_queue?.includes(3));
  const rival=await guest.wait(m=>m.type==='state'&&m.revision>=planned.revision);
  assert.equal(rival.players[0].research_queue,undefined);
- await host.wait(m=>m.type==='state'&&m.tick>=planned.players[0].cooldown);
  assert.equal((await host.send({type:'command',kind:'plan',value:255,seq:4})).error,0);
  const stopped=await host.wait(m=>m.type==='state'&&m.revision>planned.revision&&m.players[0].research_queue?.length===0);
- assert.equal(stopped.players[0].research,1,'clearing future work preserves the paid cavalry study');
+ assert.equal(stopped.players[0].research,-1,'cancellation stops active research too');
 });
 test('simultaneous invitations cannot overbook the eight-player lobby',async()=>{
  const host=await post('/api/rooms',{seed:42,count:8});
