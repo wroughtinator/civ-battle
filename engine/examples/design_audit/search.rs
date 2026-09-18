@@ -166,8 +166,19 @@ pub fn belief(g: &Game, p: usize, sample: u32) -> Game {
         a.research = -1;
         a.research_left = 0;
         a.research_queue.clear();
-        a.launch_tile = None;
         a.unlocked = vec![0, 12, 13];
+        // Launch pads are broadcast. A legal active launch also proves the
+        // orbital prerequisite path is complete; replacing it with an early-game prior
+        // would erase a publicly observable imminent loss from every rollout.
+        if a.launch_tile.is_some() {
+            let mut pending=vec![10];
+            while let Some(k)=pending.pop() {
+                if !a.unlocked.contains(&k) {
+                    a.unlocked.push(k);
+                    pending.extend(meridian_engine::tactics::roster::definition(k).prerequisites.iter().copied());
+                }
+            }
+        }
         if b.tick > 180 {
             a.unlocked.extend([1, 2]);
         }
@@ -480,5 +491,19 @@ mod tests {
         g.players[0].gold = 1e9;
         assert_eq!(value(&g, 0), 0.);
         assert_eq!(value(&g, 1), 1.);
+    }
+    #[test]
+    fn public_launch_remains_an_imminent_loss_in_hidden_state_samples() {
+        let mut g=fresh(9001,2);g.squads.clear();g.discoveries.clear();
+        let tile=g.cities.iter_mut().find(|c|c.owner==1).map(|c|{c.production=3;c.tile}).unwrap();
+        g.players[1].unlocked=(0..meridian_engine::tactics::roster::UNIT_COUNT).collect();
+        g.players[1].launch_tile=Some(tile);
+        g.players[1].launch=meridian_engine::tactics::SPACE_GOAL-2;
+        g.squads.push(unit(999,1,10,tile));
+        let mut sampled=belief(&g,0,42);
+        assert_eq!(sampled.players[1].launch_tile,Some(tile));
+        assert!(sampled.space_ready(1));
+        sampled.step(3);
+        assert_eq!(sampled.winner,1,"ignoring a broadcast launch must lose in the real rollout");
     }
 }

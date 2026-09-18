@@ -1,7 +1,21 @@
 //! Observation-limited planning. Difficulty changes forecasting, never income or damage.
 use super::*;
 
+fn military_technologies(policy:u8)-> &'static [u8] {
+    match policy {
+        1=>&[15,16,17,26,34], 2=>&[1,24,3,22], 3=>&[2,14,23,32],
+        4=>&[18,4,25,35,22], 5=>&[2,19,20,31,7,29,8,30,9], _=>&[]
+    }
+}
+
 impl Game {
+    // Civilian and support jobs occupy real slots too. Keep one free slot for
+    // a situational response instead of targeting an impossible army size.
+    fn bot_army_capacity(&self,p:usize)->usize {
+        let support=self.squads.iter().filter(|u|u.owner==p&&spec(u.kind).damage==0.).count()
+            +self.cities.iter().filter(|c|c.owner==p&&c.training>=0&&spec(c.training as u8).damage==0.).count();
+        self.cap(p).saturating_sub(support+1)
+    }
     pub fn bot(&mut self, p: usize) {
         self.bot_policy(p, 0);
     }
@@ -55,6 +69,30 @@ impl Game {
         let city_dist: Vec<_> = self.cities.iter().map(|c| self.distances(c.tile)).collect();
         let enemy_dist: Vec<_> = enemies.iter().map(|u| self.distances(u.tile)).collect();
         let a = self.players[p].clone();
+        // Interruption is an objective, not just another low-health target.
+        // Use only the same broadcast pad and detected engineer humans see.
+        let mut launches:Vec<_>=enemies.iter().filter(|e|e.kind==10
+            && self.players.get(e.owner).is_some_and(|a|a.launch_tile==Some(e.tile))).collect();
+        launches.sort_by_key(|e|Reverse(self.players[e.owner].launch));
+        for e in launches {
+            for u in &own {
+                if u.left>0||u.locked_until>self.tick {continue;}
+                if (u.kind==11||u.kind==8) && u.ability_ready<=self.tick
+                    && !own.iter().any(|f|f.tile==e.tile||(u.kind==11&&self.tiles[e.tile].near.contains(&f.tile)))
+                    && self.command(p,"ability",u.id,e.tile,if u.kind==8{2}else{0}).is_ok(){return;}
+                if spec(u.kind).damage>0. && u.focus!=Some(e.id)
+                    && self.command(p,"attack",u.id,e.tile,0).is_ok(){return;}
+                if u.kind==11 && u.path.len()<=1 && self.distances(u.tile)[e.tile]>9 {
+                    let from=self.distances(u.tile);let target=self.distances(e.tile);
+                    let mut positions:Vec<_>=(0..self.tiles.len()).filter(|&t|target[t]<=9
+                        && self.can_enter(u.kind,t)&&self.occupant(t).is_none()).collect();
+                    positions.sort_by_key(|&t|from[t]);
+                    if let Some(t)=positions.into_iter().find(|&t|self.path(u,t).is_some()) {
+                        if self.command(p,"move",u.id,t,0).is_ok(){return;}
+                    }
+                }
+            }
+        }
         if self.bot_transport(p,&own) {return;}
         for u in &own {
             if u.left == 0
@@ -176,6 +214,12 @@ impl Game {
         // A switch of policy must be able to change a standing research goal;
         // otherwise every late-game portfolio choice silently funds the same plan.
         let pressure=policy!=6&&enemies.iter().any(|u|u.owner<self.players.len()&&cities.iter().any(|c|self.distances(c.tile)[u.tile]<=3));
+        let family=military_technologies(policy);
+        let military_complete=family.iter().all(|k|a.unlocked.contains(k));
+        let launch_alarm=self.players.iter().enumerate().any(|(q,a)|q!=p&&a.launch_tile.is_some());
+        if !family.is_empty() && a.research_queue.last().is_some_and(|k|!family.contains(k)&&!(*k==10&&military_complete)&&!(*k==11&&launch_alarm)) {
+            if self.command(p,"plan",0,0,255).is_ok(){return;}
+        }
         if pressure&&a.gold<250.&&!a.research_queue.is_empty()&&own.iter().filter(|u|spec(u.kind).damage>0.&&u.hp>spec(u.kind).hp*0.5).count()<4 {
             if self.command(p,"plan",0,0,255).is_ok(){return;}
         }
@@ -306,10 +350,12 @@ impl Game {
         }
         // Inexpensive defensive formations come before expensive exposed development.
         let combat_count = own.iter().filter(|u| spec(u.kind).damage > 0.).count();
-        let desired = (if policy==6 {2+cities.len()}else{3+cities.len()+usize::from(pressure)*2}).min(self.cap(p) - 1);
+        let desired = (if policy==6 {2+cities.len()}
+            else if (1..=5).contains(&policy)||a.gold>500. {self.bot_army_capacity(p)}
+            else {3+cities.len()+usize::from(pressure)*2}).min(self.bot_army_capacity(p));
         // Keep an emergency defence, but do not spend every research saving on
         // another replacement. Completing the tree is now a real win route.
-        let research_reserve = if a.research < 0 && combat_count >= 3 {
+        let research_reserve = if a.research < 0 && combat_count >= 3 && !a.research_queue.is_empty() {
             technologies().filter(|k| !a.unlocked.contains(k))
                 .filter_map(|k| self.research_info(k))
                 .filter(|info| self.tick >= info.3 && info.2.iter().all(|k|a.unlocked.contains(k)))
@@ -393,12 +439,30 @@ impl Game {
                     })
                     .collect();
             }
-            // Public launch progress makes that civilization urgent to pressure.
-            targets.sort_by_key(|&t| {
-                let launch = self.cities.iter().find(|c|c.tile==t)
-                    .map(|c|self.players[c.owner].launch>0).unwrap_or(false);
-                (if launch {0}else{1},d[t])
-            });
+            // An assault should pursue the income source, not chase whichever
+            // enemy soldier happens to be nearest. Estimate the income swing
+            // after travel and occupation; tactical scoring below still checks
+            // whether each step is safe. Unknown capital production stays a
+            // prior, never privileged knowledge from the referee state.
+            let objective=|t:usize| {
+                if let Some(c)=self.cities.iter().find(|c|c.tile==t) {
+                    if c.owner!=p {
+                        if self.players[c.owner].launch_tile==Some(t) {
+                            return (-1,(SPACE_GOAL-self.players[c.owner].launch.min(SPACE_GOAL)) as f32);
+                        }
+                        let production=if vision[t]{c.production}else{1};
+                        let travel=d[t] as f32*spec(u.kind).speed as f32+12.;
+                        let income_swing=2.*(4.+production as f32*4.)/5.;
+                        let return_value=income_swing*(240.-travel).max(0.);
+                        return (1,-return_value);
+                    }
+                    if d[t]<=4 && enemies.iter().any(|e|self.distances(t)[e.tile]<=3) {
+                        return (0,d[t] as f32);
+                    }
+                }
+                (2,d[t] as f32)
+            };
+            targets.sort_by(|&a,&b|{let x=objective(a);let y=objective(b);x.0.cmp(&y.0).then(x.1.total_cmp(&y.1))});
             targets.truncate(3);
             let Some(&goal) = targets.first() else {
                 continue;
@@ -513,6 +577,18 @@ impl Game {
         let threat = enemies
             .iter()
             .any(|u| cities.iter().any(|c| self.distances(c.tile)[u.tile] <= 3));
+        // A broadcast pad can be hit by a strategic launcher even when its
+        // engineer is alone. Waiting for a clustered army misses the objective.
+        let pads:Vec<_>=self.players.iter().enumerate().filter(|(q,_)|*q!=p).filter_map(|(_,a)|a.launch_tile).collect();
+        if let Some(c)=cities.iter().filter(|c|c.training<0&&!pads.is_empty())
+            .min_by_key(|c|pads.iter().map(|&t|self.distances(c.tile)[t]).min().unwrap_or(u16::MAX)) {
+            if !a.unlocked.contains(&11) {
+                if a.research!=11&&a.research_queue.last()!=Some(&11)
+                    && self.command(p,"plan",0,0,11).is_ok(){return true;}
+            }else if !own.iter().any(|u|u.kind==11)&&!cities.iter().any(|c|c.training==11)
+                && a.gold>=spec(11).cost as f32+150.
+                && self.command(p,"train",c.tile,0,11).is_ok(){return true;}
+        }
         if a.unlocked.contains(&10)
             && !own.iter().any(|u| u.kind == 10)
             && !cities.iter().any(|c| c.training == 10)
@@ -558,11 +634,18 @@ impl Game {
                 // A navy still needs an inexpensive land escort to hold its ports.
                 if self.command(p,"plan",0,0,2).is_ok(){return true;}
             }
-            if policy==6 || self.tick>=360 {
+            let family=military_technologies(policy);
+            let surplus_space=!family.is_empty() && family.iter().all(|k|a.unlocked.contains(k))
+                && a.gold>=800. && own.iter().filter(|u|spec(u.kind).damage>0.).count()>=self.bot_army_capacity(p);
+            if policy==6 || (self.tick>=360 && family.is_empty()) || surplus_space {
                 if self.command(p,"plan",0,0,10).is_ok(){return true;}
             }else{
-                let family:&[u8]=match policy {1=>&[15,16,17,26,34],2=>&[1,24,3,22],3=>&[2,14,23,32],4=>&[18,4,25,35,22],5=>&[19,20,31,7,29,8,30,9],_=>&[]};
-                let mut tech:Vec<_>=technologies().filter(|k|!a.unlocked.contains(k)&&a.research!=*k as i8).collect();
+                let family=military_technologies(policy);
+                // A military policy buys its composition, then spends on the
+                // army. It must not silently become another full-tree racer.
+                // Queued goals still buy every prerequisite through the engine.
+                let mut tech:Vec<_>=technologies().filter(|k|!a.unlocked.contains(k)&&a.research!=*k as i8)
+                    .filter(|k|family.is_empty()||family.contains(k)).collect();
                 tech.sort_by_key(|&k|(if family.contains(&k)||k==preferred{0}else{1},definition(k).era,hash(self.seed ^ k as u32)));
                 if let Some(&k)=tech.first(){if self.command(p,"plan",0,0,k).is_ok(){return true;}}
             }

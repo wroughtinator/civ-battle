@@ -5,12 +5,13 @@ import {makeEngine} from '../worker/wasm.js';
 import {orderBlock} from '../public/controls.js';
 import {researchTreeMarkup} from '../public/research-tree.js';
 import {icon} from '../public/icons.js';
+import {units} from '../public/roster.js';
 const run=makeEngine(new WebAssembly.Module(readFileSync(new URL('../worker/engine.wasm',import.meta.url))));
 const fixture=()=>{const s=run({op:'new',seed:42,count:2}).state;s.players.forEach(p=>p.bot=false);s.players[0].gold=1000;return s;};
 const plan=(state,value)=>{const r=run({op:'command',state,player:0,kind:'plan',value});assert.equal(r.error,0);return r.state;};
 test('switching and cancelling research refunds once, including completed-target cancellation',()=>{
- let s=fixture();s=plan(s,1);assert.equal(s.players[0].research,14);assert.equal(s.players[0].gold,982);
- s.players[0].research_left=1;s=plan(s,19);assert.equal(s.players[0].research,19);assert.equal(s.players[0].gold,982);
+ let s=fixture();s=plan(s,1);assert.equal(s.players[0].research,14);assert.equal(s.players[0].gold,1000-units[s.players[0].research].research_cost);
+ s.players[0].research_left=1;s=plan(s,19);assert.equal(s.players[0].research,19);assert.equal(s.players[0].gold,1000-units[s.players[0].research].research_cost);
  const invalid=run({op:'command',state:s,player:0,kind:'plan',value:254});assert.notEqual(invalid.error,0);
  s.players[0].unlocked.push(14);s=plan(s,14);assert.equal(s.players[0].research,-1);assert.equal(s.players[0].gold,1000);
  s=plan(s,255);assert.equal(s.players[0].gold,1000);assert.deepEqual(s.players[0].research_queue,[]);

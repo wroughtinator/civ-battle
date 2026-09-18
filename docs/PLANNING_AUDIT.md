@@ -22,7 +22,7 @@ The summary includes the source fingerprint and actual analysis/build times.
 
 The current roster has 33 researchable and three starting unit types. Automatic
 weapons, healing and research plans keep working without a shared order timer.
-Space requires orbital technology and an occupied three-minute launch. The orbital path may skip unrelated technology. The final
+Space requires orbital technology and an occupied six-minute launch. The orbital path may skip unrelated technology. The final
 main/holdout results and full-game limitations are in [Three eras](THREE_ERAS.md).
 The summaries are preserved as `era-planning-after.json` and
 `era-planning-holdout.json`; `era-planning-before.json` preserves the baseline.
@@ -125,4 +125,3 @@ At that baseline, the separate full-game [Meridian Strategy Audit](DESIGN_AUDIT.
 inconclusive full-game thinking/input-restraint gates. Policy diversity, active
 play against idle, and multiplayer gates passed. These focused passes do not
 override that failure or certify chess-like depth or several robust human metas.
-
