@@ -13,7 +13,7 @@ const html=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 let state=null,world=[],slot=0,room=null,token=null,ws=null,seq=0,inflight=null,connected=false,stopped=false;
 let selected=-1,marchFrom=-1,marchRatio=0,previewEngine=null,previewState=null,count=8,difficulty=1,seed=crypto.getRandomValues(new Uint32Array(1))[0],civ=0;
 let techOpen=false,lastTick=0,lastStateAt=performance.now(),sound=false,audio=null,markerNodes=[],marchNodes=[],hasStarted=false,retry=0,reconnectTimer,toastTimer;
-let creating=null,readyResolve=null,pointerHeld=false,pendingRender=false;
+let leaving=false,creating=null,readyResolve=null,pointerHeld=false,pendingRender=false;
 document.addEventListener('pointerdown',()=>pointerHeld=true,true);
 const finishPointer=()=>requestAnimationFrame(()=>{pointerHeld=false;if(pendingRender&&state){pendingRender=false;render();rebuildMarkers();}});
 document.addEventListener('pointerup',finishPointer,true);document.addEventListener('pointercancel',finishPointer,true);
@@ -41,7 +41,7 @@ async function api(path,body){const r=await fetch(path,{method:'POST',headers:{'
 function stored(id){try{return JSON.parse(localStorage.getItem(`meridian:${id}`)||'null');}catch{return null;}}
 function saveSeat(){try{localStorage.setItem(`meridian:${room}`,JSON.stringify({token,slot}));}catch{}}
 async function createRoom(){
- if(room&&connected)return;
+ if(room){if(!connected)throw Error('503');return;}
  if(creating)return creating;
  creating=(async()=>{const data=await api('/api/rooms',{seed,count,difficulty,civ,name:username,tag:callsign});room=data.room;token=data.token;slot=data.slot;seq=data.seq;saveSeat();history.replaceState({},'',`/?room=${room}`);await connect();})();
  try{await creating;}finally{creating=null;renderControls();}
@@ -61,10 +61,11 @@ function connect(){
    const previous=state;state=msg;seed=msg.seed;count=msg.players.length;difficulty=msg.difficulty;if(!profileDirty)civ=msg.players[slot].civ;
    callsign=msg.players[slot].tag;if(!profileDirty&&document.activeElement?.id!=='username'){username=msg.players[slot].name||username;rememberIdentity();}else msg.players[slot].name=username;
    if(!connected){setConnected(true);retry=0;}lastTick=msg.tick;lastStateAt=performance.now();globe.setState(msg,slot);feedbackLayer.accept(msg);
+   if(msg.phase==='lobby'&&previous?.phase!=='lobby'){hasStarted=false;encountered.clear();closeSelection();techOpen=false;show('research',false);}
    if(msg.phase==='running'&&!hasStarted){hasStarted=true;home();}
    soundscape.events(msg,previous,world,globe,slot);
    if(msg.phase==='running'){for(const t of msg.tiles)if(t.visible&&t.owner>=0&&t.owner!==slot&&!encountered.has(t.owner)){encountered.add(t.owner);toast(civs[msg.players[t.owner].civ],html(msg.players[t.owner].name));break;}}
-   if(pointerHeld)pendingRender=true;else{render();rebuildMarkers();}if(readyResolve){readyResolve();readyResolve=null;}
+   if(pointerHeld&&!msg.result&&msg.phase!=='ended')pendingRender=true;else{render();rebuildMarkers();}if(readyResolve){readyResolve();readyResolve=null;}
   }
   if(msg.type==='ack'&&inflight?.message.seq===msg.seq){const pending=inflight;inflight=null;if(!msg.error&&pending.message.type==='command')state.players[slot].cooldown=Math.max(state.players[slot].cooldown,state.tick+2);renderControls();if(msg.error){toast(['','warning','bolt','shield','sail','coin','lock'][msg.error]||'warning',msg.error,true);pending.reject(Error(String(msg.error)));}else{soundscape.command(pending.message.kind||pending.message.type,pending.message.value);pending.resolve();}}
   if(msg.type==='resync'){seq=msg.seq;if(inflight){const pending=inflight;inflight=null;pending.reject(Error('409'));}toast('refresh',409,true);}
@@ -82,12 +83,12 @@ function send(type,payload={}){
 }
 const command=(kind,data={})=>send('command',{kind,...data}).catch(()=>{});
 setInterval(()=>{if(connected&&ws?.readyState===1)ws.send(JSON.stringify({type:'ping',time:Date.now(),active:!document.hidden}));},10000);
-function renderControls(){if(!state)return;if(state.phase==='running'){if(pointerHeld)pendingRender=true;else{renderProvince();renderResearch();}}const lobby=state.phase==='lobby'||state.phase==='preview';$('start').disabled=!!inflight||!!creating||lobby&&state.phase!=='preview'&&(!connected||!state.host);$('invite').disabled=!!creating;if(lobby){const locked=!!inflight||!!creating||state.phase!=='preview'&&(!connected||!state.host);$('fewer-players').disabled=locked||count<=Math.max(2,state.humans||1);$('more-players').disabled=locked||count>=8;for(const id of ['difficulty','regenerate'])$(id).disabled=locked;}}
+function renderControls(){if(!state)return;if($('ending').open)$('back-lobby').disabled=!connected||!!inflight;if(state.phase==='running'){if(pointerHeld)pendingRender=true;else{renderProvince();renderResearch();}}const lobby=state.phase==='lobby'||state.phase==='preview';$('start').disabled=!!inflight||!!creating||lobby&&state.phase!=='preview'&&(!connected||!state.host||state.awaitingResults);$('invite').disabled=!!creating;if(lobby){const locked=!!inflight||!!creating||state.phase!=='preview'&&(!connected||!state.host);$('fewer-players').disabled=locked||count<=(state.minCount||2);$('more-players').disabled=locked||count>=8;for(const id of ['difficulty','regenerate'])$(id).disabled=locked;}}
 function render(){
  const lobby=state.phase==='lobby'||state.phase==='preview';document.body.classList.toggle('in-lobby',lobby);show('lobby',lobby);show('roster',!lobby);show('dock',!lobby);$('resources').innerHTML=lobby?'':resources();
  $('clock').innerHTML=icon('clock')+`<span>${time(state.tick)}</span>`;
  if(lobby)renderLobby();else{renderRoster();renderProvince();renderResearch();}
- $('tech-toggle').disabled=!!state.spectator;renderControls();if(state.spectator){clearRoute();techOpen=false;show('research',false);}if(state.phase==='ended')renderEnding();
+ $('tech-toggle').disabled=!!state.spectator;renderControls();if(state.spectator){clearRoute();techOpen=false;show('research',false);}show('leave-room',!!room);$('new-lobby').disabled=!!creating;if(state.result||state.phase==='ended')renderEnding();else if($('ending').open)$('ending').close();
 }
 function resources(){if(state.spectator)return `<div class="resource spectator" aria-label="Spectating: all your cities have fallen">${icon('spectate')}</div>`;const p=state.players[slot];return `<div class="resource gold" aria-label="Treasury">${icon('coin')}<span>${num(p.gold)}</span></div><div class="resource pieces" aria-label="Unit capacity">${icon('shield')}<span>${state.squads.filter(u=>u.owner===slot).length}/${state.rules.unit_cap}</span></div>`;}
 function renderLobby(){
@@ -98,10 +99,10 @@ function renderLobby(){
  $('username').oninput=()=>{username=Array.from($('username').value.replace(/[\u0000-\u001f\u007f]/g,'')).slice(0,32).join('');$('username').value=username;rememberIdentity();state.players[slot].name=username;if(state.phase==='preview')previewState.players[0].name=username;else queueProfile();renderLobby();};
  $('seats').innerHTML=state.players.map((p,i)=>`<span class="seat ${!p.bot?'human':''}" style="--seat:${colors[i]}" aria-label="${html(p.name)}, ${civNames[p.civ]}">${icon(p.bot?'bot':civs[p.civ])}<small>${html(p.name)}</small></span>`).join('');
  const host=state.phase==='preview'||state.host,humans=state.humans||1;
- $('config').innerHTML=`<div class="player-count">${btn('fewer-players','minus','Remove a player slot','',!host||count<=Math.max(2,humans)?'disabled':'')}<div class="config-group" aria-label="${humans} human players, ${count-humans} bot seats, ${count} total">${icon('person')}<span>${humans}/${count}</span><span class="bot-seats">${icon('bot')}${count-humans}</span></div>${btn('more-players','plus','Add a player slot','',!host||count>=8?'disabled':'')}</div><button id="difficulty" class="difficulty" aria-label="${['Easy','Medium','Hard'][difficulty]} bots" ${!host?'disabled':''}>${Array.from({length:difficulty+1},()=>icon('bot')).join('')}</button>${btn('regenerate','refresh','Generate a new world','',!host?'disabled':'')}`;
+ $('config').innerHTML=`<div class="player-count">${btn('fewer-players','minus','Remove a player slot','',!host||count<=(state.minCount||2)?'disabled':'')}<div class="config-group" aria-label="${humans} human players, ${count-humans} bot seats, ${count} total">${icon('person')}<span>${humans}/${count}</span><span class="bot-seats">${icon('bot')}${count-humans}</span></div>${btn('more-players','plus','Add a player slot','',!host||count>=8?'disabled':'')}</div><button id="difficulty" class="difficulty" aria-label="${['Easy','Medium','Hard'][difficulty]} bots" ${!host?'disabled':''}>${Array.from({length:difficulty+1},()=>icon('bot')).join('')}</button>${btn('regenerate','refresh','Generate a new world','',!host?'disabled':'')}`;
  $('victory-hint').innerHTML=`<em>${icon('crown')}<span>${state.rules.capital_goal??4}</span></em><span></span><em>${icon('rocket')}</em><span></span><em>${icon('clock')}20–25</em>`;
  $('seed').innerHTML=icon('globe')+`<span>${seed.toString().padStart(10,'0')}</span>`;
- $('start').innerHTML=icon(state.phase==='lobby'&&!state.host?'hourglass':'play');$('invite').innerHTML=icon('link');
+ $('start').innerHTML=icon(state.phase==='lobby'&&(!state.host||state.awaitingResults)?'hourglass':'play');$('start').setAttribute('aria-label',state.awaitingResults?'Waiting for players to return from the victory screen':'Start match');$('invite').innerHTML=icon('link');
  civs.forEach((_,i)=>$(`civ-${i}`).onclick=()=>{civ=i;rememberIdentity();if(state.phase==='preview'){previewState.players[0].civ=i;state.players[0].civ=i;globe.setState(state,slot);renderLobby();}else queueProfile();});
  $('fewer-players').onclick=()=>configure({count:count-1});$('more-players').onclick=()=>configure({count:count+1});
  $('regenerate').onclick=()=>configure({seed:crypto.getRandomValues(new Uint32Array(1))[0]});$('difficulty').onclick=()=>configure({difficulty:(difficulty+1)%3});
@@ -215,7 +216,31 @@ function renderResearch(){
 }
 function openGuide(){manual.open();}
 function home(){clearRoute();activeUnit=-1;const c=state.cities.find(c=>c.owner===slot&&c.capital===slot)||state.cities.find(c=>c.owner===slot);if(c){globe.targetDistance=1.65;globe.focus(c.tile);selectCity(c.tile);}}
-function renderEnding(){const p=state.players[state.winner];show('ending',true);$('ending').innerHTML=`<div class="winner-icon">${icon(state.victory===2?'rocket':'crown')}</div><div class="end-emblem" style="color:${colors[state.winner]}">${icon(civs[p.civ])}<span>${html(p.name)}</span></div><div>${time(state.tick)}</div>${btn('new-game','refresh','New match','','class="guide-play"')}`;$('new-game').onclick=()=>location.assign('/');}
+async function leaveRoom(newLobby=false){
+ if(leaving)return;leaving=true;
+ try{
+  if(creating)await creating;
+  const next=newLobby?await api('/api/rooms',{seed:crypto.getRandomValues(new Uint32Array(1))[0],count,difficulty,civ,name:username,tag:callsign}):null;
+  if(room&&connected){if(inflight)await inflight.promise.catch(()=>{});await send('leave');}
+  stopped=true;clearTimeout(reconnectTimer);clearTimeout(profileTimer);
+  if(room)try{localStorage.removeItem(`meridian:${room}`);}catch{}
+  if(ws){ws.onclose=null;ws.onmessage=null;ws.close();}
+  if(next)try{localStorage.setItem(`meridian:${next.room}`,JSON.stringify({token:next.token,slot:next.slot}));}catch{}
+  location.assign(next?`/?room=${next.room}`:'/');
+ }catch(e){leaving=false;toast('warning',Number(e.message)||503,true);}
+}
+function renderEnding(){
+ const result=state.result||{winner:state.winner,victory:state.victory,tick:state.tick,player:state.players[state.winner]},p=result.player;
+ const dialog=$('ending');
+ if(!dialog.open){
+  manual.close();clearRoute();techOpen=false;show('research',false);show('province',false);
+  dialog.innerHTML=`<div class="winner-icon">${icon(result.victory===2?'rocket':'crown')}</div><h1 id="victory-title">${result.winner===slot?'Victory!':'Match complete'}</h1><div class="end-emblem" style="color:${colors[result.winner]}">${icon(civs[p.civ])}<span>${html(p.name)} wins!</span></div><p>${result.victory===2?'Space victory':'Capital victory'} · ${time(result.tick)}</p><div class="result-actions">${btn('back-lobby','home','Back to lobby','Back to lobby')}${btn('leave-result','close','Leave game','Leave')}</div>`;
+  $('back-lobby').onclick=async()=>{try{await send('lobby');}catch{}};
+  $('leave-result').onclick=()=>leaveRoom();
+  dialog.showModal();
+ }
+ $('back-lobby').disabled=!connected||!!inflight;
+}
 function rebuildMarkers(){
  $('markers').innerHTML='';markerNodes=[];const preview=state.phase==='preview'||state.phase==='lobby';
  for(const c of state.cities){if(!preview&&!state.tiles[c.tile].visible&&c.capital<0)continue;const el=document.createElement('button');el.className=`marker city-marker ${c.capital>=0?'capital':''}`;el.style.setProperty('--faction',colors[c.owner]);el.setAttribute('aria-label',`${state.players[c.owner].name}, ${c.capital>=0?'capital':'city'}, production ${c.production}`);el.innerHTML=`<span class="marker-name">${html(state.players[c.owner].name)}</span>${icon(c.capital>=0?'crown':'city')}${c.capture?`<span>${c.capture}</span>`:''}`;el.onclick=()=>{if(abilityTarget)select(c.tile);else selectCity(c.tile);};$('markers').append(el);markerNodes.push({el,p:world[c.tile].p,i:c.tile});}
@@ -224,7 +249,8 @@ function rebuildMarkers(){
 function updateMarkers(now){if(!globe)return;for(const n of markerNodes){const u=n.u,pos=u?globe.unitPosition(u,now).p:n.p;const p=globe.project(pos);n.el.style.display=p.visible?'flex':'none';n.el.style.left=`${p.x}px`;n.el.style.top=`${p.y+(u?22:-34)}px`;n.el.classList.toggle('selected',u?u.id===activeUnit:n.i===selected);n.el.classList.toggle('hurt',!!u&&feedbackLayer.timeline.items.some(e=>e.action==='hit'&&e.unit===u.id&&now-e.start<1200));}
  if(state?.phase==='running')$('clock').innerHTML=icon('clock')+`<span>${time(lastTick+Math.min(2,Math.floor((now-lastStateAt)/1000)))}</span>`;feedbackLayer.update(now,globe);soundscape.mix(globe,state,now);
 }
-$('tools').innerHTML=btn('home','home','Focus your capital')+btn('zoom-in','plus','Zoom in')+btn('zoom-out','minus','Zoom out')+btn('sound','mute','Toggle sound')+btn('help','book','Open icon manual');
+$('tools').innerHTML=btn('home','home','Focus your capital')+btn('zoom-in','plus','Zoom in')+btn('zoom-out','minus','Zoom out')+btn('sound','mute','Toggle sound')+btn('help','book','Open icon manual')+btn('new-lobby','plus','Create new lobby','<span>New lobby</span>')+btn('leave-room','close','Leave game or lobby','<span>Leave</span>');
+$('new-lobby').onclick=()=>leaveRoom(true);$('leave-room').onclick=()=>leaveRoom();$('ending').addEventListener('cancel',e=>e.preventDefault());
 const manual=new Manual($('guide'),()=>({state,slot}));
 const feedbackLayer=new FeedbackLayer(soundscape);
 $('dock').innerHTML=btn('tech-toggle','flask','Open technology tree');

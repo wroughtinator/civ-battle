@@ -57,6 +57,14 @@ export class Room extends DurableObject {
     else await this.ctx.storage.setAlarm(Date.now() + 86400000);
   }
   seatFor(hash) { return this.room.seats.findIndex(s => s?.hash === hash); }
+  hostSlot() { return this.room.seats.findIndex(s => !s.left); }
+  resetLobby() {
+    const old=this.room.game;
+    this.room.game=this.simulate({op:'new',hidden_rolls:Array.from(crypto.getRandomValues(new Uint32Array(642))),seed:old.seed,count:old.players.length,difficulty:old.difficulty}).state;
+    this.room.intel=[];this.room.phase='lobby';this.room.createdAt=Date.now();this.room.updatedAt=Date.now();
+    this.room.seats.forEach((seat,i)=>{Object.assign(this.room.game.players[i],{bot:seat.left||!!seat.disconnectedAt,civ:old.players[i].civ,tag:old.players[i].tag,name:old.players[i].name});});
+    for(const w of this.ctx.getWebSockets())w.send(JSON.stringify({type:'world',world:this.room.game.tiles.map(t=>({p:t.p,poly:t.poly,near:t.near,terrain:t.terrain,capital:t.capital,site:t.site}))}));
+  }
   simulate(request) { return (this.room.rulesVersion === 4 ? engine : this.room.rulesVersion === 3 ? v3Engine : this.room.rulesVersion === 2 ? previousEngine : legacyEngine)(request); }
   identity(slot,options){const player=this.room.game.players[slot];if(Number.isInteger(options.civ)&&options.civ>=0&&options.civ<8)player.civ=options.civ;let tag=Number.isInteger(options.tag)&&options.tag>=1000&&options.tag<=9999?options.tag:1000+crypto.getRandomValues(new Uint32Array(1))[0]%9000;while(this.room.game.players.some((p,i)=>i!==slot&&p.tag===tag))tag=1000+(tag-999)%9000;player.tag=tag;const name=cleanName(options.name);if(name.trim())player.name=name;else if(!player.name||player.name.startsWith('Computer '))player.name=`Wandering Fox ${slot+1}`;}
   async fetch(request) {
@@ -87,10 +95,11 @@ export class Room extends DurableObject {
       let slot = this.seatFor(hash);
       if (slot >= 0) return json({ room: this.room.id, token: body.token, slot, seq: this.room.seats[slot].seq });
       if (this.room.phase !== 'lobby') return json({ error: 409 }, 409);
-      slot = this.room.seats.length;
+      slot = this.room.seats.findIndex(s=>s.left);
+      if(slot<0)slot = this.room.seats.length;
       if (slot >= this.room.game.players.length) return json({ error: 8 }, 409);
       const token = random(32);
-      this.room.seats.push({ hash: await digest(token), seq: 0, acks: [], disconnectedAt: Date.now() });
+      this.room.seats[slot]={ hash: await digest(token), seq: 0, acks: [], disconnectedAt: Date.now() };
       this.room.game.players[slot].bot = true;
       this.identity(slot,body);
       this.room.revision++; this.save(); this.broadcast();
@@ -105,7 +114,7 @@ export class Room extends DurableObject {
     for (const old of this.ctx.getWebSockets()) if (old.deserializeAttachment()?.slot === slot) old.close(4001, '');
     const pair = new WebSocketPair();
     this.ctx.acceptWebSocket(pair[1]);
-    pair[1].serializeAttachment({ slot, window: Date.now(), messages: 0 });
+    pair[1].serializeAttachment({ slot, hash:this.room.seats[slot].hash, window: Date.now(), messages: 0 });
     this.room.seats[slot].disconnectedAt = 0;this.room.seats[slot].lastSeen=Date.now();
     this.room.game.players[slot].bot = false;
     this.room.revision++; this.save();
@@ -127,13 +136,16 @@ export class Room extends DurableObject {
       ...view,
       type: 'state', revision: this.room.revision, phase: this.room.phase, tick: g.tick, seed: g.seed,
       difficulty: g.difficulty, winner: g.winner, victory: g.victory, serverTime: Date.now(),
-      host: slot === 0, humans: this.room.seats.length,
-      connected: this.room.seats.map(s => !s.disconnectedAt)
+      host: slot === this.hostSlot(), humans: this.room.seats.filter(s=>!s.left).length,
+      minCount: Math.max(2,this.room.seats.findLastIndex(s=>!s.left)+1),
+      result: this.room.seats[slot]?.result ?? null,
+      awaitingResults: this.room.seats.some(s=>!s.left&&!s.disconnectedAt&&s.result),
+      connected: this.room.seats.map(s => !s.left&&!s.disconnectedAt)
     };
   }
   broadcast() {
     for (const ws of this.ctx.getWebSockets()) {
-      try { ws.send(JSON.stringify(this.view(ws.deserializeAttachment().slot))); } catch { /* closed connection */ }
+      try { const a=ws.deserializeAttachment();if(this.room.seats[a.slot]?.left||a.hash&&a.hash!==this.room.seats[a.slot]?.hash)continue;ws.send(JSON.stringify(this.view(a.slot))); } catch { /* closed connection */ }
     }
     this.save();
   }
@@ -145,12 +157,17 @@ export class Room extends DurableObject {
     this.room.seats.forEach((s,i)=>{if(!s.disconnectedAt&&s.lastSeen&&now-s.lastSeen>25000)s.disconnectedAt=now;if(s.disconnectedAt&&now-s.disconnectedAt>0) this.room.game.players[i].bot=true;});
     this.room.game=this.simulate({op:'step',state:this.room.game,ticks}).state;
     this.room.updatedAt+=ticks*1000;
-    if(this.room.game.winner>=0) this.room.phase='ended';
+    if(this.room.game.winner>=0) {
+      this.room.phase='ended';
+      const g=this.room.game,result={winner:g.winner,victory:g.victory,tick:g.tick,player:{name:g.players[g.winner].name,civ:g.players[g.winner].civ}};
+      this.room.seats.forEach(s=>{if(!s.left)s.result=result;});
+    }
     this.room.revision++;
   }
   async webSocketMessage(ws, message) {
     if(typeof message!=='string'||message.length>2048){ws.close(1009,'');return;}
     const a=ws.deserializeAttachment();const now=Date.now();
+    if(this.room.seats[a.slot]?.left||a.hash&&a.hash!==this.room.seats[a.slot]?.hash){ws.close(4001,'Seat left');return;}
     if(now-a.window>10000){a.window=now;a.messages=0;}
     if(++a.messages>50){ws.close(1008,'');return;}ws.serializeAttachment(a);
     let msg;try{msg=JSON.parse(message);}catch{ws.send(JSON.stringify({type:'error',code:400}));return;}
@@ -174,13 +191,18 @@ export class Room extends DurableObject {
       if(msg.seq<=seat.seq){ws.send(JSON.stringify(seat.acks.find(x=>x.seq===msg.seq)||{type:'ack',seq:msg.seq,error:0,duplicate:true}));return;}
       if(msg.seq!==seat.seq+1){ws.send(JSON.stringify({type:'resync',seq:seat.seq}));return;}
       this.advance();let error=0;
-      if(msg.type==='start') {
-        if(a.slot!==0||this.room.phase!=='lobby') error=1;
+      if(msg.type==='leave') {
+        seat.left=true;seat.hash=null;seat.result=null;seat.disconnectedAt=now;this.room.game.players[a.slot].bot=true;
+      }else if(msg.type==='lobby') {
+        if(!seat.result&&this.room.phase!=='ended')error=1;
+        else {seat.result=null;if(this.room.phase==='ended')this.resetLobby();}
+      }else if(msg.type==='start') {
+        if(a.slot!==this.hostSlot()||this.room.phase!=='lobby'||this.room.seats.some(s=>!s.left&&!s.disconnectedAt&&s.result)) error=1;
         else {this.room.phase='running';this.room.updatedAt=Date.now();}
       }else if(msg.type==='configure') {
-        if(a.slot!==0||this.room.phase!=='lobby')error=1;
+        if(a.slot!==this.hostSlot()||this.room.phase!=='lobby')error=1;
         else if(!['count','seed','difficulty'].every(k=>msg[k]===undefined||Number.isInteger(msg[k])&&msg[k]>=0&&msg[k]<=4294967295))error=6;
-        else if(msg.count!==undefined&&(msg.count<Math.max(2,this.room.seats.length)||msg.count>8))error=6;
+        else if(msg.count!==undefined&&(msg.count<Math.max(2,this.room.seats.findLastIndex(s=>!s.left)+1)||msg.count>8))error=6;
         else {
           const count=msg.count??this.room.game.players.length;
           const seed=Number.isInteger(msg.seed)?msg.seed>>>0:this.room.game.seed;
@@ -188,6 +210,7 @@ export class Room extends DurableObject {
           const old=this.room.game.players;
           this.room.game=this.simulate({op:'new',hidden_rolls:Array.from(crypto.getRandomValues(new Uint32Array(642))),seed,count,difficulty}).state;
           this.room.intel=[];
+          this.room.seats.length=Math.min(this.room.seats.length,count);
           this.room.seats.forEach((seat,i)=>{this.room.game.players[i].bot=!!seat.disconnectedAt;this.room.game.players[i].civ=old[i]?.civ??i;this.room.game.players[i].tag=old[i]?.tag??1001+i;this.room.game.players[i].name=old[i]?.name||`Wandering Fox ${i+1}`;});
           for(const w of this.ctx.getWebSockets())w.send(JSON.stringify({type:'world',world:this.room.game.tiles.map(t=>({p:t.p,poly:t.poly,near:t.near,terrain:t.terrain,capital:t.capital,site:t.site}))}));
         }
@@ -201,11 +224,13 @@ export class Room extends DurableObject {
       }else error=6;
       const ack={type:'ack',seq:msg.seq,error};seat.seq=msg.seq;seat.acks.push(ack);seat.acks=seat.acks.slice(-32);
       this.room.revision++;this.save();await this.schedule();ws.send(JSON.stringify(ack));this.broadcast();
+      if(msg.type==='leave'&&!error)ws.close(1000,'Left room');
     });
   }
   async webSocketClose(ws,code) {
     const a=ws.deserializeAttachment();
     if(!a||!this.room)return;
+    if(this.room.seats[a.slot]?.left||a.hash&&a.hash!==this.room.seats[a.slot]?.hash)return;
     // A replaced socket closing must never mark its replacement disconnected.
     const replacement=this.ctx.getWebSockets().some(w=>w!==ws&&w.deserializeAttachment()?.slot===a.slot&&w.readyState===1);
     if(!replacement){this.room.seats[a.slot].disconnectedAt=Date.now();this.room.game.players[a.slot].bot=true;this.room.revision++;this.save();this.broadcast();}
