@@ -6,7 +6,7 @@ use std::cmp::Reverse;
 use std::collections::{BinaryHeap, VecDeque};
 
 pub const INFLUENCE_GOAL: u16 = 540;
-pub const SPACE_GOAL: u16 = 180;
+pub const SPACE_GOAL: u16 = 360;
 /// Standing orders keep working while the player considers their next choice.
 pub const ORDER_INTERVAL: u32 = 0;
 pub const SETTLER: u8 = 13;
@@ -328,6 +328,11 @@ impl Game {
     }
     pub fn vision(&self, p: usize) -> Vec<bool> {
         let mut v = vec![false; self.tiles.len()];
+        // A launch broadcasts its pad, not the surrounding army or territory.
+        // Humans and every controller receive the same actionable warning.
+        for a in self.players.iter().filter(|a|a.alive) {
+            if let Some(tile)=a.launch_tile {if tile<v.len(){v[tile]=true;}}
+        }
         for c in self.cities.iter().filter(|c| c.owner == p) {
             for (i, d) in self.distances(c.tile).iter().enumerate() {
                 if *d <= c.radius as u16 + 1 {
@@ -489,13 +494,12 @@ impl Game {
     }
 
     pub fn cap(&self, p: usize) -> usize {
-        (5 + self
+        5 + self
             .cities
             .iter()
             .filter(|c| c.owner == p)
             .map(|c| c.radius as usize + 1)
-            .sum::<usize>())
-        .min(16)
+            .sum::<usize>()
     }
     pub fn foundable(&self, tile: usize) -> bool {
         tile < self.tiles.len()
@@ -1395,7 +1399,7 @@ impl Game {
         let sources = self.territory_sources();
         let farms = self.farm_counts(&sources);
         let tiles:Vec<_>=self.tiles.iter().enumerate().map(|(i,t)|json!({"owner":if v[i]{t.owner}else{-2},"city":sources[i].filter(|&n| v[i] && (spectator || self.cities[n].owner == p || v[self.cities[n].tile])).map(|n|self.cities[n].tile),"building":if v[i]{t.building}else{0},"visible":v[i],"storm":self.storm(i)})).collect();
-        let players:Vec<_>=self.players.iter().enumerate().map(|(i,a)|if i==p{serde_json::to_value(a).unwrap()}else{json!({"civ":a.civ,"tag":a.tag,"name":a.name,"bot":a.bot,"alive":a.alive,"score":a.score,"mandate":a.mandate,"launch":a.launch,"domination":a.domination})}).collect();
+        let players:Vec<_>=self.players.iter().enumerate().map(|(i,a)|if i==p{serde_json::to_value(a).unwrap()}else{json!({"civ":a.civ,"tag":a.tag,"name":a.name,"bot":a.bot,"alive":a.alive,"score":a.score,"mandate":a.mandate,"launch":a.launch,"launch_tile":a.launch_tile,"domination":a.domination})}).collect();
         let squads: Vec<_> = self
             .squads
             .iter()

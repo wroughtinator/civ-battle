@@ -5,6 +5,22 @@ const config={type:'config',budgets:[8,32],horizon:120,seconds:120,seed:1};
 const match=(controllers,winner)=>({controllers,winner,complete:true,victory:'space',captures:0,cities_founded:0,stats:[]});
 const pair=(seed,score=1)=>({type:'pair',phase:'compute',a:'mcts-32',b:'mcts-8',seed,complete:true,
   matches:[match(['mcts-32','mcts-8'],score===0?1:0),match(['mcts-8','mcts-32'],score===1?1:0)]});
+test('victory balance separates controls and excludes censored pairs and partial rotations',()=>{
+  const mixed={type:'pair',phase:'meta',a:'guards',b:'archers',seed:1,complete:true,
+    matches:[match(['guards','archers'],0),{...match(['archers','guards'],0),victory:'elimination'}]};
+  const idle={...mixed,a:'idle',matches:[match(['idle','archers'],1),match(['archers','idle'],0)]};
+  const partial={type:'multiplayer',rotation:0,match:match(['guards','archers'],0)};
+  const r=summarize([config,mixed,idle,{...mixed,batch_complete:false},partial,pair(7)]);
+  const c=r.victory_balance.cohorts;
+  assert.equal(c.active_strategy.games,2);
+  assert.equal(c.active_strategy.space_share,.5);
+  assert.equal(c.active_strategy.distance_from_even_percentage_points,0);
+  assert.equal(c.idle_control.space_share,1);
+  assert.equal(c.compute.games,2);
+  assert.equal(c.eight_player_full_rotations.games,0);
+  assert.equal(c.eight_player_full_rotations.space_share,null);
+  assert.match(markdown(r),/Distance from 50\/50/);
+});
 test('small samples cannot certify a thinking advantage',()=>{
   const r=summarize([config,pair(1)]);
   assert.equal(r.compute[0].high_win_rate,1);

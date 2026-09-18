@@ -6,6 +6,7 @@
   "scripts": {
     "analyze:planning": "node scripts/decision-audit.mjs",
     "analyze:design": "node scripts/design-audit.mjs",
+    "analyze:outcomes": "node scripts/outcome-audit.mjs",
     "build": "node scripts/build.mjs",
     "assets": "node scripts/build-forge-assets.mjs",
     "assets:preview": "node scripts/forge-preview.mjs",

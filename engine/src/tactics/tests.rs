@@ -405,7 +405,7 @@ fn one_treasury_and_unit_unlocks() {
     let c = g.cities.iter().find(|c| c.owner == 0).unwrap().tile;
     assert_eq!(g.command(0, "train", c, 0, 3), Err(6));
     g.command(0, "research", 0, 0, 14).unwrap();
-    assert_eq!(g.players[0].gold, 152.);
+    assert_eq!(g.players[0].gold, 170. - definition(14).research_cost as f32);
     g.players[0].gold=152.; // Isolate purchase cost from the income tick.
     g.command(0, "train", c, 0, 0).unwrap();
     assert_eq!(g.players[0].gold, 97.);
@@ -1126,4 +1126,56 @@ fn chest_gold_varies_and_matches_feedback() {
         assert_eq!(amount, (25 + variant % 126) as f32);
         assert_eq!(g.players[0].gold - before, amount);
     }
+}
+
+#[test]
+fn launch_broadcasts_only_its_pad_and_bot_interrupts_the_engineer() {
+    let mut g=quiet();g.squads.clear();g.discoveries.clear();g.tick=100;
+    let tile=g.cities[1].tile;
+    assert!(!g.vision(0)[tile]);
+    g.cities[1].production=3;g.players[1].unlocked=(0..UNIT_COUNT).collect();
+    g.players[1].gold=500.;g.spawn(1,10,tile);
+    let engineer=g.squads[0].id;g.command(1,"ability",engineer,0,0).unwrap();
+    assert!(g.vision(0)[tile]);
+    let view=g.view(0);
+    assert_eq!(view["players"][1]["launch_tile"],tile);
+    assert!(view["players"][1].get("gold").is_none());
+    let near=g.tiles[tile].near[0];
+    assert!(!g.vision(0)[near],"broadcast must not reveal the surrounding army");
+    g.tiles[near].terrain=1;g.spawn(0,2,near);
+    let archer=g.squads[1].id;g.players[1].launch=100;
+    g.bot_policy(0,0);
+    assert_eq!(g.last_order.as_ref().map(|o|(&o.0,o.1,o.2)),Some((&"attack".to_string(),archer,tile)));
+    g.step(70);
+    assert!(!g.squads.iter().any(|u|u.id==engineer),"focused fire must kill the exposed engineer");
+    assert!(g.players[1].launch<100,"destroying support must roll the launch back");
+}
+
+#[test]
+fn missile_counter_advances_into_range_instead_of_waiting_at_home() {
+    let mut g=quiet();g.squads.clear();g.discoveries.clear();g.tick=100;
+    for t in &mut g.tiles{t.terrain=1;}
+    let from=g.cities[0].tile;
+    let target=(0..g.tiles.len()).find(|&t|g.distances(from)[t]==12).unwrap();
+    g.cities[1].tile=target;g.cities[1].production=3;
+    g.players[1].unlocked.push(10);g.players[1].launch_tile=Some(target);g.players[1].launch=20;
+    g.players[0].gold=1000.;g.players[0].unlocked.push(11);
+    g.spawn(0,11,from);g.spawn(1,10,target);let engineer=g.squads[1].id;
+    g.bot_policy(0,0);assert_eq!(g.last_order.as_ref().map(|o|o.0.as_str()),Some("move"));
+    for _ in 0..100 {g.tick_one(false);g.bot_policy(0,0);}
+    assert!(!g.squads.iter().any(|u|u.id==engineer),"the mobile missile counter must actually reach and destroy the launcher");
+}
+
+#[test]
+fn captured_cities_keep_adding_recruitment_capacity_beyond_sixteen() {
+    let mut g=quiet();g.squads.clear();
+    for c in &mut g.cities{c.owner=0;c.radius=1;}
+    assert_eq!(g.cap(0),21);
+    let city=g.cities[0].tile;
+    let places:Vec<_>=(0..g.tiles.len()).filter(|&t|g.can_enter(0,t)).take(16).collect();
+    for tile in places{g.spawn(0,0,tile);}
+    g.players[0].gold=1000.;
+    assert!(g.command(0,"train",city,0,0).is_ok(),"the extra city capacity must accept a real recruit order");
+    let before=g.cap(0);g.cities[1].owner=1;
+    assert_eq!(g.cap(0),before-2);
 }

@@ -217,6 +217,26 @@ as if capped games completed. Policies below 40% opponent-weighted wins, researc
 types never recruited, and a space share of at least 80% receive explicit warnings.
 These descriptive warnings do not weaken or replace any gate.
 
+The victory-balance table shows space and conquest (the engine's `elimination`
+outcome) separately for active strategy matches, complete eight-player rotations,
+idle controls, compute comparisons and each input experiment. Its target is 50/50;
+distance from that target is descriptive, not another certificate. Empty groups
+remain unknown. Unknown victory types are reported as `other`, not conquest;
+space share uses the two known routes. Censored pairs and partial multiplayer
+rotations cannot contribute to the balance table. The historical pooled space
+share remains available, but changing runtime throughput changes its mixture of
+experiments. Compare common completed seeds within each cohort and inspect stalls
+before claiming a balance improvement. Bot results do not predict human win rates.
+
+For lobby-size comparisons that outlast the ordinary audit horizon, run
+`npm run analyze:outcomes -- --rounds 4 --max-ticks 7200 --seed 42000 --out artifacts/outcome-audit/my-change`.
+This completes fixed two-player policy pairs in both seats and complete eight-seat
+rotations, without sampling more fixtures when matches finish faster. It reports
+unfinished games separately and includes no idle controls. It is a descriptive
+diagnostic, not a certificate: the standard 2,200-second completion gate and all
+input-restraint tests remain unchanged. Preserve the ordinary FAIL/INCONCLUSIVE
+alongside any longer-match result. Compare identical seeds, rounds and horizons.
+
 The roster expansion deliberately extended native policies and legal action coverage.
 Policy comparisons across that boundary mix rule and controller changes; they are not
 pure causal balance estimates. Final main/holdout runs use the same frozen rules and
