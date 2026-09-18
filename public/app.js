@@ -92,7 +92,7 @@ function render(){
  const title=state.phase==='preview',lobby=state.phase==='lobby'||title;show('title-screen',title);show('topbar',!title);document.body.classList.toggle('on-title',title);document.body.classList.toggle('in-lobby',lobby);show('lobby',lobby&&!title);show('roster',!lobby);show('dock',!lobby);$('resources').innerHTML=lobby?'':resources();
  $('clock').innerHTML=icon('clock')+`<span>${time(state.tick)}</span>`;
  if(lobby)renderLobby();else{renderRoster();renderProvince();renderResearch();}
- $('tech-toggle').disabled=!!state.spectator;renderControls();if(state.spectator){clearRoute();techOpen=false;show('research',false);}$('leave-room').setAttribute('aria-label',lobby?'Back to title':'Leave game');if(state.result||state.phase==='ended')renderEnding();else if($('ending').open)$('ending').close();
+ $('tech-toggle').disabled=!!state.spectator;$('home-toggle').disabled=!!state.spectator||!state.cities.some(c=>c.owner===slot);renderControls();if(state.spectator){clearRoute();techOpen=false;show('research',false);}$('leave-room').setAttribute('aria-label',lobby?'Back to title':'Leave game');if(state.result||state.phase==='ended')renderEnding();else if($('ending').open)$('ending').close();
 }
 function resources(){if(state.spectator)return `<div class="resource spectator" aria-label="Spectating">${icon('spectate')}</div>`;return `<div class="resource gold" aria-label="Treasury">${icon('coin')}<span>${num(state.players[slot].gold)}</span></div>`;}
 
@@ -226,6 +226,7 @@ function renderResearch(){
 }
 function openGuide(){manual.open();}
 function home(){clearRoute();activeUnit=-1;const c=state.cities.find(c=>c.owner===slot&&c.capital===slot)||state.cities.find(c=>c.owner===slot);if(c){globe.targetDistance=1.65;globe.focus(c.tile);selectCity(c.tile);}}
+function panHome(){if(!state||state.spectator)return;const c=state.cities.find(c=>c.owner===slot&&c.capital===slot)||state.cities.find(c=>c.owner===slot);if(c)globe.focus(c.tile);}
 async function leaveRoom(){
  if(leaving)return;leaving=true;
  try{
@@ -267,7 +268,8 @@ $('host-game').onclick=async()=>{try{$('host-game').disabled=true;await createRo
 $('ending').addEventListener('cancel',e=>e.preventDefault());
 const manual=new Manual($('guide'),()=>({state,slot}));
 const feedbackLayer=new FeedbackLayer(soundscape);
-$('dock').innerHTML=btn('tech-toggle','flask','Open technology tree');
+$('dock').innerHTML=btn('tech-toggle','flask','Open technology tree')+btn('home-toggle','home','Pan to your home base');
+$('home-toggle').onclick=panHome;
 function renderSound(){$('sound').innerHTML=icon(sound?'sound':'mute');$('sound').setAttribute('aria-pressed',String(sound));}renderSound();$('sound').onclick=()=>{sound=soundscape.toggle();renderSound();};$('help').onclick=openGuide;$('tech-toggle').onclick=toggleResearch;
 $('invite').onclick=async()=>{try{await createRoom();const url=`${location.origin}/?room=${room}`;try{await navigator.clipboard.writeText(url);toast('check');}catch{if(navigator.share)await navigator.share({url});else toast('link');}}catch(e){toast('warning',Number(e.message)||503,true);}};
 $('start').onclick=async()=>{try{$('lobby').classList.add('busy');if(state.phase==='preview')await createRoom();await flushProfile();await send('start');}catch(e){toast('warning',Number(e.message)||503,true);}finally{$('lobby').classList.remove('busy');}};
