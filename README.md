@@ -32,3 +32,7 @@ Use Node and Rust with `wasm32-unknown-unknown`. `npm ci`, `npm run build`, `npm
 Current rules are in `engine/src/tactics.rs` and `engine/src/tactics/`. Earlier engines remain available only for old running matches. `worker/index.js` handles admission, names, credentials, sequence replay, presence, snapshots and SQLite persistence. `public` contains custom WebGL2 rendering, icon controls and Web Audio. `docs/ASSETS.md` and `docs/asset-manifest.json` preserve asset provenance.
 
 The graphics are stylized procedural 3D. Tests establish specific invariants and compare selected policies; they do not prove chess-level depth, universal dominance of a stronger bot, or that all cheating is impossible. Physical-device performance and prolonged real-player balance testing remain useful follow-up work.
+
+## License
+
+The source code is licensed under the [MIT License](LICENSE). Visual assets retain their existing CC0 dedication. The bundled 99Sounds audio is separately licensed and is not covered by MIT; it must not be redistributed as a standalone sound library. See [asset provenance and license details](docs/ASSETS.md).
