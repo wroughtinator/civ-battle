@@ -56,7 +56,7 @@ export class UnitRings {
   if(this.data.length>this.capacity){this.capacity=this.data.length;g.bufferData(g.ARRAY_BUFFER,this.data.byteLength,g.DYNAMIC_DRAW);}
   g.bufferSubData(g.ARRAY_BUFFER,0,this.data.subarray(0,this.count*11));
   g.vertexAttrib3f(1,0,1,0);g.vertexAttrib3f(2,1,1,1);g.vertexAttrib3f(3,1,0,0);
-  g.uniform1f(globe.u.foliage,3);g.drawArraysInstanced(g.TRIANGLES,0,192,this.count);g.uniform1f(globe.u.foliage,0);
+  g.uniform1f(globe.u.foliage,4);g.drawArraysInstanced(g.TRIANGLES,0,192,this.count);g.uniform1f(globe.u.foliage,0);
  }
 }
 

@@ -211,7 +211,7 @@ function renderProvince(){
   $('close-piece').onclick=closeSelection;if(unit)$('select-occupant').onclick=()=>selectUnit(unit.id);
   if(own){$('radius-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:0});$('production-upgrade').onclick=()=>command('upgrade',{from:city.tile,value:1});units.forEach(k=>$(`train-${k}`).onclick=()=>command('train',{from:city.tile,value:k}));}
  }else{
-  $('province').innerHTML=`<div class="tile-inspector-head">${icon('territory')}<span>Tile terrain</span><span class="spacer"></span>${btn('close-piece','close','Close selection')}</div>`;
+  $('province').innerHTML=`<div class="tile-inspector-head">${icon('territory')}<span class="spacer"></span>${btn('close-piece','close','Close selection')}</div>`;
   $('close-piece').onclick=closeSelection;
  }
  $('province').insertAdjacentHTML('beforeend',terrainSummary(icon,world[u?u.tile:selected].terrain));

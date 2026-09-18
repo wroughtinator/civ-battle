@@ -35,8 +35,9 @@ vec3 rotate(vec3 p){float c=cos(camera.x),s=sin(camera.x);p=vec3(c*p.x+s*p.z,p.y
 void main(){vec3 local=position,localNormal=normal;
 if(skinned>.5){mat4 skin=bones[int(joints.x)]*weights.x+bones[int(joints.y)]*weights.y+bones[int(joints.z)]*weights.z+bones[int(joints.w)]*weights.w;local=(skin*vec4(local,1.)).xyz;localNormal=mat3(skin)*localNormal;}
 vec3 world=modelScale>0.?modelOrigin+modelBasis*local*modelScale:local;vec3 n=modelScale>0.?modelBasis*localNormal:localNormal;
-if(foliage>.5){vec3 up=normalize(treeOrigin.xyz),east=normalize(cross(abs(up.y)>.98?vec3(1,0,0):vec3(0,1,0),up)),north=cross(up,east);float c=cos(treeOrigin.w),s=sin(treeOrigin.w);mat3 basis=mat3(east*c+north*s,up,north*c-east*s);vec3 branch=position*treeShape.xyz;if(foliage<1.5)branch.x+=sin(time*1.1+treeOrigin.w+position.y*3.)*.025*position.y*position.y*treeShape.y;world=treeOrigin.xyz+basis*branch;n=normalize(basis*(localNormal/treeShape.xyz));}
-vSurfaceNormal=n;vUV=uv;if(mode>2.5&&mode<3.5){vec3 q=normalize(world);float billow=sin(q.x*31.+sin(q.y*27.))*sin(q.z*28.+sin(q.x*19.));world=q*(1.078+billow*.009);}vec3 p=rotate(world);float z=camera.z-p.z;float scale=2.75;gl_Position=vec4(p.x*scale/viewport.x+offset*z,p.y*scale,z*1.001-0.02001,z);vTeamColor=foliage>1.5?teamColor:modelTint;gl_PointSize=2.;vColor=foliage>2.5?teamColor:modelScale>0.?mix(mix(color,modelTint,.12),vec3(1.,.28,.10),modelFlash):color*(foliage>.5?treeShape.w:1.);vNormal=rotate(material.y>.5&&material.y<1.5?normalize(world):n);vPos=p;vWorld=world;vMaterial=material;}`;
+// Chest props (foliage=3) tilt their front up 35 degrees; lift the rear edge off the ground.
+if(foliage>.5){vec3 up=normalize(treeOrigin.xyz),east=normalize(cross(abs(up.y)>.98?vec3(1,0,0):vec3(0,1,0),up)),north=cross(up,east);float c=cos(treeOrigin.w),s=sin(treeOrigin.w);mat3 basis=mat3(east*c+north*s,up,north*c-east*s);vec3 branch=position*treeShape.xyz;if(foliage<1.5)branch.x+=sin(time*1.1+treeOrigin.w+position.y*3.)*.025*position.y*position.y*treeShape.y;vec3 propNormal=localNormal/treeShape.xyz;if(foliage>2.5&&foliage<3.5){mat3 tilt=mat3(1,0,0,0,.819,-.574,0,.574,.819);branch=tilt*branch;branch.y+=.15*treeShape.y;propNormal=tilt*propNormal;}world=treeOrigin.xyz+basis*branch;n=normalize(basis*propNormal);}
+vSurfaceNormal=n;vUV=uv;if(mode>2.5&&mode<3.5){vec3 q=normalize(world);float billow=sin(q.x*31.+sin(q.y*27.))*sin(q.z*28.+sin(q.x*19.));world=q*(1.078+billow*.009);}vec3 p=rotate(world);float z=camera.z-p.z;float scale=2.75;gl_Position=vec4(p.x*scale/viewport.x+offset*z,p.y*scale,z*1.001-0.02001,z);vTeamColor=foliage>1.5?teamColor:modelTint;gl_PointSize=2.;vColor=foliage>3.5?teamColor:modelScale>0.?mix(mix(color,modelTint,.12),vec3(1.,.28,.10),modelFlash):color*(foliage>.5?treeShape.w:1.);vNormal=rotate(material.y>.5&&material.y<1.5?normalize(world):n);vPos=p;vWorld=world;vMaterial=material;}`;
 const fragment=`#version 300 es
 precision highp float;
 in vec2 vUV;
@@ -164,7 +165,7 @@ export class Globe {
   this.loadStatic=(name,sway=false)=>{
    if(this.staticMeshes.has(name)||performance.now()-(this.modelLoads.get(name)??-Infinity)<15000)return;
    this.modelLoads.set(name,performance.now());
-   trackLoad(Promise.all([assetBytes('/assets/forge/'+name+'.mesh'),loadTexture(g,name)]).then(([buffer,texture])=>this.staticMeshes.set(name,new Woodland(g,buffer,texture,sway)))).catch(e=>console.warn(e));
+   trackLoad(Promise.all([assetBytes('/assets/forge/'+name+'.mesh'),loadTexture(g,name)]).then(([buffer,texture])=>this.staticMeshes.set(name,new Woodland(g,buffer,texture,sway,name.startsWith('discovery-'))))).catch(e=>console.warn(e));
   };
   treeNames.forEach(name=>this.loadStatic(name,true));
   this.yaw=.15;this.pitch=.18;this.distance=3.15;this.targetDistance=3.15;this.offset=.24;this.targetOffset=.24;this.selected=-1;this.hovered=-1;this.preview=true;this.world=[];this.state=null;this.slot=0;this.clock=0;this.pointer=null;this.lastTouch=0;
@@ -224,12 +225,18 @@ export class Globe {
    const point=(x,y,z)=>{const p=norm(add(add(up,mul(east,x)),mul(north,z)));return mul(p,ground(p,t.terrain===4?1:0)+y);};
    const prop=(name,x=0,z=0,scale=.065,angle=0,owner=-1)=>{this.loadStatic(name);const list=this.propInstances.get(name)||[];list.push([...point(x,.002,z),angle,scale,scale,scale,1,...(palette[owner]||[0,0,0])]);this.propInstances.set(name,list);};
    if(staticBuild&&(t.terrain===2||t.terrain===1)){
-    const count=t.terrain===2?9:2;
+    const forest=t.terrain===2,count=forest?9:2;
     for(let j=0;j<count;j++){
-     const angle=rnd(i,j,1)*Math.PI*2,r=.041+Math.sqrt(rnd(i,j,2))*.015,x=Math.cos(angle)*r,z=Math.sin(angle)*r,p=norm(add(add(up,mul(east,x)),mul(north,z)));
+     // A rotated, jittered spiral covers the tile instead of clumping trees on
+     // its rim. Broad overlapping crowns add density at the same mesh budget.
+     // Leave a small central clearing so units and settlements stay readable.
+     const angle=forest?rnd(i,0,8)*Math.PI*2+j*2.399963+(rnd(i,j,1)-.5)*.35:rnd(i,j,1)*Math.PI*2;
+     const r=forest?Math.sqrt(.022**2+(j+.3+rnd(i,j,2)*.4)/count*(.053**2-.022**2)):.041+Math.sqrt(rnd(i,j,2))*.015;
+     const x=Math.cos(angle)*r,z=Math.sin(angle)*r,p=norm(add(add(up,mul(east,x)),mul(north,z)));
      if(shoreDistance(p,shores)<.014)continue;
-     const h=.034+rnd(i,j,3)*.025,width=.90+rnd(i,j,4)*.60;
-     const instance=[...mul(p,surface(p,0)),rnd(i,j,5)*6.283,h*width,h,h*(.7+rnd(i,j,6)*.5),.85+rnd(i,j,7)*.25];this.treeInstances.push(instance);this.treeGroups.get(treeNames[(i+j)%3]).push(instance);
+     const h=forest?.040+rnd(i,j,3)*.018:.034+rnd(i,j,3)*.025,width=forest?1.65+rnd(i,j,4)*.40:.90+rnd(i,j,4)*.60;
+     const depth=forest?1.55+rnd(i,j,6)*.40:.7+rnd(i,j,6)*.5;
+     const instance=[...mul(p,surface(p,0)),rnd(i,j,5)*6.283,h*width,h,h*depth,(forest?.72:.85)+rnd(i,j,7)*.25];this.treeInstances.push(instance);this.treeGroups.get(treeNames[(i+j)%3]).push(instance);
     }
    }
    if(!this.preview&&s.visible&&s.owner>=0&&t.terrain===1&&!this.state.cities.some(c=>c.tile===i))prop('farm',0,0,.066,0,s.owner);

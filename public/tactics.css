@@ -82,7 +82,7 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 .tile-inspector-head,.tile-terrain-heading,.tile-effects,.tile-effect{display:flex;align-items:center;gap:8px}
 .tile-inspector-head{font-size:12px;color:#b8ccc6}.tile-inspector-head>button{min-width:44px;min-height:44px}
 .tile-terrain{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
-.tile-terrain-heading{flex-wrap:wrap;font-size:12px}.tile-terrain-heading>.icon{width:20px;height:20px}.tile-terrain-heading small{margin-left:auto;font-size:10px;color:#a6bdb6}
+.tile-terrain-icon{min-width:44px;min-height:44px}.tile-terrain-icon>.icon{width:20px;height:20px}
 .tile-effects{flex-wrap:wrap;gap:6px;margin-top:8px}
 #province .tile-effect{min-width:52px;min-height:44px;padding:7px 10px;border:1px solid #8ca79e55;border-radius:7px;font:12px ui-monospace,monospace;background:#14292d}
 #province .tile-effect .icon{width:19px;height:19px}#province .tile-effect.good{color:#a9f3c6}#province .tile-effect.bad{color:#ffc08a}#province .tile-effect.neutral{color:#b9dce8}
@@ -98,3 +98,7 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 .scoreboard-table{width:100%;border-collapse:collapse;font-size:16px}.scoreboard-table th,.scoreboard-table td{padding:12px 8px;text-align:left;border-bottom:1px solid var(--line)}.scoreboard-table thead{color:var(--muted);font-size:12px}.scoreboard-table th{font-weight:400}.scoreboard-table th[scope=row]{overflow-wrap:anywhere}.scoreboard-table th:last-child,.scoreboard-table td:last-child{text-align:right}.scoreboard-table .player-color{width:16px;height:16px}.scoreboard-table .me{background:#e6b85b0c}
 
 .lobby-title{grid-column:1/-1;font-size:25px;font-weight:400;margin:0 0 16px;color:var(--cream)}.player-color{display:inline-block;width:8px;height:8px;min-width:8px;border-radius:50%;background:var(--seat,var(--faction));box-shadow:0 0 8px color-mix(in srgb,var(--seat,var(--faction)) 30%,transparent)}.seat small{color:var(--seat)}#lobby .seat{gap:8px}
+
+.damage-number{text-shadow:none;-webkit-text-stroke:3px var(--player-outline);paint-order:stroke fill}
+.pickup-reward{font:bold 28px system-ui,sans-serif;white-space:nowrap}
+.pickup-reward .icon:first-child{width:30px;height:30px;color:#ffd36e}

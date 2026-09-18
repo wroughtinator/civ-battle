@@ -1,3 +1,4 @@
+import {icon,colors} from './icons.js';
 import {abilities,unitIcons} from './planning.js';
 
 export class EventTimeline {
@@ -19,8 +20,7 @@ export class EventTimeline {
  }
 }
 
-// Symbols describe the actual payout, including coin fallbacks, never the unopened chest.
-export const pickupSymbols=e=>({0:['coin','coin','coin'],1:['coin','coin','coin'],2:['scout'],3:['shield'],4:['coin','coin','coin'],5:['telescope'],6:['heart','heart'],7:e.amount>0?['heart','bolt']:['bolt'],8:['cloud','shield'],9:['horse']})[e.value]||['coin'];
+export const pickupSymbols=()=>['coin'];
 export const actionSymbol=e=>e.action==='shot'?(e.value?abilities(e.kind)[0]?.icon:'swords'):e.action==='ability'?(abilities(e.kind).find(a=>a.value===e.value)?.icon||'bolt'):({disembark:'disembark',move:'route',stop:'hand',refit:'refit',disband:'disband',explore:'telescope',heal:'heart'})[e.action]||unitIcons[e.kind];
 
 export class FeedbackLayer {
@@ -30,9 +30,14 @@ export class FeedbackLayer {
    // Keep numeric combat feedback without putting icons back over the map.
    if(e.action==='hit'||e.action==='heal'){
     const el=document.createElement('div');el.className=`feedback-float ${e.action==='hit'?'damage-number':'heal-number'}`;
+    el.style.setProperty('--player-outline',`${colors[e.owner]||'#b6bdc7'}66`);
     el.textContent=`${e.action==='hit'?'−':'+'}${Math.ceil(e.amount)}`;this.root.append(el);this.nodes.push({el,e});
    }
-   if(e.action==='pickup'){this.audio.pickup();continue;}
+   if(e.action==='pickup'){
+    const el=document.createElement('div');el.className='feedback-float pickup-reward';
+    el.innerHTML=icon('coin');const amount=document.createElement('span');amount.textContent=`+${Math.round(e.amount)}`;el.append(amount);
+    this.root.append(el);this.nodes.push({el,e});this.audio.pickup();continue;
+   }
    this.audio.play(e.action==='hit'?'impact':e.action==='shot'?'launch':e.action==='move'?'order':e.action==='ability'?'launch':'confirm',e.action==='hit'?.3:.18,0,e.kind===2?1.6:e.kind===4?.7:1);
   }
  }
