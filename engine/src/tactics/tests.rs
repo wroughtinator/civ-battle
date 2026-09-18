@@ -354,6 +354,9 @@ fn shot_and_health_feedback_follow_authority_and_hide_unseen_origins() {
     let hit = g.feedback.iter().find(|e| e.action == "hit").unwrap();
     assert!((before - g.squads[1].hp - hit.amount).abs() < 0.001);
     assert_eq!((hit.from, hit.to), (b, b));
+    let impact = g.feedback.iter().find(|e| e.action == "impact" && e.unit == id).unwrap();
+    assert_eq!((impact.kind, impact.from, impact.to), (2, b, b));
+    assert_eq!(impact.tick, hit.tick);
     let encoded = serde_json::to_vec(&g).unwrap();
     let restored: Game = serde_json::from_slice(&encoded).unwrap();
     assert_eq!(g.next_feedback, restored.next_feedback);
@@ -639,6 +642,7 @@ fn ballistic_strikes_warn_and_damage_friendly_pieces() {
     g.step(1);
     assert!(g.occupant(b).is_none());
     assert!(g.occupant(a).is_none());
+    assert!(g.events.iter().any(|e| e.kind == 9 && e.tile == b));
 }
 #[test]
 fn launch_needs_an_occupied_production_city_and_can_be_disrupted() {

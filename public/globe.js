@@ -4,6 +4,7 @@ import {assetBytes,assetImage,trackLoad} from './loading.js';
 import {Mesh,UnitRings,sceneryKey} from './render-buffers.js';
 import {OutlinePass} from './outline-pass.js';
 import {GlobeControls} from './globe-controls.js';
+import {drawImpact,drawNuclear} from './impact-visuals.js';
 import {attackTiming,drawAttack,unitScales,ballisticPose} from './combat-visuals.js';
 import {RiggedMesh,Woodland,modelNames,treeNames,loadTexture,orientationBasis} from './model-assets.js';
 import {coastalEdges,shoreDistance,beachWeight,smoothTerrainNormals} from './terrain.js';
@@ -329,28 +330,39 @@ export class Globe {
    if(s.refit>=0){ring(p,.032+Math.sin(now*.006)*.004,[.73,.64,.97],ground(p,0)+.025);}
    if(s.left>0){ring(p,.026+(now%850)/850*.02,s.kind>=7&&s.kind<=9?[.62,.85,.87]:[.63,.52,.32],this.world[s.tile].terrain===0?1.012:ground(p,this.world[s.tile].terrain===4?1:0)+.004);}
   }
-  for(const e of this.state?.events||[]){const age=(this.state.tick-e.tick)+elapsed;if(![1,2,3,4].includes(e.kind)||age>3)continue;const p=this.world[e.tile]?.p;if(!p)continue;const east=norm(cross(p,[0,1,0])),north=cross(p,east),r=(e.kind===2?.06:.025)*Math.min(1,age/2);for(let j=0;j<10;j++){const point=a=>add(mul(p,1.036),add(mul(east,Math.cos(a)*r),mul(north,Math.sin(a)*r)));tri(mul(p,1.04+Math.sin(age/3*Math.PI)*.055),point(j/10*6.283),point((j+1)/10*6.283),e.kind===3?[.39,.8,.72]:[1,.55,.18]);}}
+  for(const e of this.state?.events||[]){const age=(this.state.tick-e.tick)+elapsed;if(![1,2,3,4].includes(e.kind)||age>3||this.effects.items.some(f=>f.action==='impact'&&f.tick===e.tick&&f.to===e.tile))continue;const p=this.world[e.tile]?.p;if(!p)continue;const east=norm(cross(p,[0,1,0])),north=cross(p,east),r=(e.kind===2?.06:.025)*Math.min(1,age/2);for(let j=0;j<10;j++){const point=a=>add(mul(p,1.036),add(mul(east,Math.cos(a)*r),mul(north,Math.sin(a)*r)));tri(mul(p,1.04+Math.sin(age/3*Math.PI)*.055),point(j/10*6.283),point((j+1)/10*6.283),e.kind===3?[.39,.8,.72]:[1,.55,.18]);}}
   this.units.update(data);
  }
  updateEffects(now){
-  this.projectileBodies=[];const data=[],triangle=(a,b,c,col)=>{for(const p of[a,b,c])data.push(...p,...norm(p),...col);};
+  this.projectileBodies=[];const detail=this.canvas.clientWidth<760?.65:1,budget=detail<1?4500:9000;let triangles=0;const data=[],triangle=(a,b,c,col)=>{if(triangles++>=budget)return;for(const p of[a,b,c])data.push(...p,...norm(p),...col);};
   const ribbon=(a,b,width,color)=>{if(Math.hypot(...add(b,mul(a,-1)))<.000001)return;const up=norm(add(a,b)),side=mul(norm(cross(add(b,mul(a,-1)),up)),width);triangle(add(a,side),add(a,mul(side,-1)),add(b,side),color);triangle(add(b,side),add(a,mul(side,-1)),add(b,mul(side,-1)),color);};
-  const ring=(p,radius,width,color,height)=>{const east=norm(cross(Math.abs(p[1])>.95?[1,0,0]:[0,1,0],p)),north=cross(p,east),at=(a,r)=>add(mul(p,height),add(mul(east,Math.cos(a)*r),mul(north,Math.sin(a)*r)));for(let j=0;j<36;j++){const a=j/36*6.283,b=(j+1)/36*6.283;triangle(at(a,radius),at(b,radius),at(b,radius-width),color);triangle(at(a,radius),at(b,radius-width),at(a,radius-width),color);}};
-  for(const e of this.effects.items){
-   if(now>e.end)continue;const a=this.world[e.from]?.p,b=this.world[e.to]?.p;if(!a||!b)continue;
+  const ring=(p,radius,width,color,height)=>{const east=norm(cross(Math.abs(p[1])>.95?[1,0,0]:[0,1,0],p)),north=cross(p,east),at=(a,r)=>add(mul(p,height),add(mul(east,Math.cos(a)*r),mul(north,Math.sin(a)*r)));const steps=radius<.012?8:detail<1?16:24;for(let j=0;j<steps;j++){const a=j/steps*6.283,b=(j+1)/steps*6.283;triangle(at(a,radius),at(b,radius),at(b,radius-width),color);triangle(at(a,radius),at(b,radius-width),at(a,radius-width),color);}};
+  // Reserve the first part of the shared geometry budget for nuclear silhouettes.
+  const active=this.effects.items.filter(e=>now<=e.end).sort((a,b)=>(b.action==='nuclear')-(a.action==='nuclear')||b.start-a.start);
+  for(const e of active){
+   if(triangles>=budget)break;
+   if(now>e.end)continue;const a=this.world[e.from]?.p,b=this.world[e.to]?.p;if(!a||!b||this.rotate(a)[2]<-.4&&this.rotate(b)[2]<-.4)continue;
    const age=(now-e.start)/1000,base=t=>this.world[t].terrain===0?1.012:ground(this.world[t].p,this.world[t].terrain===4?1:0)+.018;
    if(e.action==='shot'){
-    drawAttack(e,now,{a,b,base,ring,ribbon,triangle,norm,add,mul,mix,cross,model:(name,p,forward,scale)=>{const kind=modelNames.indexOf(name);this.loadModel(kind);this.projectileBodies.push({kind,p,forward,scale,owner:this.state?.squads?.find(u=>u.id===e.unit)?.owner??0});}});
-   }else if(e.action==='hit'){
-    if(age>.5)continue;
-    ring(b,.018+age*.11,.009*(1-age/.5),[1,.43,.16],base(e.to));
-    const east=norm(cross(Math.abs(b[1])>.95?[1,0,0]:[0,1,0],b)),north=cross(b,east);
-    for(let j=0;j<7;j++){const angle=j*6.283/7+e.id,dir=add(mul(east,Math.cos(angle)),mul(north,Math.sin(angle))),pos=add(mul(b,base(e.to)+Math.sin(Math.min(1,age/.5)*Math.PI)*.04),mul(dir,age*.08));ribbon(pos,add(pos,mul(dir,.009)),.002,[1,.8,.35]);}
+    drawAttack(e,now,{a,b,base,ring,ribbon,triangle,norm,add,mul,mix,cross,model:(name,p,forward,scale)=>{if(this.projectileBodies.length>=(detail<1?24:48))return;const kind=modelNames.indexOf(name);this.loadModel(kind);this.projectileBodies.push({kind,p,forward,scale,owner:this.state?.squads?.find(u=>u.id===e.unit)?.owner??0});}});
+   }else if(e.action==='nuclear'){
+    drawNuclear(age,{b,height:base(e.to),triangle,ring,ribbon,detail});
+   }else if(e.action==='impact'||e.action==='hit'){
+    if(e.action==='hit'&&active.some(other=>other.action==='impact'&&other.to===e.to&&other.tick===e.tick))continue;
+    drawImpact(e.action==='hit'?{...e,kind:0}:e,age,{b,height:base(e.to),triangle,ring,ribbon,detail,water:this.world[e.to].terrain===0});
    }else{
     const pos=e.action==='move'?b:a,col=e.action==='disband'?[.75,.44,.35]:e.action==='ability'?[.4,.95,.89]:[1,.82,.43];
     ring(pos,.025+Math.min(age,1.6)*.035,.004*Math.max(.2,1-age/3),col,base(e.action==='move'?e.to:e.from));
     if(e.action==='ability'&&e.kind===8&&e.value===0)for(let j=0;j<4;j++)ring(a,.012+j*.009+age*.008,.002,[.56,.85,.92],base(e.from)+age*.015+j*.004);
    }
+  }
+  // Ballistic exhaust follows the same arc as the missile body.
+  const elapsed=Math.min(2,(now-(this.receivedAt||now))/1000);
+  for(const strike of this.state?.strikes||[]){
+   if(triangles>=budget)break;const a=this.world[strike.from]?.p,b=this.world[strike.to]?.p;
+   if(!a||!b||this.rotate(a)[2]<-.4&&this.rotate(b)[2]<-.4)continue;
+   const f=Math.min(1,1-Math.max(0,strike.left-elapsed)/strike.total);
+   for(let j=0;j<10;j++){const t=Math.max(0,f-j*.009),q=Math.max(0,f-(j+1)*.009);ribbon(ballisticPose(a,b,q).p,ballisticPose(a,b,t).p,.004*(1-j/11),j<2?[1,.42,.04]:[.24,.22,.20]);}
   }
   this.effectsMesh.update(data);
  }

@@ -6,12 +6,13 @@ export class EventTimeline {
  accept(state,now=performance.now()){
   if(this.seed!==state.seed){this.seed=state.seed;this.seen.clear();this.items=[];}
   const fresh=[];
-  for(const e of state.feedback||[]){
+  const detonations=(state.events||[]).filter(e=>e.kind===9||e.kind===8).map(e=>({id:`detonation:${e.kind}:${e.tick}:${e.tile}:${e.player}`,tick:e.tick,action:e.kind===9?'nuclear':'impact',from:e.tile,to:e.tile,kind:e.kind===9?11:35}));
+  for(const e of [...(state.feedback||[]),...detonations]){
    if(this.seen.has(e.id))continue;this.seen.add(e.id);
    // Reconnecting must not replay a dozen seconds of old attacks.
    if(state.tick-e.tick>3)continue;
    const lead=(e.action==='shot'||e.action==='support')?Math.max(.85,e.duration-(state.tick-e.tick)):0;
-   const item={...e,start:now,end:now+(e.action==='pickup'?4:e.action==='shot'?lead+1:2.5)*1000,flight:lead*1000};
+   const item={...e,start:now,end:now+(e.action==='nuclear'?6:e.action==='pickup'?4:e.action==='shot'?lead+1:2.5)*1000,flight:lead*1000};
    this.items.push(item);fresh.push(item);
   }
   this.items=this.items.filter(e=>e.end>now).slice(-120);
@@ -38,6 +39,8 @@ export class FeedbackLayer {
     el.innerHTML=icon('coin');const amount=document.createElement('span');amount.textContent=`+${Math.round(e.amount)}`;el.append(amount);
     this.root.append(el);this.nodes.push({el,e});this.audio.pickup();continue;
    }
+   if(e.action==='impact')continue;
+   if(e.action==='nuclear'){this.audio.play('nuclear',.6,0,1);continue;}
    this.audio.play(e.action==='hit'?'impact':e.action==='shot'?'launch':e.action==='move'?'order':e.action==='ability'?'launch':'confirm',e.action==='hit'?.3:.18,0,e.kind===2?1.6:e.kind===4?.7:1);
   }
  }

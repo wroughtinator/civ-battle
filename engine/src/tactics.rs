@@ -1114,6 +1114,8 @@ impl Game {
             fired.push((i, target));
         }
         for (i, t) in fired {
+            let source = self.squads[i].clone();
+            self.feedback("impact", &source, t, source.salvo, 0., 2);
             if self.squads[i].kind==21 {hits[i]+=self.squads[i].hp;}
             self.squads[i].fire_at = 0;
             // Keep the focus between shots. Move/Stop/abilities replace it.
@@ -1162,7 +1164,7 @@ impl Game {
                     hits[i] += (if s.kind == 2 { 140. } else { 75. }) * self.cover(u);
                 }
             }
-            self.event(2, s.owner, s.to);
+            self.event(if s.kind == 2 { 9 } else { 8 }, s.owner, s.to);
         }
         self.strikes.retain(|s| s.left > 0);
         for i in 0..self.squads.len() {
@@ -1469,7 +1471,7 @@ impl Game {
             .filter(|e| e.player == p || v[e.tile])
             .collect();
         let feedback: Vec<_> = self.feedback.iter()
-            .filter(|e| (spectator && matches!(e.action.as_str(), "shot" | "hit" | "heal" | "ability")) || e.audience & (1 << p) != 0)
+            .filter(|e| (spectator && matches!(e.action.as_str(), "shot" | "hit" | "heal" | "ability" | "impact")) || e.audience & (1 << p) != 0)
             .map(|e| json!({"id":format!("{}:{}:{}", e.tick, e.action, e.unit),"tick":e.tick,"action":e.action,"owner":e.owner,
                 "unit":e.unit,"kind":e.kind,"from":e.from,"to":e.to,"value":e.value,
                 "amount":e.amount,"duration":e.duration})).collect();

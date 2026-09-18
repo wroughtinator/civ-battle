@@ -29,10 +29,10 @@ impl Game {
         duration: u16,
     ) {
         let mut audience = if u.owner < 8 { 1 << u.owner } else { 0 };
-        if matches!(action, "shot" | "hit" | "heal" | "support") {
+        if matches!(action, "shot" | "hit" | "heal" | "support" | "impact") {
             for p in 0..self.players.len() {
                 let v = self.vision(p);
-                if v[to] && self.detected(p, u, &v) {
+                if v[to] && (action == "impact" || self.detected(p, u, &v)) {
                     audience |= 1 << p;
                 }
             }
@@ -45,7 +45,7 @@ impl Game {
             owner: u.owner,
             unit: u.id,
             kind: u.kind,
-            from: u.tile,
+            from: if action == "impact" { to } else { u.tile },
             to,
             value,
             amount,
