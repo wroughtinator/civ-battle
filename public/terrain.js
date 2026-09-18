@@ -33,6 +33,23 @@ export function smoothTerrainNormals(vertices){
 
 // Small, shared visual rules matching the authoritative terrain mechanics.
 export const terrainIcons=['sail','wheat','tree','sand','mountain','snow'];
+export const terrainNames=['Water','Grassland','Forest','Desert','Mountains','Ice'];
+// These describe terrain rules, not whether an individual order is available.
+const settlement=['good','settle','✓','Suitable for a city; normal spacing, coin and construction requirements still apply.'];
+const noSettlement=['bad','settle','×','Cannot found a city on this terrain.'];
+const noFarms=['bad','wheat','×','No farm income; only controlled grassland outside city centres grows farms.'];
+export const terrainEffects=[
+ [['neutral','sail','✓','Ships travel on water. Ground units must board a friendly ship with a free berth to cross; drones fly across.'],noSettlement,noFarms],
+ [['good','wheat','+0.25','Each controlled grassland tile outside a city centre adds 0.25 coins every five seconds. Blockade halves city income; sabotage pauses it.'],settlement,['bad','horse','+25%','Cavalry deal 25% more damage to targets here for twelve seconds after moving.']],
+ [['good','shield','−25%','Ground units take 25% less incoming damage in forest. Aircraft receive no cover.'],['bad','clock','+3 / +7','Forest adds three seconds to ground movement cooldown, or seven for cavalry. Commandos and aircraft have no forest movement penalty.'],['good','eye','✓','Commandos can activate camouflage in forest.'],settlement,noFarms],
+ [settlement,noFarms,['bad','horse','+25%','Cavalry deal 25% more damage to targets here for twelve seconds after moving.']],
+ [['good','shield','↗','Mountains block intervening direct fire. Artillery and drones can shoot over them; this is not a damage reduction.'],['bad','clock','+7','Mountains add seven seconds to ground movement cooldown. Aircraft are unaffected.'],['bad','tank','×','Tanks and cavalry cannot enter mountains.'],noSettlement,noFarms],
+ [['neutral','route','✓','Ground units can cross ice with no terrain movement penalty.'],noSettlement,noFarms],
+];
+export function terrainSummary(icon,terrain){
+ const effects=terrainEffects[terrain];if(!effects)return '';
+ return `<section class="tile-terrain" aria-label="${terrainNames[terrain]} terrain effects"><div class="tile-terrain-heading">${icon(terrainIcons[terrain])}<strong>${terrainNames[terrain]}</strong><small>Tap effects for details</small></div><div class="tile-effects">${effects.map(([tone,symbol,value,label])=>`<button class="tile-effect ${tone}" data-terrain-help="${terrainIcons[terrain]}" aria-label="${label}" title="${label}">${icon(symbol)}<span>${value}</span></button>`).join('')}</div></section>`;
+}
 export const inForestCover=(world,u)=>world[u.tile]?.terrain===2&&!(u.kind>=6&&u.kind<=9);
 export const terrainSlows=(terrain,kind)=>!(kind>=6&&kind<=9)&&(terrain===4||terrain===2&&kind!==5);
 export const rate=value=>Number(value.toFixed(2)).toString();
