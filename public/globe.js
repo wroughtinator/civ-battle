@@ -73,7 +73,7 @@ vec3 groundTex(float tile,vec3 p,vec3 surfaceNormal){
 void main(){terrainDx=dFdx(vWorld)*24.;terrainDy=dFdy(vWorld)*24.;vec3 wn=normalize(vWorld),n=normalize(vNormal),eye=normalize(vec3(0,0,camera.z)-vPos),sun=normalize(vec3(-.6,.85,1.));
 if(mode>3.5){if(dot(n,eye)<=.015)discard;outColor=vec4(vColor,vMaterial.z);return;}
 if(mode>2.5){
- float facing=dot(n,eye);if(facing<.025||camera.z<1.26)discard;
+ float facing=dot(n,eye);if(facing<.025)discard;
  float storm=0.;for(int i=0;i<3;i++)storm=max(storm,smoothstep(weather[i].w-.035,weather[i].w+.075,dot(wn,weather[i].xyz)));
  vec3 drift=vec3(time*.009,0,time*.004),q=wn+drift*.006;
  // Weather systems occupy distinct regions, with clear air between them.
@@ -92,7 +92,9 @@ if(mode>2.5){
  vec3 cloud=mix(vec3(.17,.24,.30),vec3(.89,.93,.95),light)*(.7+.3*max(dot(n,sun),0.));
  cloud+=vec3(.18,.15,.10)*pow(1.-mass,3.)*max(dot(n,sun),0.);
  float cloudFog=preview>.5?1.:texture(fogTexture,vec2(atan(wn.z,wn.x)/6.2831853+.5,asin(clamp(wn.y,-1.,1.))/3.14159265+.5)).r;cloud=mix(vec3(.025,.045,.065),cloud,.3+.7*cloudFog);
- float alpha=(1.-exp(-density*2.6))*smoothstep(1.26,2.55,camera.z)*smoothstep(.025,.30,facing);
+ // Keep a faint close-up layer and reach the 50% opacity ceiling farther out.
+ float zoomOpacity=mix(.10,.50,smoothstep(1.26,3.60,camera.z));
+ float alpha=(1.-exp(-density*2.6))*zoomOpacity*smoothstep(.025,.30,facing);
  outColor=vec4(tone(cloud),alpha);return;
 }
 if(mode>1.5){float edge=pow(1.-abs(dot(n,eye)),3.);outColor=vec4(.22,.61,.77,edge*.26);return;}
