@@ -120,3 +120,12 @@ test('facing affordance agrees with authority for land walls, floating barriers 
   u.left=2;compare(state,'face',{from:u.id,to},false);
  }
 });
+
+test('robot disables manual controls but remains available during recovery',()=>{
+ const state=fixture(),u=state.squads.find(u=>u.owner===0);
+ u.automated=true;u.locked_until=state.tick+20;u.left=8;
+ for(const kind of ['move','stop','attack','ability','face','explore','disembark','disband'])compare(state,kind,{from:u.id},false);
+ compare(state,'auto',{from:u.id,value:0},true);
+ compare(state,'auto',{from:u.id,value:1},true);
+ assert.equal(orderBlock(state.tiles,view(state),0,'auto',{from:u.id,value:0}),null);
+});
