@@ -13,7 +13,11 @@ bash deploy.sh --dry-run             # build and validate, without publishing
 bash deploy.sh --release RELEASE_ID  # roll back NEW rooms to an archived build
 ```
 
-The script builds Rust/WASM, captures a content-addressed release, verifies every retained file, runs five focused release tests, checks the production release catalog, and publishes. It takes an exclusive local deployment lock. Direct Wrangler publishing is blocked because it could bypass these protections. If the process is interrupted, first check that it has stopped, then remove `.deploy.lock` before retrying.
+The script fetches `origin/main` and incorporates its immutable archives, builds Rust/WASM, captures a content-addressed release, verifies every retained file, runs focused release and loading tests, and checks the production release catalog. Before publishing, it automatically commits `releases/` on top of the fetched `origin/main`, pushes that commit, and verifies the remote ref. Git access and permission to push to `origin/main` are required. A failed push or concurrent main update stops deployment; resolve the error and rerun. Dry runs fetch and validate but never commit, push, or publish.
+
+The archive commit contains only `releases/`. It uses a temporary Git index, so detached task checkouts work and unrelated staged files, working changes, and local branches are preserved. Source changes still follow the normal review/merge workflow. If publishing fails after the archive push, the backup remains available for a retry. The catalog's `current` is the selected build; `/api/health` is authoritative for the live build.
+
+The script takes an exclusive local deployment lock. Direct Wrangler publishing is blocked because it could bypass these protections. If the process is interrupted, first check that it has stopped, then remove `.deploy.lock` after checking no deployment is active.
 
 ## Existing matches
 
@@ -27,7 +31,7 @@ Cloudflare may restart an object or socket during deployment. The client reconne
 
 ## Keeping history safe
 
-Commit `releases/` with deployment changes so other checkouts retain all live versions. The production catalog prevents a stale checkout from deleting another deployment's archives. Bring in the latest shared changes before deploying; do not force past that check. The immutable files are SHA-256 verified, and identical server WASM binaries are stored only once.
+Deployment automatically commits and pushes `releases/` so other checkouts retain all live versions. The production catalog prevents a stale checkout from deleting another deployment's archives. Bring in the latest shared deployment tooling before deploying; archives are synchronized automatically. Do not force past the retention check. The immutable files are SHA-256 verified, and identical server WASM binaries are stored only once.
 
 Archives are retained, not automatically pruned. A future size-limit failure must be resolved without deleting versions referenced by rooms. The script stops on build, integrity, compatibility or upload failures instead of silently changing existing games. `.deploy/` is generated and ignored by Git.
 

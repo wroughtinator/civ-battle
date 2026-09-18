@@ -80,7 +80,7 @@ test('refresh and invitation URLs resolve the pinned client; new homepages choos
 test('packaging is deterministic, freezes all client URLs, shares engines, and rejects archive loss or tampering',t=>{
  const root=mkdtempSync(join(tmpdir(),'meridian-release-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
  for(const dir of ['public','worker'])mkdirSync(join(root,dir));
- writeFileSync(join(root,'public/_headers'),"/*\n  X-Content-Type-Options: nosniff\n");
+ writeFileSync(join(root,'public/_headers'),readFileSync(new URL('../public/_headers',import.meta.url)));
  writeFileSync(join(root,'public/index.html'),'<script type="module" src="/app.js"></script>');
  writeFileSync(join(root,'public/app.js'),"import './globe.js';fetch('/engine.wasm');fetch(`/api/rooms`);const ws=`${location.host}/api/rooms/id/ws`;location.assign('/');");
  writeFileSync(join(root,'public/globe.js'),"fetch('/assets/tank.mesh')");
@@ -94,6 +94,12 @@ test('packaging is deterministic, freezes all client URLs, shares engines, and r
  writeFileSync(join(root,'public/app.js'),"fetch('/api/rooms'); // changed client");
  const second=captureRelease(root,root);assert.notEqual(second,first);
  const catalog=stageReleases(root);assert.equal(catalog.current,second);assert.equal(catalog.bootstrap,first);
+ // Streamed textures become blob images; the packaged policy must permit them.
+ const headers=JSON.parse(readFileSync(join(root,'releases',second,'release.json'))).headers;
+ const policy=headers['Content-Security-Policy'];
+ const directive=name=>policy.split(';').map(s=>s.trim().split(/\s+/)).find(parts=>parts[0]===name).slice(1);
+ assert.ok(directive('img-src').includes('blob:'),'startup textures require blob: images');
+ assert.ok(!directive('script-src').includes('blob:'),'blob access stays limited to images');
  retainPublished(catalog,{...catalog,releases:{[first]:catalog.releases[first]}});
  assert.throws(()=>retainPublished({...catalog,releases:{[second]:catalog.releases[second]}},catalog),/Refusing to remove/);
  writeFileSync(join(root,'releases',first,'public/app.js'),'tampered');

@@ -55,6 +55,7 @@ function connect(){
  ws=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/api/rooms/${room}/ws`,['meridian',token]);
  ws.onmessage=e=>{
   const msg=JSON.parse(e.data);
+  if(msg.reload){location.replace(msg.reload);return;}
   if(msg.type==='welcome'){ws.send(JSON.stringify({type:'presence',active:!document.hidden}));slot=msg.slot;seq=Math.max(seq,msg.seq);world=msg.world;globe.setWorld(world);if(inflight)ws.send(JSON.stringify(inflight.message));}
   if(msg.type==='world'){world=msg.world;globe.setWorld(world);}
   if(msg.type==='state'){
