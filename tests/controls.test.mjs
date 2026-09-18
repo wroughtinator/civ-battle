@@ -73,3 +73,10 @@ test('highlighted attack targets honor minimum range, sight, terrain and line of
   for(const to of targets)compare(state,command,{from:u.id,to,value:0},true);
  }
 });
+
+test('Stop remains available during order recovery and preserves step cooldown',()=>{
+ const state=fixture(),u=state.squads.find(u=>u.owner===0);
+ u.path=[u.tile,state.tiles[u.tile].near[0]];u.to=u.path[1];u.left=5;state.players[0].cooldown=state.tick+2;
+ const result=compare(state,'stop',{from:u.id},true),stopped=result.state.squads.find(s=>s.id===u.id);
+ assert.deepEqual(stopped.path,[u.tile]);assert.equal(stopped.left,5);assert.equal(stopped.tile,u.tile);
+});
