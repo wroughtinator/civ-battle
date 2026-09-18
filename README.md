@@ -21,7 +21,7 @@ Win through a capital hold, accumulated territorial influence or an occupied orb
 
 ## Run, test, deploy
 
-Use Node and Rust with `wasm32-unknown-unknown`. `npm ci`, `npm run build`, `npm run dev` starts port 8793. `npm run deploy` builds and deploys to the configured Cloudflare account. Credentials are not stored in this repository.
+Use Node and Rust with `wasm32-unknown-unknown`. `npm ci`, `npm run build`, `npm run dev` starts port 8793. `bash deploy.sh` builds and deploys to the configured Cloudflare account; add `--dry-run` to check without publishing. `npm run deploy` uses the same pipeline. Existing rooms keep their exact server rules and browser assets. See [deployment instructions](docs/DEPLOYMENT.md). Credentials are not stored in this repository.
 
 `npm test` includes archived-engine regression tests plus current native, WASM and live network tests. Keep `npm run dev` running for network tests. Focused current checks: `cargo test --release --lib tactics::tests` and `node --test tests/*.test.mjs`.
 
