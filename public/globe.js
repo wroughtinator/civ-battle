@@ -176,7 +176,28 @@ export class Globe {
    if(staticBuild&&(t.terrain===2||t.terrain===1)){const trees=t.terrain===2?12:3;for(let j=0;j<trees;j++){const a=rnd(i,j,1)*6.283,r=Math.sqrt(rnd(i,j,2))*.047,x=Math.cos(a)*r,z=Math.sin(a)*r;if(Math.hypot(x,z)<.025)continue;const h=.018+rnd(i,j,3)*.017,leaf=[.10+rnd(i,j)*.055,.24+rnd(i,j)*.11,.10+rnd(i,j)*.065];box(x,z,.0018,h*.65,.0018,[.24,.19,.11]);crown(x,z,h*.35,.008+rnd(i,j,4)*.006,h*.8,leaf,i*53+j);}}
    if(staticBuild&&t.terrain===1){for(let j=0;j<13;j++){const x=(rnd(i,j,8)-.5)*.08,z=(rnd(i,j,9)-.5)*.08;tri(props,point(x-.003,0,z),point(x+.001,.004,z),point(x+.003,0,z),[.37,.45,.17]);}}
    if(staticBuild&&props.length>treeStart){vegetation.push(...props.splice(treeStart));vegetation.materials??=[];vegetation.materials.push(...props.materials.splice(treeStart/3));}
-   const discovery=this.state?.discoveries?.find(d=>d.tile===i);if(discovery&&s.visible){const d=discovery,k=d.kind,ochre=[.68,.47,.21],teal=[.28,.65,.64],stone=[.55,.57,.48];const angle=(d.variant%628)/100,ox=Math.cos(angle)*.013,oz=Math.sin(angle)*.013;if(k===0){pyramid(ox,oz,.026,.033,[.45,.24,.15],4);box(-.023,.015,.005,.045,.005,ochre);}else if(k===1){box(0,0,.031,.016,.025,ochre);box(0,0,.034,.022,.028,[.8,.61,.24]);}else if(k===2||k===3||k===9){pyramid(0,0,.028,.03,k===9?teal:stone,4);box(.025,.008,.003,.06,.003,ochre);tri(props,point(.025,.06,.008),point(.048,.05,.008),point(.025,.043,.008),teal);}else if(k===4){box(0,0,.027,.014,.065,ochre);box(0,0,.004,.05,.004,stone);}else if(k===5){box(0,0,.026,.028,.026,stone);pyramid(0,0,.025,.056,teal,8);box(.024,0,.004,.055,.004,ochre);}else if(k===6){for(const x of[-.017,.017])box(x,0,.008,.037,.008,stone);box(0,0,.044,.04,.012,stone);}else if(k===7){for(const x of[-.018,0,.018])box(x,0,.012,.016,.017,ochre);}else if(k===8){box(0,0,.006,.07,.006,stone);pyramid(0,0,.02,.06,teal,8);for(const x of[-.028,.028])box(x,0,.02,.022,.02,stone);}if(d.used)box(0,.022,.004,.025,.004,teal);}
+   const discovery=this.state?.discoveries?.find(d=>d.tile===i&&!d.used);
+   if(discovery){
+    // Every unopened discovery uses this same oversized, gold-banded chest.
+    const gold=[1,.72,.18],wood=[.48,.20,.065],dark=[.18,.085,.025];
+    box(0,0,.072,.004,.054,gold);
+    box(0,0,.064,.032,.044,wood);
+    box(0,0,.067,.035,.047,dark);
+    box(0,0,.064,.039,.044,wood);
+    for(const x of[-.023,.023])box(x,0,.007,.041,.048,gold);
+    box(0,-.024,.012,.028,.005,gold);
+    box(0,-.027,.004,.022,.002,dark);
+    // Rounded lid, with matching metal straps, makes the silhouette readable.
+    for(let j=0;j<8;j++){
+     const a=j*Math.PI/8,b=(j+1)*Math.PI/8;
+     for(const [l,r,col] of [[-.032,.032,wood],[-.0265,-.0195,gold],[.0195,.0265,gold]]){
+      const y=col===gold?.0398:.039,z=col===gold?.0228:.022;
+      tri(props,point(l,y+Math.sin(a)*.016,Math.cos(a)*z),point(r,y+Math.sin(a)*.016,Math.cos(a)*z),point(r,y+Math.sin(b)*.016,Math.cos(b)*z),col);
+      tri(props,point(l,y+Math.sin(a)*.016,Math.cos(a)*z),point(r,y+Math.sin(b)*.016,Math.cos(b)*z),point(l,y+Math.sin(b)*.016,Math.cos(b)*z),col);
+     }
+     for(const x of[-.032,.032])tri(props,point(x,.039,0),point(x,.039+Math.sin(a)*.016,Math.cos(a)*.022),point(x,.039+Math.sin(b)*.016,Math.cos(b)*.022),gold);
+    }
+   }
    if(t.site){const steel=[.27,.36,.37];box(-.023,.022,.013,.019,.016,steel);box(.022,.022,.012,.026,.013,steel);for(const x of [-.017,0,.017])box(x,-.025,.012,.008,.013,[.46,.44,.34]);}
    if(s.building===7){const steel=[.36,.45,.46],x=t.capital>=0?.045:0;box(x,0,.034,.019,.025,steel);box(x-.012,-.01,.005,.048,.005,[.48,.40,.30]);box(x+.008,-.01,.006,.035,.006,[.56,.50,.37]);}
    if(s.owner>=0&&(t.capital>=0||s.building)){const faction=palette[s.owner],stone=[.79,.74,.59];

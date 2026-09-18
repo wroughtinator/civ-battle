@@ -722,3 +722,59 @@ fn a_single_step_snaps_immediately_and_keeps_its_full_final_cooldown() {
     assert_eq!(g.squads[0].left, 0);
     assert_eq!(g.squads[0].tile, b);
 }
+
+#[test]
+fn walking_collects_every_chest_once_without_spending_or_stopping() {
+    for kind in 0..10 {
+        let (mut g, from, to) = arena();
+        g.squads.retain(|u| u.owner == 0);
+        g.players[0].gold = 0.;
+        g.squads[0].hp = 30.;
+        g.squads[0].ability_ready = g.tick + 100;
+        g.discoveries.push(Discovery {tile:to,kind,variant:0,used:false,owner:-1,seen:0,known_used:0,until:0});
+        g.squads[0].path = vec![from, to];
+        g.squads[0].to = to;
+        g.move_unit(0);
+        assert_eq!(g.squads[0].tile, to);
+        assert!(g.squads[0].left > 0);
+        assert!(g.discoveries[0].used, "kind {kind}");
+        let reward = g.feedback.iter().find(|e| e.action == "pickup").unwrap();
+        assert_eq!(reward.value, kind);
+        assert_eq!(reward.audience, 1);
+        assert_eq!(reward.to, to);
+        match kind {
+            0 => assert_eq!(g.players[0].gold, 45.),
+            1 => assert_eq!(g.players[0].gold, 35.),
+            4 => assert_eq!(g.players[0].gold, 55.),
+            2 | 3 | 9 => { assert_eq!(g.squads.len(), 2); assert_eq!(g.players[0].gold, 0.); }
+            5 => assert_eq!(g.discoveries[0].until, g.tick + 90),
+            6 => assert_eq!(g.squads[0].hp, 75.),
+            7 => { assert_eq!(g.squads[0].hp, 50.); assert_eq!(g.squads[0].ability_ready, g.tick); }
+            8 => assert_eq!(g.storm(to), 0.),
+            _ => unreachable!(),
+        }
+        let gold = g.players[0].gold;
+        assert_eq!(g.claim(0), Err(6));
+        assert_eq!(g.players[0].gold, gold);
+        assert_eq!(g.feedback.iter().filter(|e| e.action == "pickup").count(), 1);
+    }
+}
+#[test]
+fn blocked_reinforcement_and_full_health_chests_pay_coins() {
+    for kind in [2, 3, 6, 9] {
+        let (mut g, from, to) = arena();
+        g.squads.retain(|u| u.owner == 0);
+        for tile in g.tiles[to].near.clone() {
+            if tile != from { g.spawn(0, 0, tile); }
+        }
+        g.players[0].gold = 0.;
+        g.discoveries.push(Discovery {tile:to,kind,variant:0,used:false,owner:-1,seen:0,known_used:0,until:0});
+        // Collect in place to fill every neighbouring hex, including the old position.
+        g.spawn(0, 0, to);
+        g.claim(g.squads.len()-1).unwrap();
+        assert_eq!(g.players[0].gold, 35.);
+        let e = g.feedback.last().unwrap();
+        assert_eq!(e.value, 1);
+        assert_eq!(e.amount, 35.);
+    }
+}

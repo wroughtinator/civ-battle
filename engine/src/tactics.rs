@@ -940,6 +940,7 @@ impl Game {
         s.path.remove(0);
         s.left = cooldown;
         s.total = cooldown;
+        let _ = self.claim(i);
     }
     fn line_of_sight(&self, from: usize, to: usize) -> bool {
         let d = self.distances(to);

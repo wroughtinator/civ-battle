@@ -27,14 +27,14 @@ export const manualEntries={
  submerge:['Submerge / surface','Toggle the submarine’s concealed state. It takes eight seconds. Submerged travel is slower and damage is reduced to 65%. Adjacent enemies, sonar and carriers can expose it. Choose stealth for approach and surface when damage matters more.'],
  missile:['Ballistic missile','A submarine with carrier research can spend 65 coins to strike a visible hex within seven steps. The missile flies for fourteen seconds, giving units time to move. It deals 75 damage to units on the target hex, including allies, and commits the submarine for twenty-eight seconds.'],
  bomb:['Bombing run','A drone targets a visible hex up to three steps away. After a four-second wind-up, it hits the centre and splashes neighbouring hexes, including allies. Adjacent damage is 65% of the main hit. Storms reduce drone effectiveness. The full commitment is twenty-two seconds.'],
- gear:['Sabotage / repair workshop','On a commando, choose Sabotage and then an adjacent enemy city: after a four-second wind-up, its income and production stop for twenty-four seconds. The commando commits for twenty seconds. On the map, this icon is a repair workshop; move onto it and use Explore to restore health. A fully healthy unit cannot consume it.'],
- sail:['Water','Naval units require a coastal city and stay on water. Land units cannot enter water; drones can fly across it. A sail on a disabled recruit button means the city has no adjacent ocean hex. A sail discovery is a wrecked caravan.'],
- cloud:['Weather','Storms slow travel, especially aircraft and water crossings, and reduce drone damage by up to 50%. Clouds fade as you zoom closer so they do not block control. A cloud discovery is a weather station. Claim it to suppress storm penalties in the surrounding area for everyone, including enemies.'],
+ gear:['Sabotage','On a commando, choose Sabotage and then an adjacent enemy city: after a four-second wind-up, its income and production stop for twenty-four seconds. The commando commits for twenty seconds. Treasure chests can also grant automatic repairs, shown by green heart reward symbols; a fully healthy unit receives coins instead.'],
+ sail:['Water','Naval units require a coastal city and stay on water. Land units cannot enter water; drones can fly across it. A sail on a disabled recruit button means the city has no adjacent ocean hex.'],
+ cloud:['Weather','Storms slow travel, especially aircraft and water crossings, and reduce drone damage by up to 50%. Clouds fade as you zoom closer so they do not block control. A weather reward from a treasure chest suppresses storm penalties nearby for everyone, including enemies.'],
  tree:['Forest','Forest slows most ground units. Cavalry are especially slow; commandos move through it efficiently and can camouflage here. Forest is suitable for founding a city if all spacing and cost rules are met.'],
  mountain:['Mountains','Cavalry and tanks cannot enter mountains. Other ground units travel slowly here. Mountains block most direct fire, though artillery and drones can shoot over them. Settlers cannot found cities here.'],
  sand:['Desert','Traversable land suitable for settlement when it is far enough from other cities. The founding action still requires coins and time.'],
  snow:['Ice','Cold terrain is traversable for most ground units, but cannot host a new settlement.'],
- telescope:['Observatory','An exploration discovery. Move onto its hex, then choose Explore to claim temporary long-range vision. Unexplored discoveries are not revealed by the map seed.'],
+ telescope:['Observatory','An exploration discovery. Walk onto a treasure chest to automatically collect its reward. The telescope reward grants temporary long-range vision. Unexplored discoveries are not revealed by the map seed.'],
  wheat:['Supply / land','A supply symbol. In the current rules there is no food currency or population management: coins pay for everything and discrete units have health.'],
  fort:['Defence','Defensive positions and guard units help hold choke points. Defensive abilities reduce incoming health damage; they do not add a second shield resource.'],
  temple:['Historical era','An emblem of the early era. The lobby’s temple-to-rocket diagram represents progression from early units to modern technology. All players start with the same capabilities.'],
@@ -94,17 +94,5 @@ export function unitDetails(key,state){
 }
 
 export function contextDetails(label){
- const discoveries={
-  'Hostile camp':'Defeat all barbarian guards within two hexes, then explore with a unit standing here to collect 45 coins.',
-  'Buried treasury':'Explore with a unit standing here to collect 35 coins. This site can be claimed only once.',
-  'Stranded scouts':'Explore to rescue a scout at 55% health. You need unit capacity and a free neighbouring land hex.',
-  'Abandoned guard post':'Explore to rescue a guard at 55% health. You need unit capacity and a free neighbouring land hex.',
-  'Wrecked caravan':'Explore with a unit standing here to salvage 55 coins.',
-  'Observatory':'Explore to reveal five hexes around this site for ninety seconds.',
-  'Repair workshop':'Explore to heal the occupying unit by up to 45 health. A fully healthy unit cannot use it.',
-  'Supply depot':'Explore to heal up to 20 health and recharge the occupying unit’s special ability. Does not cancel an existing commitment.',
-  'Weather station':'Explore to suppress storm penalties around the station. The sheltered area also benefits enemies.',
-  'Mercenary camp':'Pay 50 coins to hire cavalry at 80% health. Requires capacity and a free neighbouring land hex.',
- };
- return Object.entries(discoveries).find(([name])=>label.startsWith(`Explore ${name}`))?.[1]||'';
+ return label.startsWith('Treasure chest')?'Walk onto this chest to automatically collect its reward. All chests look alike. Rewards include coins, rescued units, healing, vision, ability recharge and weather protection. If a unit reward cannot fit, or a repair reward cannot heal, receive 35 coins instead. Cavalry rewards are free.':'';
 }
