@@ -1,0 +1,110 @@
+import {unitIcons,unitNames,abilities,counters} from './planning.js';
+
+// Text lives exclusively in the manual. Symbols remain the game's live vocabulary.
+export const manualEntries={
+ book:['Field manual','Choose an icon below, search for a rule, or use “Pick an icon in the game”. Picking explains the icon without activating it, including disabled buttons. The match keeps running while you read.'],
+ route:['Move','Select a unit, choose this first action, then tap a destination on the globe. A route appears and the unit follows it one hex at a time. There is no confirmation. Only one unit fits on a hex; moving never attacks. Land units cannot enter water. Each step immediately occupies the next hex, with a short visual glide followed by a cooldown. Terrain, weather and unit speed change the cooldown. A queued move waits for an ongoing action to finish. Tap the selected action again to leave targeting.'],
+ swords:['Attack','Choose Attack, then tap a highlighted hex. Each order fires once after a wind-up. It does not chase or automatically repeat. A moving enemy can escape the aimed hex before impact. The unit stays committed until its recovery countdown ends. Health loss, a red flash and a damage number mark a hit. No damage number means the shot missed or hit empty ground.'],
+ sword:['Attack damage','Damage is taken from health. Matchups, terrain, weather and defensive abilities modify the base damage. Attacks are separate from movement.'],
+ settle:['Found a city','Stop your settler on grassland, forest or desert. The location must be at least four hex steps from every city and other active foundation, including enemy cities. There is no city-count limit. Pay 35 coins plus 25 for each city you own: the first expansion normally costs 60. Construction takes 45 seconds, pauses after damage and consumes the settler when complete. Movement stops construction and the fee is not refunded. An hourglass means the settler is busy; a coin means insufficient funds; a hex with 4 means the site is too close. Fog can hide an enemy city that prevents settlement.'],
+ disband:['Disband a unit','Removes the selected unit immediately and frees capacity. In your territory you recover one quarter of its recruitment cost; elsewhere there is no refund. A unit committed to an action or refit cannot be disbanded yet. This is immediate and cannot be undone.'],
+ hand:['Stop','Immediately clears the remaining route. The unit stays on its current hex and finishes its existing movement cooldown. Stop is available during shared order recovery. Also stops city construction; the founding fee is not returned. It cannot interrupt an attack’s commitment. Disabled when there is no route or construction to stop.'],
+ refit:['Refit a military unit','On friendly territory, convert a stationary military unit into another researched military type in the same land or naval group. Choose the new unit in the palette. Costs the new recruitment price minus half the old price, with a minimum of 30 coins. Takes 20 seconds and preserves the percentage of health remaining. Civilian specialists cannot refit.'],
+ territory:['Territory / target hex','In a city, spend coins to expand control from radius 1 to 2 for 80, then to 3 for 140. More territory improves sight and unit capacity. Each city has a coloured boundary. Selecting a city highlights all its controlled hexes with a bright border and stronger tint. Shared borders divide nearby cities; the closest city controls an overlap, with ties going to the older city. In targeting mode, outlined hexes show legal attack targets. On a disabled founding button, a hex with 4 means a city or foundation is too close.'],
+ factory:['City production','Upgrade production from 1 to 2 for 110 coins, then to 3 for 180. Income becomes 5, 7 or 9 coins every five seconds and recruitment speeds up. A production-three city is required for an orbital launch. Enemy ships next to a city halve its income; sabotage pauses income and recruitment.'],
+ city:['City','Tap the city marker or its hex to inspect it. Train units or upgrade territory and production. Recruitment reserves a capacity slot and waits if every deployment hex is occupied. To capture a city, stop a ground unit on its centre for 12 seconds, or 6 with a commando. Recent damage pauses capture. Losing every city eliminates you and removes your remaining units, even settlers; you then spectate.'],
+ crown:['Capitals and territorial victory','Original capitals are permanent capture objectives. Hold at least half the starting capitals (rounded up, minimum two) for 90 consecutive seconds to win, or accumulate 540 influence. Each original capital contributes one influence every four seconds; other cities contribute one every twelve seconds. Influence already earned is kept, but eliminated players cannot win. Capturing the last surviving opponent’s city also wins.'],
+ trophy:['Victory','Win through control of capitals, accumulated territorial influence, an orbital launch, or eliminating all opponents. There is no twenty-minute timeout. The clock shows elapsed match time.'],
+ rocket:['Orbital launch','An orbital engineer standing in your production-three city can spend 180 coins to begin. Keep an engineer there for 360 supported seconds to win. Recent damage interrupts support; missing support drains two seconds of progress per second. This ties up a vulnerable specialist and an important city.'],
+ coin:['Coins','The single spending currency pays for recruitment, research, city upgrades and some abilities. Cities generate income every five seconds. Non-settler units beyond your first three cost 0.7 coins each every ten seconds. A coin badge on a disabled action means you cannot afford it.'],
+ flask:['Research','Tap an available unit in the connected tree to buy its research immediately; there is no confirmation. Use this manual to inspect a unit before spending. The unit becomes recruitable when the research finishes. Only one research project runs at a time. Each branch costs 65, 145, then 235 coins; later tiers open at 4:00 and 9:00. Research uses the same coins as your army, so investing leaves fewer coins for immediate defence.'],
+ clock:['Time remaining','Numbers next to a clock show seconds or minutes. On an action they show why it must wait; on recruitment or a route they show progress. The top clock is elapsed match time, not a deadline.'],
+ hourglass:['Committed / waiting','A unit performing an action cannot move or perform another action until its commitment ends. You may queue movement to begin afterwards. A short shared two-second order recovery also limits rapid orders. Recruitment and research have their own countdowns.'],
+ heart:['Health','A unit has one health pool. Hits reduce it; at zero the unit is destroyed. The bar and number show remaining health, and floating red numbers show health lost. Idle units in friendly territory heal four health every five seconds after eighteen seconds without damage. No separate population or shield pool is used.'],
+ eye:['Sight and concealment','Fog hides units and activity outside your vision. Scouts can use reconnaissance to extend their sight to four hexes for sixteen seconds, exposing themselves and committing for twelve. Commandos can toggle camouflage in forest, committing for eight seconds. Adjacency, sonar and carriers can detect concealed units. On a unit-stat row, this icon means attack range.'],
+ spectate:['Spectator','You lost your last city and are permanently eliminated. Your surviving units and unfinished foundations are removed. You can rotate, zoom and inspect the whole battlefield until the match ends, but cannot issue orders. Opponents’ treasuries, research and queued orders remain private.'],
+ radar:['Sonar / reconnaissance','A fleet, submarine or carrier can ping. It increases sight to four hexes for sixteen seconds and detects nearby concealed units. You commit for twelve seconds and reveal yourself for twenty-four: information has a positional cost.'],
+ submerge:['Submerge / surface','Toggle the submarine’s concealed state. It takes eight seconds. Submerged travel is slower and damage is reduced to 65%. Adjacent enemies, sonar and carriers can expose it. Choose stealth for approach and surface when damage matters more.'],
+ missile:['Ballistic missile','A submarine with carrier research can spend 65 coins to strike a visible hex within seven steps. The missile flies for fourteen seconds, giving units time to move. It deals 75 damage to units on the target hex, including allies, and commits the submarine for twenty-eight seconds.'],
+ bomb:['Bombing run','A drone targets a visible hex up to three steps away. After a four-second wind-up, it hits the centre and splashes neighbouring hexes, including allies. Adjacent damage is 65% of the main hit. Storms reduce drone effectiveness. The full commitment is twenty-two seconds.'],
+ gear:['Sabotage / repair workshop','On a commando, choose Sabotage and then an adjacent enemy city: after a four-second wind-up, its income and production stop for twenty-four seconds. The commando commits for twenty seconds. On the map, this icon is a repair workshop; move onto it and use Explore to restore health. A fully healthy unit cannot consume it.'],
+ sail:['Water','Naval units require a coastal city and stay on water. Land units cannot enter water; drones can fly across it. A sail on a disabled recruit button means the city has no adjacent ocean hex. A sail discovery is a wrecked caravan.'],
+ cloud:['Weather','Storms slow travel, especially aircraft and water crossings, and reduce drone damage by up to 50%. Clouds fade as you zoom closer so they do not block control. A cloud discovery is a weather station. Claim it to suppress storm penalties in the surrounding area for everyone, including enemies.'],
+ tree:['Forest','Forest slows most ground units. Cavalry are especially slow; commandos move through it efficiently and can camouflage here. Forest is suitable for founding a city if all spacing and cost rules are met.'],
+ mountain:['Mountains','Cavalry and tanks cannot enter mountains. Other ground units travel slowly here. Mountains block most direct fire, though artillery and drones can shoot over them. Settlers cannot found cities here.'],
+ sand:['Desert','Traversable land suitable for settlement when it is far enough from other cities. The founding action still requires coins and time.'],
+ snow:['Ice','Cold terrain is traversable for most ground units, but cannot host a new settlement.'],
+ telescope:['Observatory','An exploration discovery. Move onto its hex, then choose Explore to claim temporary long-range vision. Unexplored discoveries are not revealed by the map seed.'],
+ wheat:['Supply / land','A supply symbol. In the current rules there is no food currency or population management: coins pay for everything and discrete units have health.'],
+ fort:['Defence','Defensive positions and guard units help hold choke points. Defensive abilities reduce incoming health damage; they do not add a second shield resource.'],
+ temple:['Historical era','An emblem of the early era. The lobby’s temple-to-rocket diagram represents progression from early units to modern technology. All players start with the same capabilities.'],
+ scroll:['Knowledge','Research unlocks unit choices. There is no separate science currency; all research is paid for with coins.'],
+ logistics:['Supply movement','Movement and support symbolism. Route timing depends on the unit, terrain and storms; occupied hexes cannot be stacked.'],
+ bot:['AI control / difficulty','A robot beside a player means AI currently controls that seat. The host chooses two to eight seats with the minus and plus buttons. Empty seats use bots; match the seat count to your human players for a humans-only match. The person fraction shows humans / total seats, and the nearby robot number shows remaining bot seats. Smaller groups start at neighbouring positions on the same full-size globe. One, two or three robots on the difficulty button mean easy, medium or hard. AI takes over when a human hides or leaves the tab, and gives control back when they return.'],
+ person:['Human player','Names identify players. Edit your name in the lobby, up to 32 characters; it is saved in this browser and shared with the lobby. A green dot in the roster means the human is online and in control.'],
+ home:['Home camera','Focus your capital or another surviving city. This moves only the camera. It never orders a unit to move.'],
+ globe:['Globe / map seed','Drag with one finger or the mouse to rotate. Pinch with two fingers, scroll, or use the zoom buttons to zoom. A tap selects a city or unit; when an action is armed, a tap supplies its map target. The lobby number is the world seed.'],
+ plus:['Add a player / zoom in','In the lobby, add a player slot, up to eight. Only the host can change the count. On the camera toolbar, move the camera closer. On a phone, pinch outward with two fingers for the same effect.'],
+ minus:['Remove a player / zoom out','In the lobby, remove a spare bot slot, down to two players. Joined humans cannot be removed this way. On the camera toolbar, move the camera farther away. On a phone, pinch inward with two fingers.'],
+ refresh:['Refresh / new world','In the lobby, generate a new map. On connection status, this means reconnecting. After the match, start a fresh lobby.'],
+ link:['Invite','Creates a lobby if needed and copies its invitation link, or opens mobile sharing. Humans joining before the match replace bots. The host can choose two to eight seats. Set two seats and invite one friend for a match with no filler bots.'],
+ play:['Start match','The lobby host starts the match immediately. Empty seats are filled by bots at the selected difficulty.'],
+ sound:['Sound enabled','Toggle sound effects and ambience. Ocean, land and rain ambience follow the camera. Your browser needs a tap before it can play audio.'],
+ mute:['Sound muted','Tap to enable sound. This preference is saved in your browser.'],
+ help:['Help','Open the field manual to look up icons and rules. Use its icon picker to understand a button without activating it.'],
+ close:['Close a panel','Dismiss this panel or selection. This is not an order confirmation or rejection. It does not stop a unit’s existing orders.'],
+ check:['Complete','A status mark for completed research or a successfully copied invitation. Orders do not need a second confirmation.'],
+ arrow:['Leads to / choose a target','In a diagram this connects a cause to its result. Below an armed action, action → hex means your next map tap chooses the target.'],
+ lock:['Unavailable','This action cannot currently be used. Use Pick an icon to read its exact current reason, such as missing research, wrong terrain or an ongoing action. Striped disabled buttons never issue orders.'],
+ network:['Connection','Connected to the authoritative game server. The small number is round-trip latency in milliseconds. While disconnected, orders are disabled and AI takes over.'],
+ warning:['Order rejected / problem','The server could not perform an order, or an asset or connection failed. A numeric code is diagnostic, not a resource. Check the selected action in the manual for its requirements.'],
+ bolt:['Order recovering','Wait for the shared two-second order interval or the selected unit’s commitment to finish. Queue movement while an attack recovers if you want to depart as soon as possible.'],
+ laurel:['Laurel emblem','A player-selected identity emblem. It gives no gameplay bonus; everyone starts with the same units and rules.'],
+ ankh:['Ankh emblem','A player-selected identity emblem. Names and colours distinguish civilizations; this emblem gives no gameplay bonus.'],
+ owl:['Owl emblem','A player-selected identity emblem. It gives no gameplay bonus.'],
+ amphora:['Amphora emblem','A player-selected identity emblem. It gives no gameplay bonus.'],
+ dragon:['Dragon emblem','A player-selected identity emblem. It gives no gameplay bonus.'],
+ sun:['Sun emblem','A player-selected identity emblem. It gives no gameplay bonus.'],
+ torii:['Torii emblem','A player-selected identity emblem. It gives no gameplay bonus.'],
+ axe:['Axe emblem','A player-selected identity emblem. It gives no gameplay bonus.'],
+};
+const roles=[
+ 'Durable infantry that counters cavalry. Brace reduces incoming damage by 45% for eighteen seconds, but holds the unit in place.',
+ 'Fast ground cavalry that threaten archers and artillery. Shock charge damages and pushes a defender into an empty adjacent hex, opening a route or interrupting occupation. Guards counter cavalry.',
+ 'Ranged infantry that counter guards. Attack reaches one or two hexes. Volley hits the target and neighbours, including allies, after a four-second wind-up. Cavalry can close the distance and punish them.',
+ 'Heavy ground armour that counters early infantry. Cannot cross mountains. Hull down reduces incoming damage by 45% for eighteen seconds, tying the tank to its position. Artillery and drones counter it.',
+ 'Long-range siege unit. Fires two or three hexes away, leaving an adjacent blind spot. Must set up for ten seconds after moving. Both shells and the stronger barrage splash neighbours, including allies. Cavalry and commandos punish exposed guns.',
+ 'Mobile specialist. Captures cities in six seconds. Can camouflage in forest or sabotage adjacent enemy city production. Strong against artillery and vulnerable specialists; protect it from direct fire.',
+ 'Flying unit effective against tanks and artillery. Crosses all terrain. Can bomb a hex up to three steps away with friendly-fire splash. Weather reduces its damage; fleets and carriers counter it.',
+ 'Ocean warship that counters submarines and drones. Has a broadside attack with splash damage and a sonar ping to reveal hidden units. Submarines counter ships.',
+ 'Naval ambusher that counters fleets and carriers. Can submerge, ping sonar, and—with carrier research—launch a ballistic missile. Cannot attack land with its normal torpedoes.',
+ 'Large naval platform with attack range up to three hexes. Strong against drones. Can activate an air-defence screen or ping sonar. Submarines and artillery threaten it.',
+ 'Vulnerable civilian specialist with no normal attack. Starts an orbital launch from a production-three city for 180 coins. Must remain supported to win.',
+ 'Vulnerable launcher with no normal attack. Its nuclear action costs 150 coins and targets a visible hex within nine steps. Fourteen seconds of flight give defenders time to escape. Deals 140 damage in the target and neighbouring hexes, including allies. Commits for thirty-six seconds.',
+ 'Fast reconnaissance infantry. Its reconnaissance action extends vision, but exposes its position. Useful for discovering threats and rewards; much weaker in battle than dedicated fighters.',
+ 'Weak civilian unit with no attack. Move it to a valid site and choose Found City. Protect it during its forty-five-second construction. See Found a city for every requirement.',
+];
+for(let k=0;k<unitIcons.length;k++){
+ const key=unitIcons[k],existing=manualEntries[key];
+ manualEntries[key]=[unitNames[k],roles[k]+(existing?' '+existing[1]:'')];
+}
+export function unitDetails(key,state){
+ const k=unitIcons.indexOf(key),s=state?.rules?.specs[k];if(!s)return '';
+ return `Health ${s.hp}. Recruitment ${s.cost} coins; base training ${s.train} seconds. Base movement cooldown ${s.speed} seconds between hexes.`+(s.damage?` Base attack ${s.damage}; range ${s.min}–${s.range} hexes; recovery ${s.reload} seconds.`:' No normal attack.')+(counters[k].length?` Strong against ${counters[k].map(i=>unitNames[i]).join(', ')}.`:'')+' Abilities: '+abilities(k).map(a=>a.label).join('. ')+'.';
+}
+
+export function contextDetails(label){
+ const discoveries={
+  'Hostile camp':'Defeat all barbarian guards within two hexes, then explore with a unit standing here to collect 45 coins.',
+  'Buried treasury':'Explore with a unit standing here to collect 35 coins. This site can be claimed only once.',
+  'Stranded scouts':'Explore to rescue a scout at 55% health. You need unit capacity and a free neighbouring land hex.',
+  'Abandoned guard post':'Explore to rescue a guard at 55% health. You need unit capacity and a free neighbouring land hex.',
+  'Wrecked caravan':'Explore with a unit standing here to salvage 55 coins.',
+  'Observatory':'Explore to reveal five hexes around this site for ninety seconds.',
+  'Repair workshop':'Explore to heal the occupying unit by up to 45 health. A fully healthy unit cannot use it.',
+  'Supply depot':'Explore to heal up to 20 health and recharge the occupying unit’s special ability. Does not cancel an existing commitment.',
+  'Weather station':'Explore to suppress storm penalties around the station. The sheltered area also benefits enemies.',
+  'Mercenary camp':'Pay 50 coins to hire cavalry at 80% health. Requires capacity and a free neighbouring land hex.',
+ };
+ return Object.entries(discoveries).find(([name])=>label.startsWith(`Explore ${name}`))?.[1]||'';
+}

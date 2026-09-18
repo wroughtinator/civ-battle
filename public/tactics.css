@@ -34,7 +34,8 @@ input,textarea,[contenteditable=true],#guide{-webkit-user-select:text;user-selec
 #province .order-action:disabled,#research .order-action:disabled{color:#718684;background:repeating-linear-gradient(135deg,#101e23,#101e23 5px,#15262a 5px,#15262a 6px);border-color:#4f626155;box-shadow:none;opacity:.58;cursor:not-allowed}
 .action-lock{position:absolute;right:3px;top:2px;display:flex;align-items:center;gap:2px;font-size:9px;line-height:12px}.action-lock .icon{width:11px!important;height:11px!important}
 .order-action:not(:disabled) .price{color:inherit}.order-action.primary-action:not(:disabled) .price .icon{color:inherit}
-.city-upgrades .order-action{flex-direction:column;gap:4px;min-height:75px}.radius-change{display:flex;align-items:center;justify-content:center;gap:5px;font:13px ui-monospace,monospace}.radius-change .icon{width:17px!important;height:17px!important}
+.city-upgrades .order-action{flex-direction:column;gap:6px;height:auto;min-height:116px;min-width:0;padding:9px 6px}.radius-change{display:flex;align-items:center;justify-content:center;gap:5px;font:13px ui-monospace,monospace}.radius-change .icon{width:17px!important;height:17px!important}
+.upgrade-benefit,.upgrade-per{display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}.upgrade-benefit{color:#a9f3c6;font:12px ui-monospace,monospace;min-height:17px}.upgrade-benefit .icon{width:14px!important;height:14px!important}.upgrade-per{gap:2px}.city-upgrades .price{margin-top:auto;padding-top:5px;border-top:1px solid var(--line);justify-content:center;width:100%}
 #province .unit-actions{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:7px}
 #province .unit-actions button{min-height:64px;flex-direction:column;gap:4px;padding:10px 5px 5px}
 .movement-status,.aim-hint{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;color:#a1d5d5}.aim-hint>.icon{width:22px;height:22px}.aim-hint button{margin-left:auto}
@@ -73,3 +74,5 @@ body.manual-picking button:disabled{pointer-events:auto}body.manual-picking butt
 .pickup-reward .icon:first-child{width:23px;height:23px;color:#b8ffd2}
 @keyframes treasure-burst{from{transform:translate(-50%,-50%) scale(.35);filter:brightness(2.5)}to{transform:translate(-50%,-50%) scale(1);filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){.pickup-reward{animation:none}}
+/* Terrain benefits use the same symbols as upgrades and unit capacity. */
+.terrain-status,.terrain-status>span{display:inline-flex;align-items:center;gap:4px}.terrain-status{margin-left:8px;color:#a9f3c6;font:11px ui-monospace,monospace}.terrain-status .icon{width:15px;height:15px}.cover-badge{position:absolute;right:-7px;top:-7px;width:19px;height:21px;display:flex;align-items:center;justify-content:center;background:#163a2e;border:1px solid #a9f3c6;border-radius:5px;color:#baf2be;pointer-events:none}.unit-marker .cover-badge .icon{width:13px;height:13px}.city-upgrades .order-action{min-height:140px}
